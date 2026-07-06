@@ -696,44 +696,45 @@ export default function DashboardPage() {
       )}
 
       {/* ---------- PACKAGE MODAL ---------- */}
-      {showPackageModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
-            <div className="relative bg-white rounded-lg max-w-3xl w-full p-6 max-h-[90vh] overflow-y-auto">
-              <h2 className="text-xl font-bold mb-4">{editingPackage ? "Edit Package" : "Add Package"}</h2>
-              <form onSubmit={handlePackageSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input type="text" placeholder="Package Name *" className="border p-2 rounded" value={packageForm.name} onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })} required />
-                  <input type="number" placeholder="Price *" className="border p-2 rounded" value={packageForm.price} onChange={(e) => setPackageForm({ ...packageForm, price: e.target.value })} required />
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">Inclusions (ek feature per line)</label>
-                    <textarea className="border p-2 rounded w-full" rows={3} value={packageForm.inclusions} onChange={(e) => setPackageForm({ ...packageForm, inclusions: e.target.value })} />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">Brands (ek brand per line)</label>
-                    <textarea className="border p-2 rounded w-full" rows={2} value={packageForm.brands} onChange={(e) => setPackageForm({ ...packageForm, brands: e.target.value })} />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">FAQs (Valid JSON, e.g. [{"question":"Q1","answer":"A1"}])</label>
-                    <textarea className="border p-2 rounded w-full" rows={3} value={packageForm.faqs} onChange={(e) => setPackageForm({ ...packageForm, faqs: e.target.value })} placeholder='[{"question":"What is included?","answer":"Everything!"}]' />
-                  </div>
-                  <input type="text" placeholder="Image URL" className="border p-2 rounded col-span-2" value={packageForm.image_url} onChange={(e) => setPackageForm({ ...packageForm, image_url: e.target.value })} />
-                  <div className="col-span-2 flex items-center gap-2">
-                    <input type="checkbox" checked={packageForm.is_active} onChange={(e) => setPackageForm({ ...packageForm, is_active: e.target.checked })} />
-                    <label className="text-sm font-medium text-gray-700">Active</label>
-                  </div>
-                </div>
-                <div className="flex justify-end gap-3 mt-4">
-                  <button type="button" onClick={() => { setShowPackageModal(false); resetPackageForm(); }} className="px-4 py-2 border rounded">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded">{editingPackage ? "Update Package" : "Create Package"}</button>
-                </div>
-              </form>
+{showPackageModal && (
+  <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="flex min-h-full items-center justify-center p-4">
+      <div className="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+      <div className="relative bg-white rounded-lg max-w-3xl w-full p-6 max-h-[90vh] overflow-y-auto">
+        <h2 className="text-xl font-bold mb-4">{editingPackage ? "Edit Package" : "Add Package"}</h2>
+        <form onSubmit={handlePackageSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="text" placeholder="Package Name *" className="border p-2 rounded" value={packageForm.name} onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })} required />
+            <input type="number" placeholder="Price *" className="border p-2 rounded" value={packageForm.price} onChange={(e) => setPackageForm({ ...packageForm, price: e.target.value })} required />
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700">Inclusions (ek feature per line)</label>
+              <textarea className="border p-2 rounded w-full" rows={3} value={packageForm.inclusions} onChange={(e) => setPackageForm({ ...packageForm, inclusions: e.target.value })} />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700">Brands (ek brand per line)</label>
+              <textarea className="border p-2 rounded w-full" rows={2} value={packageForm.brands} onChange={(e) => setPackageForm({ ...packageForm, brands: e.target.value })} />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700">
+                FAQs (Valid JSON format, e.g. {`[{"question":"Q1","answer":"A1"}]`})
+              </label>
+              <textarea className="border p-2 rounded w-full" rows={3} value={packageForm.faqs} onChange={(e) => setPackageForm({ ...packageForm, faqs: e.target.value })} placeholder='[{"question":"What is included?","answer":"Everything!"}]' />
+            </div>
+            <input type="text" placeholder="Image URL" className="border p-2 rounded col-span-2" value={packageForm.image_url} onChange={(e) => setPackageForm({ ...packageForm, image_url: e.target.value })} />
+            <div className="col-span-2 flex items-center gap-2">
+              <input type="checkbox" checked={packageForm.is_active} onChange={(e) => setPackageForm({ ...packageForm, is_active: e.target.checked })} />
+              <label className="text-sm font-medium text-gray-700">Active</label>
             </div>
           </div>
-        </div>
-      )}
-
+          <div className="flex justify-end gap-3 mt-4">
+            <button type="button" onClick={() => { setShowPackageModal(false); resetPackageForm(); }} className="px-4 py-2 border rounded">Cancel</button>
+            <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded">{editingPackage ? "Update Package" : "Create Package"}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+)}
       {/* ---------- TESTIMONIAL MODAL ---------- */}
       {showTestimonialModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
