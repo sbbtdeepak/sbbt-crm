@@ -9,7 +9,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function Home() {
+export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
@@ -23,16 +23,16 @@ export default function Home() {
   }, [router]);
 
   const handleGoogleLogin = async () => {
-  // ✅ यह Localhost या Live Domain, दोनों पहचान लेगा
-  const redirectUrl = window.location.origin + '/auth/callback';
+    // ✅ यह लाइन Localhost और Live दोनों जगह काम करेगी
+    const redirectUrl = window.location.origin + '/auth/callback';
 
-  await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: redirectUrl,
-    },
-  });
-};
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUrl,
+      },
+    });
+  };
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
@@ -42,9 +42,7 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-96 text-center">
         <h1 className="text-2xl font-bold mb-4">SBBT CRM</h1>
-        <p className="text-gray-600 mb-6">
-          Admin login ke liye Google account se sign in karein.
-        </p>
+        <p className="text-gray-600 mb-6">Admin login ke liye Google account se sign in karein.</p>
         <button
           onClick={handleGoogleLogin}
           className="w-full bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition"
