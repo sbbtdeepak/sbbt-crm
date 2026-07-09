@@ -23,13 +23,16 @@ export default function Home() {
   }, [router]);
 
   const handleGoogleLogin = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: 'http://localhost:3003/auth/callback',
-      },
-    });
-  };
+  // ✅ यह Localhost या Live Domain, दोनों पहचान लेगा
+  const redirectUrl = window.location.origin + '/auth/callback';
+
+  await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: redirectUrl,
+    },
+  });
+};
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
