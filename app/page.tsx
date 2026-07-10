@@ -113,13 +113,13 @@ export default function HomePage() {
               <Link href="#testimonials" className="text-gray-600 hover:text-indigo-600 transition font-medium">Testimonials</Link>
               <Link href="/contact" className="text-gray-600 hover:text-indigo-600 transition font-medium">Contact</Link>
               {isLoggedIn ? (
-                <Link href="/dashboard" className="bg-indigo-600 text-white px-5 py-2 rounded-full hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">
-                  Dashboard
-                </Link>
-              ) : (
-                <Link href="/login" className="bg-gray-900 text-white px-5 py-2 rounded-full hover:bg-gray-800 transition">
-                  Admin Login
-                </Link>
+                 <a href="/dashboard" className="bg-indigo-600 text-white px-5 py-2 rounded-full hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">
+    Dashboard
+  </a>
+) : (
+  <a href="/login" className="bg-gray-900 text-white px-5 py-2 rounded-full hover:bg-gray-800 transition">
+    Admin Login
+  </a>
               )}
             </div>
           </div>

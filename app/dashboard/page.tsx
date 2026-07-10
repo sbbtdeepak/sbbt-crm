@@ -2,8 +2,10 @@
 
 export default function DashboardPage() {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'green', color: 'white' }}>
-      <h1 style={{ fontSize: '48px' }}>✅ DASHBOARD ROUTE WORKS!</h1>
-    </div>
+    <html>
+      <body style={{ margin: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'green' }}>
+        <h1 style={{ color: 'white', fontSize: '48px' }}>✅ DASHBOARD ROUTE WORKS!</h1>
+      </body>
+    </html>
   );
 }
