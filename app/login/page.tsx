@@ -4,16 +4,24 @@ import { createClient } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+let supabase: any = null;
 
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    // ✅ Supabase Client को Client Side पर Initialize करें (Build Time Error से बचने के लिए)
+    if (!supabase) {
+      supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+    }
+    setIsReady(true);
+
+    // Check if already logged in
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
         router.push('/dashboard');
@@ -23,7 +31,12 @@ export default function LoginPage() {
   }, [router]);
 
   const handleGoogleLogin = async () => {
-    // ✅ यह लाइन Localhost और Live दोनों जगह काम करेगी
+    if (!isReady || !supabase) {
+      alert('Please wait, loading...');
+      return;
+    }
+
+    // ✅ Dynamic Redirect: Localhost या Live Domain, दोनों पर काम करेगा
     const redirectUrl = window.location.origin + '/auth/callback';
 
     await supabase.auth.signInWithOAuth({
