@@ -35,16 +35,23 @@ export default function LoginPage() {
     }
 
     // ✅ सीधा Live URL (हार्ड-कोडेड)
-    const redirectUrl = 'https://sbbt-crm-new-seven.vercel.app/auth/callback';
-    console.log('🔍 Redirecting to:', redirectUrl);
+    const handleGoogleLogin = async () => {
+  if (!isReady || !supabase) {
+    alert('Please wait...');
+    return;
+  }
 
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-      },
-    });
-  };
+  // ✅ सीधा Live URL (हार्ड-कोडेड)
+  const redirectUrl = 'https://sbbt-crm-new-seven.vercel.app/auth/callback';
+  console.log('🔍 Redirecting to:', redirectUrl);
+
+  await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: redirectUrl,
+    },
+  });
+};
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
