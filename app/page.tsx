@@ -2,7 +2,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from from 'react';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
