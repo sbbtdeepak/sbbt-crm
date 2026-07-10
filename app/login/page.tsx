@@ -36,7 +36,7 @@ export default function LoginPage() {
   }
 
   // ✅ सीधा Live URL डालें (हार्ड-कोडेड)
-  const redirectUrl = 'https://sbbt-crm.vercel.app/auth/callback';
+  const redirectUrl = 'https://sbbt-crm-new-seven.vercel.app/auth/callback';
 
   await supabase.auth.signInWithOAuth({
     provider: 'google',
