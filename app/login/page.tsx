@@ -20,7 +20,6 @@ export default function LoginPage() {
     }
     setIsReady(true);
 
-    // ✅ TypeScript Error Fix: `data` का Type `any` Set करें
     supabase.auth.getUser().then(({ data }: { data: any }) => {
       if (data?.user) {
         router.push('/dashboard');
@@ -30,21 +29,23 @@ export default function LoginPage() {
   }, [router]);
 
   const handleGoogleLogin = async () => {
-  if (!isReady || !supabase) {
-    alert('Please wait...');
-    return;
-  }
+    if (!isReady || !supabase) {
+      alert('Please wait...');
+      return;
+    }
 
-  // ✅ सीधा Live URL डालें (हार्ड-कोडेड)
-  const redirectUrl = 'https://sbbt-crm-new-seven.vercel.app/auth/callback';
+    // ✅ सीधा Live URL (हार्ड-कोडेड)
+    const redirectUrl = 'https://sbbt-crm-new-seven.vercel.app/auth/callback';
+    console.log('🔍 Redirecting to:', redirectUrl);
 
-  await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: redirectUrl,
-    },
-  });
-};
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUrl,
+      },
+    });
+  };
+
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
