@@ -29,21 +29,22 @@ export default function LoginPage() {
   }, [router]);
 
   const handleGoogleLogin = async () => {
-    if (!isReady || !supabase) {
-      alert('Please wait...');
-      return;
-    }
+  if (!isReady || !supabase) {
+    alert('Please wait...');
+    return;
+  }
 
-    const redirectUrl = 'https://sbbt-crm-new-seven.vercel.app/auth/callback';
-    console.log('🔍 Redirecting to:', redirectUrl);
+  // ✅ सीधा Live URL (हार्ड-कोडेड)
+  const redirectUrl = 'https://sbbt-crm-new-seven.vercel.app/auth/callback';
+  console.log('🔍 Redirecting to:', redirectUrl);
 
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-      },
-    });
-  };
+  await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: redirectUrl,
+    },
+  });
+};
 
   if (loading) {
     return (
