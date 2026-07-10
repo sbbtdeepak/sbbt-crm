@@ -30,23 +30,21 @@ export default function LoginPage() {
   }, [router]);
 
   const handleGoogleLogin = async () => {
-    if (!isReady || !supabase) {
-      alert('Please wait...');
-      return;
-    }
+  if (!isReady || !supabase) {
+    alert('Please wait...');
+    return;
+  }
 
-    // ✅ Dynamic Redirect
-    const redirectUrl = window.location.origin + '/auth/callback';
-    console.log('🔍 Redirecting to:', redirectUrl);
+  // ✅ सीधा Live URL डालें (हार्ड-कोडेड)
+  const redirectUrl = 'https://sbbt-crm.vercel.app/auth/callback';
 
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-      },
-    });
-  };
-
+  await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: redirectUrl,
+    },
+  });
+};
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
