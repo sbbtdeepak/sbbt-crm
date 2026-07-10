@@ -31,21 +31,16 @@ export default function LoginPage() {
   }, [router]);
 
   const handleGoogleLogin = async () => {
-    if (!isReady || !supabase) {
-      alert('Please wait, loading...');
-      return;
-    }
+  // ✅ यह Localhost या Live Domain, दोनों पहचान लेगा
+  const redirectUrl = window.location.origin + '/auth/callback';
 
-    // ✅ Dynamic Redirect: Localhost या Live Domain, दोनों पर काम करेगा
-    const redirectUrl = window.location.origin + '/auth/callback';
-
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-      },
-    });
-  };
+  await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: redirectUrl,
+    },
+  });
+};
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
