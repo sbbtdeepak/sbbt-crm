@@ -34,7 +34,6 @@ export default function LoginPage() {
       return;
     }
 
-    // ✅ सीधा Live URL (हार्ड-कोडेड)
     const redirectUrl = 'https://sbbt-crm-new-seven.vercel.app/auth/callback';
     console.log('🔍 Redirecting to:', redirectUrl);
 
@@ -47,14 +46,20 @@ export default function LoginPage() {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-96 text-center">
         <h1 className="text-2xl font-bold mb-4">SBBT CRM</h1>
-        <p className="text-gray-600 mb-6">Admin login ke liye Google account se sign in karein.</p>
+        <p className="text-gray-600 mb-6">
+          Admin login ke liye Google account se sign in karein.
+        </p>
         <button
           onClick={handleGoogleLogin}
           className="w-full bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition"
