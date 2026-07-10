@@ -100,20 +100,28 @@ export default function DashboardPage() {
     is_featured: false,
   });
 
-  // ---------- Auth & Data Fetch ----------
+  // ---------- Auth & Data Fetch (✅ FIXED) ----------
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push("/");
-        return;
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        console.log("🔍 User:", user, "Error:", error);
+
+        if (error || !user) {
+          console.log("❌ No user, redirecting to /login");
+          router.push("/login");
+          return;
+        }
+
+        setUser(user);
+        await Promise.all([fetchProjects(), fetchPackages(), fetchTestimonials()]);
+        setLoading(false);
+      } catch (err) {
+        console.error("❌ Dashboard Error:", err);
+        router.push("/login");
       }
-      setUser(user);
-      fetchProjects();
-      fetchPackages();
-      fetchTestimonials();
-      setLoading(false);
     };
+
     checkUser();
   }, []);
 
