@@ -12,7 +12,6 @@ export default function LoginPage() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // ✅ Supabase Client को Client Side पर Initialize करें (Build Time Error से बचने के लिए)
     if (!supabase) {
       supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,9 +20,9 @@ export default function LoginPage() {
     }
     setIsReady(true);
 
-    // Check if already logged in
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
+    // ✅ TypeScript Error Fix: `data` का Type `any` Set करें
+    supabase.auth.getUser().then(({ data }: { data: any }) => {
+      if (data?.user) {
         router.push('/dashboard');
       }
       setLoading(false);
@@ -31,16 +30,22 @@ export default function LoginPage() {
   }, [router]);
 
   const handleGoogleLogin = async () => {
-  // ✅ यह Localhost या Live Domain, दोनों पहचान लेगा
-  const redirectUrl = window.location.origin + '/auth/callback';
+    if (!isReady || !supabase) {
+      alert('Please wait...');
+      return;
+    }
 
-  await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: redirectUrl,
-    },
-  });
-};
+    // ✅ Dynamic Redirect
+    const redirectUrl = window.location.origin + '/auth/callback';
+    console.log('🔍 Redirecting to:', redirectUrl);
+
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUrl,
+      },
+    });
+  };
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
