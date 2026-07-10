@@ -2,12 +2,10 @@
 
 import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// ✅ Client Side पर Supabase बनाएँ (Build Time पर नहीं)
+let supabase: any = null;
 
 export default function ContactPage() {
   const [form, setForm] = useState({
@@ -20,6 +18,18 @@ export default function ContactPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [isReady, setIsReady] = useState(false);
+
+  // ✅ Supabase Client को Client Side पर Initialize करें
+  useEffect(() => {
+    if (!supabase) {
+      supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+    }
+    setIsReady(true);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -27,6 +37,11 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isReady || !supabase) {
+      setError('Please wait, loading...');
+      return;
+    }
+
     setSubmitting(true);
     setError('');
 
