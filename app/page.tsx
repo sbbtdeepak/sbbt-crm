@@ -13,16 +13,20 @@ export default function HomePage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ हर बार Component Mount (माउंट) होने पर User Check (जाँच) करें
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    console.log("🔍 Homepage User:", user);
-    setUser(user);
-    setLoading(false);
-  };
-
   useEffect(() => {
-    checkUser();
+    // ✅ अगर URL में ?reload=true है—तो Clean Reload करें
+    if (window.location.search.includes('reload=true')) {
+      window.location.href = window.location.pathname;
+      return;
+    }
+
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log("🔍 Homepage User:", user);
+      setUser(user);
+      setLoading(false);
+    };
+    getUser();
 
     // ✅ Auth State Change (स्थिति परिवर्तन) पर User Update (अद्यतन) करें
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -51,7 +55,7 @@ export default function HomePage() {
             <button
               onClick={async () => {
                 await supabase.auth.signOut();
-                window.location.reload();
+                window.location.href = '/';
               }}
               className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
             >

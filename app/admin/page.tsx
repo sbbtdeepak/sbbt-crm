@@ -26,13 +26,9 @@ export default function AdminLogin() {
       password,
     });
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    } else {
-      window.location.href = '/';
-    }
-  };
+    if (!error) {
+  window.location.href = '/?reload=true'; // ✅ Reload Parameter (पैरामीटर) के साथ Homepage पर भेजें
+}
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-100 to-blue-100">
