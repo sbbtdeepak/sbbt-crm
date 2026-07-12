@@ -102,24 +102,28 @@ export default function DashboardPage() {
 
   // ---------- Auth & Data Fetch ----------
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error || !user) {
-          router.push("/admin");
-          return;
-        }
-        setUser(user);
-        await Promise.all([fetchProjects(), fetchPackages(), fetchTestimonials()]);
-        setLoading(false);
-      } catch (err) {
-        console.error("Dashboard Error:", err);
-        router.push("/admin");
-      }
-    };
-    checkUser();
-  }, []);
+  const checkUser = async () => {
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      console.log("🔍 Dashboard User Check:", { user, error });
 
+      if (error || !user) {
+        console.log("❌ No user, redirecting to /admin");
+        window.location.href = '/admin'; // ✅ router.push की जगह window.location.href
+        return;
+      }
+
+      setUser(user);
+      await Promise.all([fetchProjects(), fetchPackages(), fetchTestimonials()]);
+      setLoading(false);
+    } catch (err) {
+      console.error("❌ Dashboard Error:", err);
+      window.location.href = '/admin';
+    }
+  };
+
+  checkUser();
+}, []);
   // ---------- Fetch Functions ----------
   async function fetchProjects() {
     const { data, error } = await supabase
