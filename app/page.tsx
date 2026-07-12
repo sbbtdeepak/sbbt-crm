@@ -13,14 +13,28 @@ export default function HomePage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // ✅ हर बार Component Mount (माउंट) होने पर User Check (जाँच) करें
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    console.log("🔍 Homepage User:", user);
+    setUser(user);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      console.log("🔍 Homepage User:", user); // ✅ Debug Log
-      setUser(user);
-      setLoading(false);
-    };
-    getUser();
+    checkUser();
+
+    // ✅ Auth State Change (स्थिति परिवर्तन) पर User Update (अद्यतन) करें
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("🔄 Auth State Changed:", event, session?.user);
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        setUser(session?.user || null);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   if (loading) {
