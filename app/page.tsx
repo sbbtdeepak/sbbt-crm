@@ -18,9 +18,6 @@ export default function HomePage() {
                 <a href="/quote" className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition shadow-lg shadow-green-200">
                   Get Quote Now
                 </a>
-                <a href="/admin" className="bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition">
-                  Admin Login
-                </a>
               </div>
             </div>
             <div className="hidden md:block">
