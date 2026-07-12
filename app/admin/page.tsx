@@ -28,7 +28,7 @@ export default function AdminLogin() {
       setError(error.message);
       setLoading(false);
     } else {
-      window.location.href = '/';
+      window.location.href = '/dashboard';
     }
   };
 
