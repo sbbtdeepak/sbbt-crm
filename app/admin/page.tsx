@@ -26,11 +26,9 @@ export default function AdminLogin() {
       password,
     });
 
-    if (!error) {
-  console.log("✅ Admin Login Success, redirecting to /dashboard");
-  router.push('/dashboard');
+   if (!error) {
+  window.location.href = '/dashboard';
 }
-
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-100 to-blue-100">
       <div className="bg-white p-8 rounded-2xl shadow-2xl w-96">
