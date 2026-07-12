@@ -26,28 +26,27 @@ export default function AdminLogin() {
       password,
     });
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    } else {
-      router.push('/dashboard');
-    }
-  };
+    if (!error) {
+  console.log("✅ Admin Login Success, redirecting to /dashboard");
+  router.push('/dashboard');
+}
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          Admin Login
-        </h1>
-        <form onSubmit={handleLogin}>
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-100 to-blue-100">
+      <div className="bg-white p-8 rounded-2xl shadow-2xl w-96">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-800">Admin Login</h1>
+          <p className="text-gray-500 mt-1">Enter your credentials</p>
+        </div>
+        <form onSubmit={handleLogin} className="mt-6">
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full border border-gray-300 p-2 rounded focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              placeholder="admin@sbbt.com"
               required
             />
           </div>
@@ -57,15 +56,20 @@ export default function AdminLogin() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full border border-gray-300 p-2 rounded focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              placeholder="••••••••"
               required
             />
           </div>
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm mb-4">
+              {error}
+            </div>
+          )}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 disabled:opacity-50"
+            className="w-full bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700 transition disabled:opacity-50 font-semibold"
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
