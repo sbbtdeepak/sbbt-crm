@@ -1,93 +1,8 @@
 "use client";
 
-import { createClient } from '@supabase/supabase-js';
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 export default function HomePage() {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // ✅ URL से # (hash) हटाएँ
-    if (window.location.hash) {
-      window.history.replaceState(null, '', window.location.pathname);
-    }
-
-    // ✅ अगर URL में ?reload=true है—तो Clean Reload करें
-    if (window.location.search.includes('reload=true')) {
-      window.location.href = window.location.pathname;
-      return;
-    }
-
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      console.log("🔍 Homepage User:", user);
-      setUser(user);
-      setLoading(false);
-    };
-    getUser();
-
-    // ✅ Auth State Change पर User Update करें
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("🔄 Auth State Changed:", event, session?.user);
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        setUser(session?.user || null);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  }
-
-  // ✅ अगर User Login है → पूरा Dashboard (Editable) दिखाओ
-  if (user) {
-    return (
-      <div className="min-h-screen bg-gray-100 p-8">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                window.location.href = '/';
-              }}
-              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-            >
-              Logout
-            </button>
-          </div>
-          <p className="text-gray-600 mt-2">Logged in as {user.email}</p>
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-indigo-50 p-4 rounded-lg">
-              <h2 className="font-semibold">Projects</h2>
-              <p className="text-sm text-gray-600">Manage your projects</p>
-            </div>
-            <div className="bg-indigo-50 p-4 rounded-lg">
-              <h2 className="font-semibold">Packages</h2>
-              <p className="text-sm text-gray-600">Manage packages</p>
-            </div>
-            <div className="bg-indigo-50 p-4 rounded-lg">
-              <h2 className="font-semibold">Testimonials</h2>
-              <p className="text-sm text-gray-600">Manage testimonials</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ❌ अगर User Login नहीं है → Homepage दिखाओ
   return (
     <div className="min-h-screen bg-white">
       <section className="pt-24 pb-16 md:pt-32 md:pb-24 bg-gradient-to-r from-indigo-50 to-blue-50">
@@ -121,11 +36,9 @@ export default function HomePage() {
       </section>
       <footer className="bg-gray-900 text-white py-8 text-center text-sm">
         <p>&copy; 2026 SBBT Construction. All rights reserved.</p>
-        <div className="mt-2">
-          <Link href="/admin" className="text-gray-400 hover:text-white transition text-xs">
-            Admin Login
-          </Link>
-        </div>
+        <Link href="/admin" className="text-gray-400 hover:text-white transition text-xs">
+          Admin Login
+        </Link>
       </footer>
     </div>
   );

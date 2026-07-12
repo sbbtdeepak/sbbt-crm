@@ -9,7 +9,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// ---------- Types ----------
 type Project = {
   id: string;
   name: string;
@@ -103,27 +102,23 @@ export default function DashboardPage() {
 
   // ---------- Auth & Data Fetch ----------
   useEffect(() => {
-  const checkUser = async () => {
-    try {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      console.log("🔍 Dashboard User Check:", { user, error });
-
-      if (error || !user) {
-  window.location.href = '/admin'; // ✅ router.push की जगह
-  return;
-}
-
-      setUser(user);
-      await Promise.all([fetchProjects(), fetchPackages(), fetchTestimonials()]);
-      setLoading(false);
-    } catch (err) {
-      console.error("❌ Dashboard Error:", err);
-      window.location.href = '/admin';
-    }
-  };
-
-  checkUser();
-}, []);
+    const checkUser = async () => {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error || !user) {
+          router.push("/admin");
+          return;
+        }
+        setUser(user);
+        await Promise.all([fetchProjects(), fetchPackages(), fetchTestimonials()]);
+        setLoading(false);
+      } catch (err) {
+        console.error("Dashboard Error:", err);
+        router.push("/admin");
+      }
+    };
+    checkUser();
+  }, []);
 
   // ---------- Fetch Functions ----------
   async function fetchProjects() {
@@ -206,7 +201,6 @@ export default function DashboardPage() {
         projectId = data.id;
       }
 
-      // Handle Images Upload
       if (selectedFiles.length > 0 && projectId) {
         const imageUrls: string[] = [];
         for (const file of selectedFiles) {
@@ -402,7 +396,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -440,7 +433,7 @@ export default function DashboardPage() {
           </nav>
         </div>
 
-        {/* ========== PROJECTS TAB ========== */}
+        {/* Projects Tab */}
         {activeTab === "projects" && (
           <div>
             <div className="flex justify-between items-center mb-4">
@@ -454,7 +447,7 @@ export default function DashboardPage() {
             </div>
             <div className="bg-white rounded-xl shadow overflow-hidden">
               {projects.length === 0 ? (
-                <div className="p-8 text-center text-gray-500">No projects yet. Add your first project!</div>
+                <div className="p-8 text-center text-gray-500">No projects yet.</div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
@@ -464,7 +457,6 @@ export default function DashboardPage() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rating</th>
                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                       </tr>
                     </thead>
@@ -489,7 +481,6 @@ export default function DashboardPage() {
                               {project.status}
                             </span>
                           </td>
-                          <td className="px-6 py-4">{project.rating || "-"}</td>
                           <td className="px-6 py-4 text-right space-x-2">
                             <button
                               onClick={() => {
@@ -524,7 +515,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* ========== PACKAGES TAB ========== */}
+        {/* Packages Tab */}
         {activeTab === "packages" && (
           <div>
             <div className="flex justify-between items-center mb-4">
@@ -598,7 +589,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* ========== TESTIMONIALS TAB ========== */}
+        {/* Testimonials Tab */}
         {activeTab === "testimonials" && (
           <div>
             <div className="flex justify-between items-center mb-4">
@@ -621,7 +612,6 @@ export default function DashboardPage() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Review</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rating</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Featured</th>
                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                       </tr>
                     </thead>
@@ -631,13 +621,6 @@ export default function DashboardPage() {
                           <td className="px-6 py-4 font-medium text-gray-900">{item.client_name}</td>
                           <td className="px-6 py-4 max-w-xs truncate">{item.content}</td>
                           <td className="px-6 py-4">{item.rating} ⭐</td>
-                          <td className="px-6 py-4">
-                            {item.is_featured ? (
-                              <span className="text-green-600 text-sm font-medium">Yes</span>
-                            ) : (
-                              <span className="text-gray-400 text-sm">No</span>
-                            )}
-                          </td>
                           <td className="px-6 py-4 text-right space-x-2">
                             <button
                               onClick={() => {

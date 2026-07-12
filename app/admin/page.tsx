@@ -26,14 +26,11 @@ export default function AdminLogin() {
       password,
     });
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    } else {
-      // ✅ Login के बाद Homepage पर Reload Parameter के साथ भेजें
-      window.location.href = '/?reload=true';
-    }
-  };
+    if (!error) {
+  window.location.href = '/dashboard'; // ✅ Dashboard पर Redirect (पुनर्निर्देशन)
+}if (!error) {
+  window.location.href = '/dashboard'; // ✅ Dashboard पर Redirect (पुनर्निर्देशन)
+}
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-100 to-blue-100">
