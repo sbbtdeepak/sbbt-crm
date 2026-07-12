@@ -33,8 +33,10 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8 text-center text-sm">
-        <p>&copy; 2026 SBBT Construction. All rights reserved.</p>
-      </footer>
-    </div>
-  );
-}
+  <p>&copy; 2026 SBBT Construction. All rights reserved.</p>
+  <div className="mt-2">
+    <a href="/admin" className="text-gray-400 hover:text-white transition text-xs">
+      Admin Login
+    </a>
+  </div>
+</footer>
