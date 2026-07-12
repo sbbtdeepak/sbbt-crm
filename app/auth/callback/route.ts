@@ -22,5 +22,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/quote', origin));
   }
 
+  // ❌ अगर Code नहीं है → Homepage
   return NextResponse.redirect(new URL('/', origin));
 }
