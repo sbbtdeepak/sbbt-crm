@@ -283,7 +283,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500 text-sm">
-            &copy; 2026 SBBT Construction. All rights reserved.
+            &copy; 2025 SBBT Construction. All rights reserved.
           </div>
         </div>
       </footer>
