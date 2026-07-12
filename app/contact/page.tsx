@@ -31,12 +31,10 @@ export default function ContactPage() {
     setIsReady(true);
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  // ... Submit Logic (प्रस्तुत तर्क)
-  setSubmitted(true);
-  setForm({ name: '', email: '', phone: '', message: '', location: '' }); // ✅ Form Reset (रीसेट)
-};
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isReady || !supabase) {
