@@ -28,6 +28,7 @@ export default function AdminLogin() {
       setError(error.message);
       setLoading(false);
     } else {
+      // ✅ Login के बाद Dashboard पर भेजें
       window.location.href = '/dashboard';
     }
   };
