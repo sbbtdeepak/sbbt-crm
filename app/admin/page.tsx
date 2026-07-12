@@ -2,7 +2,6 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,7 +13,6 @@ export default function AdminLogin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,11 +24,13 @@ export default function AdminLogin() {
       password,
     });
 
-    if (!error) {
-  window.location.href = '/dashboard'; // ✅ Dashboard पर Redirect (पुनर्निर्देशन)
-}if (!error) {
-  window.location.href = '/dashboard'; // ✅ Dashboard पर Redirect (पुनर्निर्देशन)
-}
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    } else {
+      window.location.href = '/dashboard';
+    }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-100 to-blue-100">
