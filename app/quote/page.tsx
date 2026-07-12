@@ -22,8 +22,9 @@ export default function QuotePage() {
     });
   }, []);
 
-  const handleGoogleLogin = async () => {
-  const redirectUrl = window.location.origin + '/auth/callback?returnTo=/quote';
+ const handleGoogleLogin = async () => {
+  // ✅ बिना किसी returnTo के—सीधा /quote पर Redirect (पुनर्निर्देशन) करें
+  const redirectUrl = 'https://sbbt-crm-new-seven.vercel.app/quote';
   await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {

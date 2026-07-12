@@ -4,8 +4,6 @@ import { NextResponse, type NextRequest } from 'next/server';
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const returnTo = searchParams.get('returnTo') ?? '/';
-  const redirectUrl = new URL(returnTo, origin).toString();
 
   if (code) {
     const supabase = createClient(
@@ -20,8 +18,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=login_failed', origin));
     }
 
-    // ✅ Login के बाद returnTo वाले URL (पते) पर Redirect (पुनर्निर्देशन) करें
-    return NextResponse.redirect(redirectUrl);
+    // ✅ Login (लॉगिन) के बाद हमेशा /quote पर भेजें
+    return NextResponse.redirect(new URL('/quote', origin));
   }
 
   return NextResponse.redirect(new URL('/', origin));
