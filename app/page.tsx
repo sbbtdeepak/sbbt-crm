@@ -2,6 +2,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -58,16 +59,45 @@ export default function HomePage() {
     );
   }
 
-  // ❌ अगर User Login नहीं है → Homepage दिखाओ
+  // ❌ अगर User Login नहीं है → Homepage (Hero Section + Buttons) दिखाओ
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-5xl font-bold text-gray-900">Build Your <span className="text-indigo-600">Dream Space</span></h1>
-        <p className="text-gray-600 mt-4">Welcome to SBBT Construction</p>
-        <a href="/login" className="inline-block mt-6 bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700">
-          Admin Login
-        </a>
-      </div>
+      {/* ---------- HERO SECTION ---------- */}
+      <section className="pt-24 pb-16 md:pt-32 md:pb-24 bg-gradient-to-r from-indigo-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight">
+                Build Your <span className="text-indigo-600">Dream Space</span> with SBBT
+              </h1>
+              <p className="mt-6 text-lg text-gray-600 leading-relaxed">
+                Premium construction services tailored to your needs. From foundation to finishing,
+                we bring architectural excellence to life.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Link href="/quote" className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition shadow-lg shadow-green-200">
+                  Get Quote Now
+                </Link>
+                <Link href="/admin" className="bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition">
+                  Admin Login
+                </Link>
+              </div>
+            </div>
+            <div className="hidden md:block">
+              <img
+                src="https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=600"
+                alt="Construction"
+                className="rounded-2xl shadow-2xl object-cover w-full h-96"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- FOOTER ---------- */}
+      <footer className="bg-gray-900 text-white py-8 text-center text-sm">
+        &copy; 2026 SBBT Construction. All rights reserved.
+      </footer>
     </div>
   );
 }
