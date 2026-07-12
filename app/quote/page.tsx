@@ -16,15 +16,14 @@ export default function QuotePage() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ✅ Session Check (सत्र जाँच)
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
-    setLoading(false);
-  };
-
+  // ✅ Session Check - हर बार Component Mount पर चलेगा
   useEffect(() => {
-    checkUser();
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      setLoading(false);
+    };
+    getUser();
   }, []);
 
   const handleGoogleLogin = async () => {
@@ -41,8 +40,9 @@ export default function QuotePage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // ✅ Form Submit (प्रस्तुत) से पहले User को दोबारा Check (जाँच) करें
+    // ✅ हर Submit पर ताज़ा User Check
     const { data: { user: currentUser } } = await supabase.auth.getUser();
+    console.log('🔍 Current User:', currentUser); // Debug Log
 
     if (!currentUser) {
       alert('Please login with Google first');
@@ -50,21 +50,18 @@ export default function QuotePage() {
       return;
     }
 
-    // ✅ अगर User है → Quotation Save (सहेजें)
-    console.log('✅ Quotation submitted by:', currentUser.email);
-    console.log('📞 Phone:', phone);
-    console.log('📍 Location:', location);
-
-    // यहाँ Supabase Table में Save (सहेजें) करें (बाद में)
+    // ✅ यहाँ Quotation Save करें
+    console.log('✅ Quotation by:', currentUser.email);
     setSubmitted(true);
     setIsSubmitting(false);
   };
 
+  // ✅ अगर Loading है → Loader दिखाओ
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
-  // ✅ अगर User Login (लॉगिन) नहीं है → Google Login Button
+  // ✅ अगर User नहीं है → Google Login Button
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -82,7 +79,7 @@ export default function QuotePage() {
     );
   }
 
-  // ✅ अगर User Login (लॉगिन) है → Quotation Form (कोटेशन फॉर्म)
+  // ✅ अगर User है → Quotation Form
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold text-gray-900">Get a Quote</h1>
