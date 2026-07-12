@@ -1,4 +1,4 @@
-\"use client";
+"use client";
 
 import { createClient } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
@@ -14,40 +14,57 @@ export default function QuotePage() {
   const [phone, setPhone] = useState('');
   const [location, setLocation] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ✅ Session Check (सत्र जाँच)
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
-      setLoading(false);
-    });
+    checkUser();
   }, []);
 
- const handleGoogleLogin = async () => {
-  // ✅ बिना किसी returnTo के—सीधा /quote पर Redirect (पुनर्निर्देशन) करें
-  const redirectUrl = 'https://sbbt-crm-new-seven.vercel.app/quote';
-  await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: redirectUrl,
-    },
-  });
-};
+  const handleGoogleLogin = async () => {
+    const redirectUrl = window.location.origin + '/auth/callback';
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUrl,
+      },
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
+    setIsSubmitting(true);
+
+    // ✅ Form Submit (प्रस्तुत) से पहले User को दोबारा Check (जाँच) करें
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+    if (!currentUser) {
       alert('Please login with Google first');
+      setIsSubmitting(false);
       return;
     }
-    // यहाँ Quotation Save करें (Supabase Table में)
+
+    // ✅ अगर User है → Quotation Save (सहेजें)
+    console.log('✅ Quotation submitted by:', currentUser.email);
+    console.log('📞 Phone:', phone);
+    console.log('📍 Location:', location);
+
+    // यहाँ Supabase Table में Save (सहेजें) करें (बाद में)
     setSubmitted(true);
+    setIsSubmitting(false);
   };
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
-  // ✅ अगर User Login नहीं है → Google Login Button दिखाओ
+  // ✅ अगर User Login (लॉगिन) नहीं है → Google Login Button
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -65,7 +82,7 @@ export default function QuotePage() {
     );
   }
 
-  // ✅ अगर User Login है → Quotation Form दिखाओ
+  // ✅ अगर User Login (लॉगिन) है → Quotation Form (कोटेशन फॉर्म)
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold text-gray-900">Get a Quote</h1>
@@ -76,27 +93,34 @@ export default function QuotePage() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <input
-            type="tel"
-            placeholder="Phone Number"
-            className="w-full border p-3 rounded"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Location"
-            className="w-full border p-3 rounded"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            required
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Phone Number *</label>
+            <input
+              type="tel"
+              placeholder="Enter your phone number"
+              className="w-full border p-3 rounded mt-1"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Location *</label>
+            <input
+              type="text"
+              placeholder="Enter your location"
+              className="w-full border p-3 rounded mt-1"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              required
+            />
+          </div>
           <button
             type="submit"
-            className="bg-indigo-600 text-white px-6 py-3 rounded hover:bg-indigo-700"
+            disabled={isSubmitting}
+            className="w-full bg-indigo-600 text-white py-3 rounded hover:bg-indigo-700 disabled:opacity-50"
           >
-            Submit Quote Request
+            {isSubmitting ? 'Submitting...' : 'Submit Quote Request'}
           </button>
         </form>
       )}

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=login_failed', origin));
     }
 
-    // ✅ Login (लॉगिन) के बाद हमेशा /quote पर भेजें
+    // ✅ Login (लॉगिन) के बाद /quote पर भेजें
     return NextResponse.redirect(new URL('/quote', origin));
   }
 
