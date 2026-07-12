@@ -109,10 +109,9 @@ export default function DashboardPage() {
       console.log("🔍 Dashboard User Check:", { user, error });
 
       if (error || !user) {
-        console.log("❌ No user, redirecting to /admin");
-        window.location.href = '/admin';  // ✅ router.push की जगह window.location.href
-        return;
-      }
+  window.location.href = '/admin'; // ✅ router.push की जगह
+  return;
+}
 
       setUser(user);
       await Promise.all([fetchProjects(), fetchPackages(), fetchTestimonials()]);
