@@ -23,14 +23,14 @@ export default function QuotePage() {
   }, []);
 
   const handleGoogleLogin = async () => {
-    const redirectUrl = window.location.origin + '/auth/callback';
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-      },
-    });
-  };
+  const redirectUrl = window.location.origin + '/auth/callback?returnTo=/quote';
+  await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: redirectUrl,
+    },
+  });
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
