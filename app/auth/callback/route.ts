@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const returnTo = searchParams.get('returnTo') ?? '/dashboard'; // ✅ Default Dashboard
+  const returnTo = searchParams.get('returnTo') ?? '/'; // Default Homepage
 
   if (code) {
     const supabase = createClient(
@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=login_failed', origin));
     }
 
+    // ✅ Login के बाद returnTo वाले URL पर Redirect करें
     return NextResponse.redirect(new URL(returnTo, origin));
   }
 

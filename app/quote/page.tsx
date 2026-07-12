@@ -17,13 +17,24 @@ export default function QuotePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
-    };
-    getUser();
-  }, []);
+  const getUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+    setLoading(false);
+  };
+  getUser();
+
+  // ✅ Auth State Change पर User Update करें
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      setUser(session?.user || null);
+    } else if (event === 'SIGNED_OUT') {
+      setUser(null);
+    }
+  });
+
+  return () => subscription.unsubscribe();
+}, []);
 
   const handleGoogleLogin = async () => {
   const redirectUrl = window.location.origin + '/auth/callback?returnTo=/quote';
@@ -33,7 +44,7 @@ export default function QuotePage() {
       redirectTo: redirectUrl,
     },
   });
-};
+};  
   const handleLogout = async () => {
     await supabase.auth.signOut();
     window.location.reload();
