@@ -14,6 +14,11 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // ✅ URL से # (hash) हटाएँ
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+
     // ✅ अगर URL में ?reload=true है—तो Clean Reload करें
     if (window.location.search.includes('reload=true')) {
       window.location.href = window.location.pathname;
@@ -28,7 +33,7 @@ export default function HomePage() {
     };
     getUser();
 
-    // ✅ Auth State Change (स्थिति परिवर्तन) पर User Update (अद्यतन) करें
+    // ✅ Auth State Change पर User Update करें
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("🔄 Auth State Changed:", event, session?.user);
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
@@ -45,7 +50,7 @@ export default function HomePage() {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
-  // ✅ अगर User Login है → Dashboard दिखाओ
+  // ✅ अगर User Login है → पूरा Dashboard (Editable) दिखाओ
   if (user) {
     return (
       <div className="min-h-screen bg-gray-100 p-8">
