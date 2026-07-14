@@ -1,13 +1,8 @@
 "use client";
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 type Project = {
   id: string;
@@ -49,6 +44,7 @@ type Testimonial = {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const supabase = createClient();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"projects" | "packages" | "testimonials">("projects");
@@ -102,19 +98,23 @@ export default function DashboardPage() {
 
   // ---------- Auth & Data Fetch ----------
   useEffect(() => {
+    console.log("Dashboard Mounted");
   const checkUser = async () => {
     try {
       const { data: { user }, error } = await supabase.auth.getUser();
-      console.log("🔍 Dashboard User Check:", { user, error });
+      console.log("Result of supabase.auth.getUser():", { user, error });
+      console.log("Error object:", error);
+      console.log("User object:", user);
 
       if (error || !user) {
-        console.log("❌ No user, redirecting to /admin");
+        console.log("Before redirect to /admin");
         window.location.href = '/admin'; // ✅ router.push की जगह window.location.href
         return;
       }
 
       setUser(user);
       await Promise.all([fetchProjects(), fetchPackages(), fetchTestimonials()]);
+      console.log("Before dashboard loading completes");
       setLoading(false);
     } catch (err) {
       console.error("❌ Dashboard Error:", err);

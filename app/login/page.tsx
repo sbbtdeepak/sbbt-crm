@@ -3,6 +3,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signInWithGoogle } from "@/lib/auth/oauth";
 
 let supabase: any = null;
 
@@ -29,22 +30,8 @@ export default function LoginPage() {
   }, [router]);
 
   const handleGoogleLogin = async () => {
-  if (!isReady || !supabase) {
-    alert('Please wait...');
-    return;
-  }
-
-  // ✅ सीधा Live URL (हार्ड-कोडेड)
-  const redirectUrl = 'https://sbbt-crm-new-seven.vercel.app/auth/callback';
-  console.log('🔍 Redirecting to:', redirectUrl);
-
-  await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: redirectUrl,
-    },
-  });
-};
+    await signInWithGoogle("/dashboard");
+  };
 
   if (loading) {
     return (

@@ -1,29 +1,56 @@
-import { createClient } from '@supabase/supabase-js'
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from "next/server";
 
-export async function proxy(request: NextRequest) {
-  // 🔍 Debug: Check if env variables are loaded
-  console.log("🔍 URL:", process.env.NEXT_PUBLIC_SUPABASE_URL)
-  console.log("🔍 KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+const PUBLIC_ROUTES = [
+  "/",
+  "/about",
+  "/contact",
+  "/projects",
+  "/blogs",
+  "/privacy-policy",
+  "/terms",
+  "/refer-earn",
+];
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+const AUTH_ROUTES = [
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+];
 
-  const { data: { session } } = await supabase.auth.getSession()
+export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
-    if (!session) {
-      return NextResponse.redirect(new URL('/', request.url))
-    }
+  // Ignore Next.js internals and static assets
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/favicon") ||
+    pathname.includes(".")
+  ) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next()
+  // Public & auth pages
+  if (
+    PUBLIC_ROUTES.includes(pathname) ||
+    AUTH_ROUTES.includes(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
+  console.log(
+  "PATH:",
+  pathname,
+  "COOKIES:",
+  request.cookies.getAll().map((c) => c.name)
+);
+
+return NextResponse.next();
+
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
-}
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+};

@@ -2,6 +2,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
+import { signInWithGoogle } from "@/lib/auth/oauth";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,14 +38,8 @@ export default function QuotePage() {
 }, []);
 
   const handleGoogleLogin = async () => {
-  const redirectUrl = window.location.origin + '/auth/callback?returnTo=/quote';
-  await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: redirectUrl,
-    },
-  });
-};  
+    await signInWithGoogle("/quote");
+  };  
   const handleLogout = async () => {
     await supabase.auth.signOut();
     window.location.reload();
