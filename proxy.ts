@@ -1,24 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
 const PUBLIC_ROUTES = [
   "/",
-  "/about",
+  "/admin",
+  "/login",
+  "/quote",
   "/contact",
   "/projects",
-  "/blogs",
-  "/privacy-policy",
-  "/terms",
-  "/refer-earn",
+  "/packages",
+  "/testimonials",
 ];
 
-const AUTH_ROUTES = [
-  "/login",
-  "/signup",
-  "/forgot-password",
-  "/reset-password",
-];
-
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Ignore Next.js internals and static assets
@@ -26,27 +20,37 @@ export function proxy(request: NextRequest) {
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
     pathname.startsWith("/favicon") ||
+    pathname.startsWith("/auth") ||
     pathname.includes(".")
   ) {
     return NextResponse.next();
   }
 
-  // Public & auth pages
-  if (
-    PUBLIC_ROUTES.includes(pathname) ||
-    AUTH_ROUTES.includes(pathname)
-  ) {
+  // Public routes - allow access
+  if (PUBLIC_ROUTES.includes(pathname)) {
     return NextResponse.next();
   }
 
-  console.log(
-  "PATH:",
-  pathname,
-  "COOKIES:",
-  request.cookies.getAll().map((c) => c.name)
-);
+  // Protect /dashboard
+  if (pathname.startsWith("/dashboard")) {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+        },
+      }
+    );
 
-return NextResponse.next();
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
+  }
 
   return NextResponse.next();
 }
