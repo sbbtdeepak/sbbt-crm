@@ -1,7 +1,20 @@
-export default function Page() {
+import { createClient } from "@/lib/supabase/server";
+import LeadContent from "./components/LeadContent";
+
+export default async function LeadsPage() {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("contact_leads")
+    .select("*")
+    .order("created_at", {
+      ascending: false,
+    });
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Coming Soon</h1>
-    </div>
+    <LeadContent
+      leads={data ?? []}
+      error={error?.message}
+    />
   );
 }

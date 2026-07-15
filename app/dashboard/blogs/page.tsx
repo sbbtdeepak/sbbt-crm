@@ -1,7 +1,21 @@
-export default function Page() {
+import { createClient } from "@/lib/supabase/server";
+import BlogsContent from "./components/BlogsContent";
+
+export default async function BlogsPage() {
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("blogs")
+    .select("*")
+    .order("created_at", {
+      ascending: false,
+    });
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Coming Soon</h1>
-    </div>
+    <BlogsContent
+      blogs={data ?? []}
+      error={error?.message}
+    />
   );
 }

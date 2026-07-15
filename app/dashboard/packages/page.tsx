@@ -17,4 +17,4 @@ export default async function PackagesPage() {
       error={error?.message}
     />
   );
-}
+} 

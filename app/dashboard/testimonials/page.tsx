@@ -1,7 +1,21 @@
-export default function Page() {
+import { createClient } from "@/lib/supabase/server";
+import TestimonialsContent from "./components/TestimonialsContent";
+
+export default async function TestimonialsPage() {
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("testimonials")
+    .select("*")
+    .order("created_at", {
+      ascending: false,
+    });
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Coming Soon</h1>
-    </div>
+    <TestimonialsContent
+      testimonials={data ?? []}
+      error={error?.message}
+    />
   );
 }
