@@ -1,7 +1,20 @@
-export default function Page() {
+import { createClient } from "@/lib/supabase/server";
+import PackagesContent from "./components/PackagesContent";
+
+export default async function PackagesPage() {
+  const supabase = await createClient();
+
+  const { data: packages, error } = await supabase
+    .from("packages")
+    .select("*")
+    .order("created_at", {
+      ascending: false,
+    });
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Coming Soon</h1>
-    </div>
+    <PackagesContent
+      packages={packages ?? []}
+      error={error?.message}
+    />
   );
 }
