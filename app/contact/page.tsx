@@ -80,7 +80,7 @@ export default function ContactPage() {
             </Link>
             <div className="hidden md:flex items-center space-x-8">
               <Link href="/projects" className="text-gray-600 hover:text-indigo-600">Projects</Link>
-              <Link href="/#packages" className="text-gray-600 hover:text-indigo-600">Packages</Link>
+              <Link href="/packages" className="text-gray-600 hover:text-indigo-600">Packages</Link>
               <Link href="/#testimonials" className="text-gray-600 hover:text-indigo-600">Testimonials</Link>
               <Link href="/contact" className="text-indigo-600 font-medium">Contact</Link>
             </div>

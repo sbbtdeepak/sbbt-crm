@@ -1,7 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
+﻿import { createClient } from "@/lib/supabase/server";
 
 export default async function Testimonials() {
-
   const supabase = await createClient();
 
   const { data } = await supabase
@@ -12,58 +11,45 @@ export default async function Testimonials() {
   if (!data?.length) return null;
 
   return (
-    <section
-      id="testimonials"
-      className="bg-white py-20"
-    >
-
-      <div className="mx-auto max-w-7xl px-4">
-
-        <div className="mb-12 text-center">
-
-          <h2 className="text-4xl font-bold">
-            Happy Customers
+    <section id="testimonials" className="bg-white py-24 text-slate-900">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-sm uppercase tracking-[0.32em] text-indigo-600">
+            Customer confidence
+          </p>
+          <h2 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
+            What clients say about our craftsmanship.
           </h2>
-
+          <p className="mt-4 text-lg leading-8 text-slate-600">
+            Featured stories from clients who trusted us with their most important construction projects.
+          </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-
+        <div className="mt-16 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {data.map((item: any) => (
-
-            <div
+            <blockquote
               key={item.id}
-              className="rounded-2xl border bg-gray-50 p-6"
+              className="group rounded-[2rem] border border-slate-200 bg-[#f8fafc] p-8 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
-
-              <div className="mb-4 text-yellow-500">
-                ⭐⭐⭐⭐⭐
+              <div className="flex items-center gap-4 text-indigo-600">
+                <span className="text-3xl">“</span>
+                <p className="text-sm uppercase tracking-[0.24em] text-indigo-600">
+                  Featured testimonial
+                </p>
               </div>
 
-              <p className="italic text-gray-600">
+              <p className="mt-6 text-lg leading-8 text-slate-700 italic">
                 "{item.content}"
               </p>
 
-              <div className="mt-6">
-
-                <h3 className="font-bold">
-                  {item.client_name}
-                </h3>
-
-                <p className="text-sm text-gray-500">
-                  {item.project_name}
-                </p>
-
-              </div>
-
-            </div>
-
+              <footer className="mt-8 border-t border-slate-200 pt-5">
+                <p className="font-semibold text-slate-950">{item.client_name}</p>
+                <p className="mt-1 text-sm text-slate-500">{item.project_name}</p>
+              </footer>
+            </blockquote>
           ))}
-
         </div>
-
       </div>
-
     </section>
   );
 }

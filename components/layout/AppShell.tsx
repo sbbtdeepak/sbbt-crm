@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Sidebar } from "./Sidebar";
-import { Header } from "./Header";
+import DashboardHeader from "./DashboardHeader";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -28,7 +28,7 @@ export function AppShell({ children, pageTitle }: AppShellProps) {
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Header */}
-        <Header title={pageTitle} onMenuClick={() => setSidebarOpen(true)} />
+        <DashboardHeader title={pageTitle} onMenuClick={() => setSidebarOpen(true)} />
 
         {/* Page content */}
         <main className="p-4 sm:p-6 lg:p-8">{children}</main>
