@@ -4,6 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -88,27 +90,11 @@ export default function ProjectDetailPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Navbar */}
-      <nav className="bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold text-indigo-700">
-              SBBT <span className="text-gray-800">Construction</span>
-            </Link>
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/projects" className="text-indigo-600 font-medium">Projects</Link>
-              <Link href="/packages" className="text-gray-600 hover:text-indigo-600">Packages</Link>
-              <Link href="/#testimonials" className="text-gray-600 hover:text-indigo-600">Testimonials</Link>
-              <Link href="/contact" className="text-gray-600 hover:text-indigo-600">Contact</Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
-      {/* Project Details */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="pt-28 max-w-7xl mx-auto px-6 py-12">
         <Link href="/projects" className="inline-flex items-center text-indigo-600 hover:underline mb-6">
-          ← Back to Projects
+          &#x2190; Back to Projects
         </Link>
 
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -192,12 +178,7 @@ export default function ProjectDetailPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 mt-12">
-        <div className="max-w-7xl mx-auto px-4 text-center text-gray-400 text-sm">
-          &copy; 2026 SBBT Construction. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

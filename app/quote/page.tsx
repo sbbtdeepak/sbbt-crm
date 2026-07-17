@@ -3,6 +3,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 import { signInWithGoogle } from "@/lib/auth/oauth";
+import { useSearchParams } from 'next/navigation';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,12 +11,23 @@ const supabase = createClient(
 );
 
 export default function QuotePage() {
+  const searchParams = useSearchParams();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [phone, setPhone] = useState('');
   const [location, setLocation] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Prefill from URL params
+  const estimatorData = {
+    plotSize: searchParams.get('plotSize') || '',
+    floors: searchParams.get('floors') || '',
+    builtUpArea: searchParams.get('builtUpArea') || '',
+    pkg: searchParams.get('package') || '',
+    rate: searchParams.get('rate') || '',
+    estimatedCost: searchParams.get('estimatedCost') || '',
+  };
 
   useEffect(() => {
   const getUser = async () => {
@@ -25,7 +37,6 @@ export default function QuotePage() {
   };
   getUser();
 
-  // ✅ Auth State Change पर User Update करें
   const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
       setUser(session?.user || null);
@@ -59,9 +70,27 @@ export default function QuotePage() {
     console.log('✅ Quotation submitted by:', currentUser.email);
     console.log('📞 Phone:', phone);
     console.log('📍 Location:', location);
+    console.log('📐 Estimator data:', estimatorData);
 
     setSubmitted(true);
     setIsSubmitting(false);
+  };
+
+  // Package label lookup
+  const packageLabels: Record<string, string> = {
+    basic: 'Basic',
+    premium: 'Premium',
+    luxury: 'Luxury',
+    custom: 'Custom Quote',
+  };
+
+  const floorLabels: Record<string, string> = {
+    gf: 'Ground Floor',
+    g1: 'G+1',
+    g2: 'G+2',
+    g3: 'G+3',
+    g4: 'G+4',
+    custom: 'Custom Floors',
   };
 
   if (loading) {
@@ -98,6 +127,39 @@ export default function QuotePage() {
           </button>
         </div>
         <p className="text-gray-600 mt-2">Logged in as {user.email}</p>
+
+        {/* Estimator summary from URL params */}
+        {estimatorData.plotSize && (
+          <div className="mt-6 rounded-xl bg-indigo-50 p-4 ring-1 ring-indigo-200/60">
+            <h3 className="text-sm font-semibold text-indigo-700 mb-3">Your estimate summary</h3>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <span className="text-indigo-500">Plot Size:</span>{' '}
+                <span className="font-medium text-indigo-900">{Number(estimatorData.plotSize).toLocaleString('en-IN')} sq. ft.</span>
+              </div>
+              <div>
+                <span className="text-indigo-500">Floors:</span>{' '}
+                <span className="font-medium text-indigo-900">{floorLabels[estimatorData.floors] || estimatorData.floors}</span>
+              </div>
+              <div>
+                <span className="text-indigo-500">Built-up Area:</span>{' '}
+                <span className="font-medium text-indigo-900">{Number(estimatorData.builtUpArea).toLocaleString('en-IN')} sq. ft.</span>
+              </div>
+              <div>
+                <span className="text-indigo-500">Package:</span>{' '}
+                <span className="font-medium text-indigo-900">{packageLabels[estimatorData.pkg] || estimatorData.pkg}</span>
+              </div>
+              <div>
+                <span className="text-indigo-500">Rate:</span>{' '}
+                <span className="font-medium text-indigo-900">₹{Number(estimatorData.rate).toLocaleString('en-IN')}/sqft</span>
+              </div>
+              <div>
+                <span className="text-indigo-500">Est. Cost:</span>{' '}
+                <span className="font-semibold text-indigo-900">₹{Number(estimatorData.estimatedCost).toLocaleString('en-IN')}</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {submitted ? (
           <div className="bg-green-100 p-6 rounded-xl mt-6 text-center">

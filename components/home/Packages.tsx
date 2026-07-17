@@ -1,15 +1,43 @@
-﻿import { createClient } from "@/lib/supabase/server";
+﻿"use client";
 
-export default async function Packages() {
-  const supabase = await createClient();
+import { createClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
+import { PACKAGE_RATES } from "@/lib/pricing";
 
-  const { data: packages } = await supabase
-    .from("packages")
-    .select("*")
-    .eq("is_active", true)
-    .order("price");
+const PACKAGE_RATE_MAP = PACKAGE_RATES;
 
-  if (!packages || packages.length === 0) return null;
+export default function Packages() {
+  const [packages, setPackages] = useState<any[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from("packages")
+      .select("*")
+      .eq("is_active", true)
+      .order("price")
+      .then(({ data }) => {
+        if (data) setPackages(data);
+      });
+  }, []);
+
+  const handleEstimate = (pkgName: string) => {
+    const rate = PACKAGE_RATE_MAP[pkgName];
+    if (!rate) return;
+
+    window.dispatchEvent(
+      new CustomEvent("select-package", {
+        detail: { rate, label: pkgName },
+      })
+    );
+
+    const estimator = document.getElementById("construction-estimator");
+    if (estimator) {
+      estimator.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  if (packages.length === 0) return null;
 
   return (
     <section className="bg-[#f8fafc] py-24 text-slate-900">
@@ -77,12 +105,20 @@ export default async function Packages() {
                 </span>
               </div>
 
-              <a
-                href="/quote"
-                className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
-              >
-                Request a quote
-              </a>
+              <div className="mt-6 flex flex-col gap-3">
+                <button
+                  onClick={() => handleEstimate(pkg.name)}
+                  className="inline-flex w-full items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500"
+                >
+                  Estimate with this Package
+                </button>
+                <a
+                  href="/quote"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+                >
+                  Request a quote
+                </a>
+              </div>
             </article>
           ))}
         </div>

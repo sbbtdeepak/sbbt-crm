@@ -1,8 +1,14 @@
 "use client";
 
-import { createClient } from '@/lib/supabase/client';
-import Link from 'next/link';
+import { createClient } from '@supabase/supabase-js';
 import { useState } from 'react';
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function ContactPage() {
   const [form, setForm] = useState({
@@ -26,7 +32,6 @@ export default function ContactPage() {
     setSubmitting(true);
     setError('');
 
-    const supabase = createClient();
     const { error: supabaseError } = await supabase.from('contact_leads').insert({
       name: form.name,
       email: form.email,
@@ -51,44 +56,24 @@ export default function ContactPage() {
   if (submitted) {
     return (
       <div className="bg-gray-50 min-h-screen">
-        <nav className="bg-white shadow-sm border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <Link href="/" className="text-2xl font-bold text-indigo-700">SBBT <span className="text-gray-800">Construction</span></Link>
-            </div>
-          </div>
-        </nav>
-        <div className="max-w-xl mx-auto px-4 py-20 text-center">
+        <Header />
+        <div className="max-w-xl mx-auto px-4 py-20 text-center pt-28">
           <div className="bg-white p-12 rounded-2xl shadow-lg">
             <h1 className="text-3xl font-bold text-green-600">Thank You!</h1>
             <p className="mt-4 text-gray-600">Your message has been sent. We'll get back to you shortly.</p>
-            <Link href="/" className="mt-6 inline-block text-indigo-600 hover:underline">Return Home</Link>
+            <a href="/" className="mt-6 inline-block text-indigo-600 hover:underline">Return Home</a>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Navbar */}
-      <nav className="bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold text-indigo-700">
-              SBBT <span className="text-gray-800">Construction</span>
-            </Link>
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/projects" className="text-gray-600 hover:text-indigo-600">Projects</Link>
-              <Link href="/packages" className="text-gray-600 hover:text-indigo-600">Packages</Link>
-              <Link href="/#testimonials" className="text-gray-600 hover:text-indigo-600">Testimonials</Link>
-              <Link href="/contact" className="text-indigo-600 font-medium">Contact</Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
-      <div className="max-w-4xl mx-auto px-4 py-12">
+      <div className="pt-28 max-w-4xl mx-auto px-6 py-12">
         <div className="grid md:grid-cols-2 gap-12">
           {/* Contact Form */}
           <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100">
@@ -167,9 +152,9 @@ export default function ContactPage() {
             <div>
               <h2 className="text-xl font-bold text-gray-900">Contact Information</h2>
               <ul className="mt-4 space-y-3 text-gray-600">
-                <li><span className="font-medium text-gray-900">📍 Office:</span> SBBT Constructions, Mumbai</li>
-                <li><span className="font-medium text-gray-900">📞 Phone:</span> +91 98765 43210</li>
-                <li><span className="font-medium text-gray-900">✉️ Email:</span> info@sbbtconstruction.com</li>
+                <li><span className="font-medium text-gray-900">Office:</span> SBBT Constructions, Mumbai</li>
+                <li><span className="font-medium text-gray-900">Phone:</span> +91 98765 43210</li>
+                <li><span className="font-medium text-gray-900">Email:</span> info@sbbtconstruction.com</li>
               </ul>
             </div>
 
@@ -190,11 +175,7 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <footer className="bg-gray-900 text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center text-gray-400 text-sm">
-          &copy; 2026 SBBT Construction. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

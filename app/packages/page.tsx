@@ -1,9 +1,16 @@
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import ConstructionEstimator from "@/components/home/ConstructionEstimator";
+import Brands from "@/components/home/Brands";
+import ReferEarn from "@/components/home/ReferEarn";
+import WhyChooseUs from "@/components/home/WhyChooseUs";
+import PackageComparison from "@/components/home/PackageComparison";
+import FAQ from "@/components/home/FAQ";
 
 const packages = [
   {
     name: "Basic",
-    price: "₹1,99,000",
+    price: "₹1,699/sqft",
     description: "Essential construction package for standard homes.",
     features: [
       "Architectural planning",
@@ -13,8 +20,8 @@ const packages = [
     ],
   },
   {
-    name: "Standard",
-    price: "₹3,49,000",
+    name: "Premium",
+    price: "₹1,899/sqft",
     description: "Our most popular package with premium finishes.",
     features: [
       "Everything in Basic",
@@ -24,11 +31,11 @@ const packages = [
     ],
   },
   {
-    name: "Premium",
-    price: "₹5,99,000",
+    name: "Luxury",
+    price: "₹2,499/sqft",
     description: "End-to-end luxury construction and interiors.",
     features: [
-      "Everything in Standard",
+      "Everything in Premium",
       "Smart home integration",
       "Luxury finishes",
       "Turnkey handover",
@@ -73,9 +80,19 @@ export default function PackagesPage() {
         </div>
       </div>
 
-      <footer className="bg-slate-900 py-8 text-center text-sm text-slate-400">
-        &copy; 2026 SBBT Construction. All rights reserved.
-      </footer>
+      <PackageComparison />
+
+      <ConstructionEstimator />
+
+      <WhyChooseUs />
+
+      <Brands />
+
+      <ReferEarn />
+
+      <FAQ />
+
+      <Footer />
     </div>
   );
 }
