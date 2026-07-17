@@ -29,7 +29,7 @@ export default function ReferEarn() {
   return (
     <section className="bg-slate-50 py-24 text-slate-900">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        {/* Section header */}
+        {/* Section header - Desktop only (large) */}
         <div className="mx-auto max-w-3xl space-y-4 text-center">
           <p className="text-sm uppercase tracking-[0.32em] text-indigo-600">
             Refer & Earn
@@ -43,8 +43,8 @@ export default function ReferEarn() {
           </p>
         </div>
 
-        {/* Steps */}
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Desktop Steps Grid - Unchanged */}
+        <div className="mt-16 hidden lg:grid gap-6 lg:grid-cols-4">
           {STEPS.map((step, index) => (
             <div
               key={step.number}
@@ -84,6 +84,34 @@ export default function ReferEarn() {
               </p>
             </div>
           ))}
+        </div>
+
+        {/* Mobile Steps - Compact 2x2 Grid in Single Card */}
+        <div className="mt-12 lg:hidden">
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg">
+            <div className="grid grid-cols-2 gap-4">
+              {STEPS.map((step) => (
+                <div key={step.number} className="flex flex-col">
+                  {/* Step number */}
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold text-white ${step.color}`}
+                  >
+                    {step.number}
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="mt-2 text-sm font-semibold text-slate-900">
+                    {step.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="mt-1 text-xs leading-5 text-slate-600">
+                    {step.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Reward card */}

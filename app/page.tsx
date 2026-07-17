@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import Hero from "@/components/home/Hero";
 import Packages from "@/components/home/Packages";
 import Projects from "@/components/home/Projects";
+import GoogleReviews from "@/components/home/GoogleReviews";
 import Testimonials from "@/components/home/Testimonials";
 import Blogs from "@/components/home/Blogs";
 import CTA from "@/components/home/CTA";
@@ -47,6 +48,8 @@ export default function HomePage() {
       </section>
 
       <Projects />
+
+      <GoogleReviews />
 
       <WhyChooseUs />
 

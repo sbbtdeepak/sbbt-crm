@@ -72,8 +72,8 @@ export default function WhyChooseUs() {
           </p>
         </div>
 
-        {/* Feature grid */}
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Desktop Grid */}
+        <div className="mt-16 hidden md:grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((feature) => (
             <div
               key={feature.title}
@@ -95,6 +95,33 @@ export default function WhyChooseUs() {
               </p>
             </div>
           ))}
+        </div>
+
+        {/* Mobile Swipe Carousel */}
+        <div className="mt-16 md:hidden">
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {FEATURES.map((feature, idx) => (
+              <div
+                key={feature.title}
+                className="group snap-start flex-shrink-0 w-80 overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+              >
+                {/* Icon */}
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 transition-colors duration-300 group-hover:bg-indigo-600 group-hover:text-white">
+                  {feature.icon}
+                </div>
+
+                {/* Title */}
+                <h3 className="mt-4 text-lg font-semibold text-slate-900">
+                  {feature.title}
+                </h3>
+
+                {/* Description */}
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -31,7 +31,6 @@ function getInitials(name: string): string {
 }
 
 function getBrandColor(name: string): string {
-  // Deterministic pastel hue from name
   const hash = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const hue = hash % 360;
   return `hsl(${hue}, 40%, 92%)`;
@@ -39,7 +38,7 @@ function getBrandColor(name: string): string {
 
 export default function Brands() {
   return (
-    <section className="bg-white py-24 text-slate-900">
+    <section className="bg-white py-24 text-slate-900 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Section header */}
         <div className="mx-auto max-w-3xl space-y-4 text-center">
@@ -55,34 +54,43 @@ export default function Brands() {
           </p>
         </div>
 
-        {/* Brand grid */}
-        <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {BRANDS.map((brand) => (
-            <div
-              key={brand.name}
-              className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-slate-200"
-            >
-              {/* Logo placeholder */}
-              <div
-                className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
-                style={{ backgroundColor: getBrandColor(brand.name) }}
-              >
-                <span className="text-sm font-bold text-slate-700">
-                  {getInitials(brand.name)}
-                </span>
-              </div>
+        {/* Auto Marquee - Desktop pauses on hover, mobile continuous */}
+        <div className="mt-16 relative">
+          {/* Fade edges */}
+          <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+          
+          <div className="overflow-hidden">
+            <div className="flex animate-marquee gap-4 hover:[animation-play-state:paused] pl-4">
+              {/* Duplicate brands for continuous loop */}
+              {[...BRANDS, ...BRANDS].map((brand, idx) => (
+                <div
+                  key={`${brand.name}-${idx}`}
+                  className="group flex-shrink-0 w-48 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-slate-200"
+                >
+                  {/* Logo placeholder */}
+                  <div
+                    className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
+                    style={{ backgroundColor: getBrandColor(brand.name) }}
+                  >
+                    <span className="text-sm font-bold text-slate-700">
+                      {getInitials(brand.name)}
+                    </span>
+                  </div>
 
-              {/* Brand name */}
-              <p className="mt-4 text-center text-sm font-semibold text-slate-900 transition-colors group-hover:text-indigo-600">
-                {brand.name}
-              </p>
+                  {/* Brand name */}
+                  <p className="mt-4 text-center text-sm font-semibold text-slate-900 transition-colors group-hover:text-indigo-600">
+                    {brand.name}
+                  </p>
 
-              {/* Category */}
-              <p className="mt-0.5 text-center text-xs text-slate-400">
-                {brand.category}
-              </p>
+                  {/* Category */}
+                  <p className="mt-0.5 text-center text-xs text-slate-400">
+                    {brand.category}
+                  </p>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
 
         {/* Trusted by note */}
