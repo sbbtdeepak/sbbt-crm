@@ -45,7 +45,7 @@ export default async function Projects() {
                     "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=900"
                   }
                   alt={project.title}
-                  className="h-24 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-36"
+                  className="h-[90px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-36"
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/80 to-transparent px-1.5 py-1 sm:px-2.5 sm:py-1.5">
                   <p className="text-[7px] uppercase tracking-[0.24em] text-white sm:text-[8px]">

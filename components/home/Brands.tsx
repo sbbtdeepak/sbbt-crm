@@ -38,13 +38,11 @@ function getBrandColor(name: string): string {
   return `hsl(${hue}, 40%, 92%)`;
 }
 
-type Brand = (typeof BRANDS)[number];
-
 export default function Brands() {
-  // Create 2x2 grid rows for mobile - 4 items per "slide"
-  const brandChunks: Brand[][] = [];
+  // Create pairs of brands for 2x2 mobile display
+  const brandPairs: (typeof BRANDS[number])[] = [];
   for (let i = 0; i < BRANDS.length; i += 2) {
-    brandChunks.push(BRANDS.slice(i, i + 2));
+    brandPairs.push(BRANDS[i], BRANDS[i + 1]);
   }
 
   return (
@@ -64,89 +62,54 @@ export default function Brands() {
           <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
           <div className="overflow-hidden">
+            {/* Mobile: 2x2 grid scrolling marquee */}
             <div className="animate-marquee flex gap-2 sm:hidden">
-              {/* Duplicate chunks for infinite loop */}
-              {[...brandChunks, ...brandChunks].map((chunk, chunkIdx) => (
-                <div key={chunkIdx} className="flex flex-shrink-0 gap-2 w-[calc(100%+2rem)]">
-                  {/* First row of 2 */}
-                  <div className="grid grid-cols-2 gap-2 flex-1">
-                    {chunk.map((brand) => (
-                      <div
-                        key={`${brand.name}-r1`}
-                        className="flex-shrink-0 rounded-lg border border-slate-100 bg-white p-1.5 shadow-sm"
-                      >
-                        <div className="flex items-center justify-center gap-1">
-                          <div
-                            className="flex h-5 w-5 items-center justify-center rounded-md transition-transform duration-300"
-                            style={{ backgroundColor: getBrandColor(brand.name) }}
-                          >
-                            <span className="text-[6px] font-bold text-slate-700">
-                              {getInitials(brand.name)}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="text-[7px] font-semibold text-slate-900 leading-tight">
-                              {brand.name}
-                            </p>
-                            <p className="text-[6px] text-slate-400 leading-tight">
-                              {brand.category}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  {/* Second row of 2 (duplicate) */}
-                  <div className="grid grid-cols-2 gap-2 flex-1">
-                    {chunk.map((brand) => (
-                      <div
-                        key={`${brand.name}-r2`}
-                        className="flex-shrink-0 rounded-lg border border-slate-100 bg-white p-1.5 shadow-sm"
-                      >
-                        <div className="flex items-center justify-center gap-1">
-                          <div
-                            className="flex h-5 w-5 items-center justify-center rounded-md transition-transform duration-300"
-                            style={{ backgroundColor: getBrandColor(brand.name) }}
-                          >
-                            <span className="text-[6px] font-bold text-slate-700">
-                              {getInitials(brand.name)}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="text-[7px] font-semibold text-slate-900 leading-tight">
-                              {brand.name}
-                            </p>
-                            <p className="text-[6px] text-slate-400 leading-tight">
-                              {brand.category}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+              {[...brandPairs, ...brandPairs].map((brand, idx) => (
+                <div
+                  key={`${brand.name}-${idx}-mobile`}
+                  className="flex-shrink-0 w-[calc(50%-0.25rem)] rounded-lg border border-slate-100 bg-white p-1.5 shadow-sm"
+                >
+                  <div className="flex items-center gap-1">
+                    <div
+                      className="flex h-4 w-4 items-center justify-center rounded"
+                      style={{ backgroundColor: getBrandColor(brand.name) }}
+                    >
+                      <span className="text-[5px] font-bold text-slate-700">
+                        {getInitials(brand.name)}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-[7px] font-semibold text-slate-900 leading-tight">
+                        {brand.name}
+                      </p>
+                      <p className="text-[6px] text-slate-400 leading-tight">
+                        {brand.category}
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
             
-            {/* Desktop: Single row marquee */}
+            {/* Desktop: Single row marquee (4+ logos visible) */}
             <div className="animate-marquee hidden sm:flex gap-3">
               {[...BRANDS, ...BRANDS].map((brand, idx) => (
                 <div
                   key={`${brand.name}-${idx}-desktop`}
-                  className="flex-shrink-0 w-28 rounded-lg border border-slate-100 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                  className="flex-shrink-0 w-24 rounded-lg border border-slate-100 bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
                 >
                   <div
-                    className="flex h-9 w-9 items-center justify-center rounded-md mx-auto transition-transform duration-300"
+                    className="flex h-7 w-7 items-center justify-center rounded-md mx-auto transition-transform duration-300"
                     style={{ backgroundColor: getBrandColor(brand.name) }}
                   >
-                    <span className="text-[10px] font-bold text-slate-700">
+                    <span className="text-[8px] font-bold text-slate-700">
                       {getInitials(brand.name)}
                     </span>
                   </div>
-                  <p className="mt-1.5 text-center text-xs font-semibold text-slate-900 leading-tight">
+                  <p className="mt-1 text-center text-[9px] font-semibold text-slate-900 leading-tight">
                     {brand.name}
                   </p>
-                  <p className="text-center text-[10px] text-slate-400 leading-tight">
+                  <p className="text-center text-[7px] text-slate-400 leading-tight">
                     {brand.category}
                   </p>
                 </div>
@@ -155,7 +118,7 @@ export default function Brands() {
           </div>
         </div>
 
-        <p className="mt-2 text-center text-[9px] sm:text-xs text-slate-400">
+        <p className="mt-2 text-center text-[9px] sm:text-[10px] text-slate-400">
           &hellip;and many more trusted names in the construction industry.
         </p>
       </div>
