@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from '@supabase/supabase-js';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { signInWithGoogle } from "@/lib/auth/oauth";
 import { useSearchParams } from 'next/navigation';
 
@@ -10,7 +10,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function QuotePage() {
+function QuoteForm() {
   const searchParams = useSearchParams();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -204,5 +204,13 @@ export default function QuotePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function QuotePage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-screen">Loading...</div>}>
+      <QuoteForm />
+    </Suspense>
   );
 }

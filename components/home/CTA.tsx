@@ -1,31 +1,31 @@
 ﻿export default function CTA() {
   return (
-    <section className="bg-slate-50 py-24 text-slate-900">
+    <section className="bg-slate-50 py-6 sm:py-10 text-slate-900">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="overflow-hidden rounded-[2rem] bg-white p-10 shadow-xl shadow-slate-200 ring-1 ring-slate-200/60 sm:p-12">
-          <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-            <div className="space-y-5 text-center lg:text-left">
-              <p className="text-sm uppercase tracking-[0.32em] text-indigo-600">
+        <div className="overflow-hidden rounded-xl bg-white p-5 shadow-lg shadow-slate-200 ring-1 ring-slate-200/60 sm:p-8">
+          <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+            <div className="text-center lg:text-left">
+              <p className="text-[10px] uppercase tracking-[0.32em] text-indigo-600 sm:text-xs">
                 Start your project
               </p>
-              <h2 className="text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
+              <h2 className="mt-1.5 text-lg font-semibold tracking-tight text-slate-950 sm:text-2xl">
                 Ready to turn your construction vision into reality?
               </h2>
-              <p className="max-w-2xl text-lg leading-8 text-slate-600">
+              <p className="mt-1.5 text-xs leading-5 text-slate-600 sm:text-sm">
                 Connect with our planning team for a fast quotation, site review, and project strategy tailored to your site.
               </p>
             </div>
 
-            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-end">
+            <div className="flex flex-row items-center justify-center gap-2 sm:justify-end">
               <a
                 href="/quote"
-                className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500"
+                className="flex-1 max-w-[160px] rounded-full bg-emerald-600 px-5 py-2 text-xs font-semibold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-500 text-center"
               >
                 Book a quote
               </a>
               <a
                 href="#projects"
-                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-8 py-4 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
+                className="flex-1 max-w-[160px] rounded-full border border-slate-200 bg-white px-5 py-2 text-xs font-semibold text-slate-900 transition hover:bg-slate-50 text-center"
               >
                 View projects
               </a>

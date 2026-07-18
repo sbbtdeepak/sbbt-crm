@@ -12,7 +12,8 @@ export default async function Hero() {
 
   const hero = data ?? {
     title: "Build Your Dream Home",
-    subtitle: "Premium construction, turnkey delivery, and full-site supervision for modern homes.",
+    subtitle:
+      "Premium construction, turnkey delivery, and full-site supervision for modern homes.",
     cta_text: "Get Your Free Quote",
     cta_link: "/quote",
     image_url:
@@ -25,57 +26,78 @@ export default async function Hero() {
       : "https://images.pexels.com/photos/5843998/pexels-photo-5843998.jpeg?auto=compress&cs=tinysrgb&w=1200";
 
   return (
+    // pt-14 for mobile header space compensation (transparent header on home)
+    // Desktop uses standard pt-28
     <section className="bg-white">
-      <div className="mx-auto max-w-7xl px-6 py-24 lg:px-8">
-        <div className="grid gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div className="space-y-8">
-            <span className="inline-flex rounded-full bg-[#eef4ff] px-4 py-2 text-sm font-semibold text-indigo-700 ring-1 ring-indigo-100">
-              Luxury residential construction
-            </span>
-
-            <div className="space-y-6">
-              <h1 className="max-w-3xl text-5xl font-semibold tracking-tight text-slate-950 sm:text-6xl">
-                {hero.title}
-              </h1>
-              <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                {hero.subtitle}
-              </p>
+      <div className="mx-auto max-w-7xl px-4 lg:px-8">
+        <div className="grid lg:grid-cols-[1fr_1.3fr] lg:items-center lg:gap-8">
+          {/* Image — first on mobile with SBBT overlay */}
+          <div className="order-first lg:order-last relative">
+            <div className="overflow-hidden rounded-2xl shadow-2xl shadow-slate-200/60 lg:rounded-[2rem]">
+              <img
+                src={image}
+                alt="Luxury home construction"
+                className="aspect-[4/3] w-full object-cover lg:aspect-[4/5]"
+              />
             </div>
-
-            <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
-              <Link
-                href={hero.cta_link || "/quote"}
-                className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500"
-              >
-                {hero.cta_text || "Get Quote Now"}
-              </Link>
-
-              <Link
-                href="#projects"
-                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-8 py-4 text-base font-semibold text-slate-900 shadow-sm transition hover:border-indigo-300 hover:bg-slate-50"
-              >
-                View Featured Work
-              </Link>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-[2rem] bg-[#f8fafc] p-6 shadow-sm ring-1 ring-slate-200">
-                <p className="text-3xl font-semibold text-indigo-700">500+</p>
-                <p className="mt-2 text-sm text-slate-600">Projects delivered</p>
-              </div>
-              <div className="rounded-[2rem] bg-[#f8fafc] p-6 shadow-sm ring-1 ring-slate-200">
-                <p className="text-3xl font-semibold text-indigo-700">13+</p>
-                <p className="mt-2 text-sm text-slate-600">Years of construction experience</p>
-              </div>
+            {/* SBBT logo overlay on image */}
+            <div className="absolute top-3 left-3 flex items-center gap-2 rounded-xl bg-white/80 backdrop-blur-sm px-3 py-1.5 shadow-sm">
+              <span className="text-sm font-bold text-indigo-700">SBBT</span>
+              <span className="text-[10px] text-slate-600 leading-tight">Shree Badree<br />Build Tech</span>
             </div>
           </div>
 
-          <div className="rounded-[2.5rem] bg-[#f8fafc] p-4 shadow-xl shadow-slate-200/50 ring-1 ring-slate-200 sm:p-6">
-            <img
-              src={image}
-              alt={hero.title}
-              className="aspect-[4/5] w-full rounded-[2rem] object-cover"
-            />
+          {/* Content — compact */}
+          <div className="pt-14 pb-2 lg:pt-0 lg:pb-0 space-y-2 lg:space-y-4">
+            <span className="inline-flex rounded-full bg-[#eef4ff] px-3 py-1 text-[10px] font-semibold text-indigo-700 ring-1 ring-indigo-100 sm:text-xs sm:px-4 sm:py-1.5">
+              Luxury Residential Construction
+            </span>
+
+            <h1 className="max-w-3xl text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl lg:text-4xl xl:text-5xl">
+              Build Your Dream Home Designed Around Your Lifestyle
+            </h1>
+
+            <div className="flex flex-row gap-2">
+              <Link
+                href={hero.cta_link || "/quote"}
+                className="inline-flex flex-1 items-center justify-center rounded-full bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 sm:text-sm sm:px-6 sm:py-3"
+              >
+                Get Free Quote
+              </Link>
+
+              <Link
+                href="/packages"
+                className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-900 shadow-sm transition hover:border-indigo-300 hover:bg-slate-50 sm:text-sm sm:px-6 sm:py-3"
+              >
+                View Packages
+              </Link>
+            </div>
+
+            {/* Stats row */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <div className="flex items-baseline gap-1">
+                <span className="text-base font-bold text-indigo-700 sm:text-xl">
+                  500+
+                </span>
+                <span className="text-[10px] text-slate-600 sm:text-xs">Homes</span>
+              </div>
+              <div className="h-4 w-px bg-slate-200 sm:h-6" />
+              <div className="flex items-baseline gap-1">
+                <span className="text-base font-bold text-indigo-700 sm:text-xl">
+                  13+
+                </span>
+                <span className="text-[10px] text-slate-600 sm:text-xs">Years</span>
+              </div>
+              <div className="h-4 w-px bg-slate-200 sm:h-6" />
+              <div className="flex items-baseline gap-1">
+                <span className="text-base font-bold text-indigo-700 sm:text-xl">
+                  4.8★
+                </span>
+                <span className="text-[10px] text-slate-600 sm:text-xs">
+                  Google Rating
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

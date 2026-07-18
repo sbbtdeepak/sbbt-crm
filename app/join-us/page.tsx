@@ -43,13 +43,13 @@ export default function JoinUsPage() {
       <Header />
 
       {/* Hero */}
-      <section className="pt-28 bg-slate-50">
-        <div className="mx-auto max-w-7xl px-6 py-20">
+      <section className="pt-24 bg-slate-50">
+        <div className="mx-auto max-w-7xl px-6 py-10">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-slate-950 sm:text-5xl">
+            <h1 className="text-xl font-bold text-slate-950 sm:text-2xl lg:text-3xl">
               Join <span className="text-indigo-600">Us</span>
             </h1>
-            <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="mt-1.5 text-xs text-slate-600 max-w-xl mx-auto sm:text-sm">
               Become part of the SBBT family. Choose your path and grow with us.
             </p>
           </div>
@@ -57,29 +57,29 @@ export default function JoinUsPage() {
       </section>
 
       {/* Choose Your Category */}
-      <section className="bg-white py-20">
+      <section className="bg-white py-8">
         <div className="mx-auto max-w-7xl px-6">
-          <h2 className="text-3xl font-bold text-slate-900 text-center mb-12">
+          <h2 className="text-lg font-bold text-slate-900 text-center mb-6">
             Choose Your Category
           </h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {categories.map((category) => (
               <div
                 key={category.name}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-lg transition"
+                className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md transition"
               >
-                <div className="text-4xl mb-4">{category.icon}</div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                <div className="text-xl mb-2">{category.icon}</div>
+                <h3 className="text-sm font-bold text-slate-900 mb-1">
                   {category.name}
                 </h3>
-                <p className="text-slate-600 mb-4 text-sm leading-relaxed">
+                <p className="text-slate-600 mb-2 text-xs">
                   {category.description}
                 </p>
-                <div className="flex gap-2">
-                  <button className="rounded-full bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-100 transition">
+                <div className="flex flex-row gap-1">
+                  <button className="rounded-full bg-indigo-50 px-3 py-1 text-[10px] font-medium text-indigo-600 hover:bg-indigo-100 transition flex-1">
                     Learn More
                   </button>
-                  <button className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 transition">
+                  <button className="rounded-full bg-emerald-600 px-3 py-1 text-[10px] font-medium text-white hover:bg-emerald-500 transition flex-1">
                     Apply Now
                   </button>
                 </div>
@@ -90,46 +90,46 @@ export default function JoinUsPage() {
       </section>
 
       {/* Simple Enquiry Form */}
-      <section className="bg-slate-50 py-20">
+      <section className="bg-slate-50 py-8">
         <div className="mx-auto max-w-3xl px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900">
+          <div className="text-center mb-6">
+            <h2 className="text-lg font-bold text-slate-900">
               Have Questions?
             </h2>
-            <p className="mt-3 text-slate-600">
+            <p className="mt-1 text-xs text-slate-600">
               Fill out the form below and we will get back to you shortly.
             </p>
           </div>
 
-          <form className="rounded-2xl bg-white p-8 shadow-lg border border-slate-200 space-y-5">
-            <div className="grid gap-4 sm:grid-cols-2">
+          <form className="rounded-xl bg-white p-5 shadow-md border border-slate-200 space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-xs font-medium text-slate-700 mb-1">
                   Full Name
                 </label>
                 <input
                   type="text"
                   placeholder="Your name"
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:ring-1 focus:ring-indigo-500 focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-xs font-medium text-slate-700 mb-1">
                   Email
                 </label>
                 <input
                   type="email"
                   placeholder="Your email"
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:ring-1 focus:ring-indigo-500 focus:border-transparent"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-xs font-medium text-slate-700 mb-1">
                 Category
               </label>
-              <select className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+              <select className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:ring-1 focus:ring-indigo-500 focus:border-transparent">
                 <option>Select category</option>
                 {categories.map((cat) => (
                   <option key={cat.name} value={cat.name}>
@@ -140,19 +140,19 @@ export default function JoinUsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-xs font-medium text-slate-700 mb-1">
                 Message
               </label>
               <textarea
-                rows={4}
+                rows={3}
                 placeholder="Your message"
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:ring-1 focus:ring-indigo-500 focus:border-transparent"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full rounded-full bg-emerald-600 px-6 py-4 font-semibold text-white shadow-lg hover:bg-emerald-500 transition"
+              className="w-full rounded-full bg-emerald-600 px-4 py-2 font-semibold text-white shadow-md hover:bg-emerald-500 transition text-xs"
             >
               Send Enquiry
             </button>

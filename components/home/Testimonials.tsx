@@ -1,5 +1,13 @@
 ﻿import { createClient } from "@/lib/supabase/server";
 
+interface Testimonial {
+  id: string;
+  client_name: string;
+  project_name: string;
+  content: string;
+  is_featured?: boolean;
+}
+
 export default async function Testimonials() {
   const supabase = await createClient();
 
@@ -11,70 +19,65 @@ export default async function Testimonials() {
   if (!data?.length) return null;
 
   return (
-    <section id="testimonials" className="bg-white py-24 text-slate-900">
+    <section id="testimonials" className="bg-white py-6 sm:py-10 text-slate-900">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm uppercase tracking-[0.32em] text-indigo-600">
+          <p className="text-xs uppercase tracking-[0.32em] text-indigo-600 sm:text-sm">
             Customer confidence
           </p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
+          <h2 className="mt-1.5 text-lg font-semibold tracking-tight text-slate-950 sm:text-2xl">
             What clients say about our craftsmanship.
           </h2>
-          <p className="mt-4 text-lg leading-8 text-slate-600">
+          <p className="mt-1.5 text-xs leading-5 text-slate-600 sm:text-sm">
             Featured stories from clients who trusted us with their most important construction projects.
           </p>
         </div>
 
         {/* Desktop Grid */}
-        <div className="mt-16 hidden md:grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {data.map((item: any) => (
+        <div className="mt-4 hidden md:grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {data.map((item: Testimonial) => (
             <blockquote
               key={item.id}
-              className="group rounded-[2rem] border border-slate-200 bg-[#f8fafc] p-8 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="group rounded-xl border border-slate-200 bg-[#f8fafc] p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
             >
-              <div className="flex items-center gap-4 text-indigo-600">
-                <span className="text-3xl">"</span>
-                <p className="text-sm uppercase tracking-[0.24em] text-indigo-600">
+              <div className="flex items-center gap-2 text-indigo-600">
+                <span className="text-lg">&ldquo;</span>
+                <p className="text-[10px] uppercase tracking-[0.24em] text-indigo-600">
                   Featured testimonial
                 </p>
               </div>
-
-              <p className="mt-6 text-lg leading-8 text-slate-700 italic">
+              <p className="mt-3 text-xs leading-5 text-slate-700 italic">
                 &ldquo;{item.content}&rdquo;
               </p>
-
-              <footer className="mt-8 border-t border-slate-200 pt-5">
-                <p className="font-semibold text-slate-950">{item.client_name}</p>
-                <p className="mt-1 text-sm text-slate-500">{item.project_name}</p>
+              <footer className="mt-3 border-t border-slate-200 pt-2">
+                <p className="font-semibold text-slate-950 text-xs">{item.client_name}</p>
+                <p className="mt-0.5 text-[10px] text-slate-500">{item.project_name}</p>
               </footer>
             </blockquote>
           ))}
         </div>
 
         {/* Mobile Swipe Carousel */}
-        <div className="mt-16 md:hidden">
-          {/* Padding container for partial card visibility */}
-          <div className="px-4">
-            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 hide-scrollbar">
-              {data.map((item: any) => (
+        <div className="mt-4 md:hidden">
+          <div className="px-2">
+            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 hide-scrollbar">
+              {data.map((item: Testimonial) => (
                 <blockquote
                   key={item.id}
-                  className="snap-start flex-shrink-0 w-[calc(100vw-32px-80px)] max-w-sm rounded-[2rem] border border-slate-200 bg-[#f8fafc] p-6 shadow-sm"
+                  className="snap-start flex-shrink-0 w-[calc(100vw-32px-60px)] max-w-sm rounded-xl border border-slate-200 bg-[#f8fafc] p-4 shadow-sm"
                 >
-                  <div className="flex items-center gap-3 text-indigo-600">
-                    <span className="text-2xl">"</span>
-                    <p className="text-xs uppercase tracking-[0.24em] text-indigo-600">
+                  <div className="flex items-center gap-1.5 text-indigo-600">
+                    <span className="text-base">&ldquo;</span>
+                    <p className="text-[9px] uppercase tracking-[0.24em] text-indigo-600">
                       Testimonial
                     </p>
                   </div>
-
-                  <p className="mt-4 text-sm leading-6 text-slate-700 italic">
+                  <p className="mt-2 text-xs leading-4 text-slate-700 italic">
                     &ldquo;{item.content}&rdquo;
                   </p>
-
-                  <footer className="mt-4 border-t border-slate-200 pt-3">
-                    <p className="font-semibold text-slate-950 text-sm">{item.client_name}</p>
-                    <p className="mt-1 text-xs text-slate-500">{item.project_name}</p>
+                  <footer className="mt-2 border-t border-slate-200 pt-1.5">
+                    <p className="font-semibold text-slate-950 text-xs">{item.client_name}</p>
+                    <p className="mt-0 text-[9px] text-slate-500">{item.project_name}</p>
                   </footer>
                 </blockquote>
               ))}

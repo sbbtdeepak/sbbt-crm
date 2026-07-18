@@ -1,3 +1,5 @@
+"use client";
+
 const BRANDS = [
   { name: "UltraTech", category: "Cement" },
   { name: "ACC", category: "Cement" },
@@ -36,55 +38,115 @@ function getBrandColor(name: string): string {
   return `hsl(${hue}, 40%, 92%)`;
 }
 
+type Brand = (typeof BRANDS)[number];
+
 export default function Brands() {
+  // Create 2x2 grid rows for mobile - 4 items per "slide"
+  const brandChunks: Brand[][] = [];
+  for (let i = 0; i < BRANDS.length; i += 2) {
+    brandChunks.push(BRANDS.slice(i, i + 2));
+  }
+
   return (
-    <section className="bg-white py-24 text-slate-900 overflow-hidden">
+    <section className="bg-white py-4 sm:py-8 text-slate-900 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        {/* Section header */}
-        <div className="mx-auto max-w-3xl space-y-4 text-center">
-          <p className="text-sm uppercase tracking-[0.32em] text-indigo-600">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-[10px] uppercase tracking-[0.32em] text-indigo-600 sm:text-xs">
             Our Partners
           </p>
-          <h2 className="text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
+          <h2 className="mt-1.5 text-lg font-semibold tracking-tight text-slate-950 sm:text-xl">
             Trusted Brands We Work With
           </h2>
-          <p className="text-lg leading-8 text-slate-600">
-            We use only trusted and premium construction brands to deliver
-            durable, high-quality homes.
-          </p>
         </div>
 
-        {/* Auto Marquee - Desktop pauses on hover, mobile continuous */}
-        <div className="mt-16 relative">
-          {/* Fade edges */}
-          <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-          
+        {/* Mobile: 2x2 grid marquee showing 4 logos at once */}
+        <div className="mt-3 sm:mt-4 relative">
+          <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
           <div className="overflow-hidden">
-            <div className="flex animate-marquee gap-4 hover:[animation-play-state:paused] pl-4">
-              {/* Duplicate brands for continuous loop */}
+            <div className="animate-marquee flex gap-2 sm:hidden">
+              {/* Duplicate chunks for infinite loop */}
+              {[...brandChunks, ...brandChunks].map((chunk, chunkIdx) => (
+                <div key={chunkIdx} className="flex flex-shrink-0 gap-2 w-[calc(100%+2rem)]">
+                  {/* First row of 2 */}
+                  <div className="grid grid-cols-2 gap-2 flex-1">
+                    {chunk.map((brand) => (
+                      <div
+                        key={`${brand.name}-r1`}
+                        className="flex-shrink-0 rounded-lg border border-slate-100 bg-white p-1.5 shadow-sm"
+                      >
+                        <div className="flex items-center justify-center gap-1">
+                          <div
+                            className="flex h-5 w-5 items-center justify-center rounded-md transition-transform duration-300"
+                            style={{ backgroundColor: getBrandColor(brand.name) }}
+                          >
+                            <span className="text-[6px] font-bold text-slate-700">
+                              {getInitials(brand.name)}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-[7px] font-semibold text-slate-900 leading-tight">
+                              {brand.name}
+                            </p>
+                            <p className="text-[6px] text-slate-400 leading-tight">
+                              {brand.category}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Second row of 2 (duplicate) */}
+                  <div className="grid grid-cols-2 gap-2 flex-1">
+                    {chunk.map((brand) => (
+                      <div
+                        key={`${brand.name}-r2`}
+                        className="flex-shrink-0 rounded-lg border border-slate-100 bg-white p-1.5 shadow-sm"
+                      >
+                        <div className="flex items-center justify-center gap-1">
+                          <div
+                            className="flex h-5 w-5 items-center justify-center rounded-md transition-transform duration-300"
+                            style={{ backgroundColor: getBrandColor(brand.name) }}
+                          >
+                            <span className="text-[6px] font-bold text-slate-700">
+                              {getInitials(brand.name)}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-[7px] font-semibold text-slate-900 leading-tight">
+                              {brand.name}
+                            </p>
+                            <p className="text-[6px] text-slate-400 leading-tight">
+                              {brand.category}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Desktop: Single row marquee */}
+            <div className="animate-marquee hidden sm:flex gap-3">
               {[...BRANDS, ...BRANDS].map((brand, idx) => (
                 <div
-                  key={`${brand.name}-${idx}`}
-                  className="group flex-shrink-0 w-48 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-slate-200"
+                  key={`${brand.name}-${idx}-desktop`}
+                  className="flex-shrink-0 w-28 rounded-lg border border-slate-100 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
                 >
-                  {/* Logo placeholder */}
                   <div
-                    className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
+                    className="flex h-9 w-9 items-center justify-center rounded-md mx-auto transition-transform duration-300"
                     style={{ backgroundColor: getBrandColor(brand.name) }}
                   >
-                    <span className="text-sm font-bold text-slate-700">
+                    <span className="text-[10px] font-bold text-slate-700">
                       {getInitials(brand.name)}
                     </span>
                   </div>
-
-                  {/* Brand name */}
-                  <p className="mt-4 text-center text-sm font-semibold text-slate-900 transition-colors group-hover:text-indigo-600">
+                  <p className="mt-1.5 text-center text-xs font-semibold text-slate-900 leading-tight">
                     {brand.name}
                   </p>
-
-                  {/* Category */}
-                  <p className="mt-0.5 text-center text-xs text-slate-400">
+                  <p className="text-center text-[10px] text-slate-400 leading-tight">
                     {brand.category}
                   </p>
                 </div>
@@ -93,9 +155,8 @@ export default function Brands() {
           </div>
         </div>
 
-        {/* Trusted by note */}
-        <p className="mt-12 text-center text-sm text-slate-400">
-          …and many more trusted names in the construction industry.
+        <p className="mt-2 text-center text-[9px] sm:text-xs text-slate-400">
+          &hellip;and many more trusted names in the construction industry.
         </p>
       </div>
     </section>
