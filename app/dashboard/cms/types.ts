@@ -117,6 +117,32 @@ export type CMSCompanyInsert = CMSInsert<CMSCompanyRow>;
 /** Shape for updating an existing company row */
 export type CMSCompanyUpdate = CMSUpdate<CMSCompanyRow>;
 
+/** @deprecated Use CMSCompanyRow for database row type */
+export type CMSCompany = CMSCompanyRow;
+
+// ============================================================
+// Hero Banner
+// ============================================================
+
+/**
+ * Hero banner content for the homepage.
+ * Controls the main hero section displayed on the public homepage.
+ */
+export interface HeroBanner {
+  /** Auto-incrementing primary key */
+  id: number;
+  /** Main hero heading text */
+  title: string;
+  /** Hero subheading / description text */
+  subtitle: string;
+  /** Call-to-action button text */
+  button_text: string;
+  /** Call-to-action button link */
+  button_link: string;
+  /** URL to hero background image */
+  image_url: string;
+}
+
 // ============================================================
 // Homepage
 // ============================================================
@@ -159,6 +185,9 @@ export type CMSHomepageInsert = CMSInsert<CMSHomepageRow>;
 /** Shape for updating an existing homepage row */
 export type CMSHomepageUpdate = CMSUpdate<CMSHomepageRow>;
 
+/** @deprecated Use CMSHomepageRow for database row type */
+export type CMSHomepage = CMSHomepageRow;
+
 // ============================================================
 // SEO
 // ============================================================
@@ -198,6 +227,9 @@ export type CMSSeoInsert = CMSInsert<CMSSEORow>;
 /** Shape for updating an existing SEO row */
 export type CMSSeoUpdate = CMSUpdate<CMSSEORow>;
 
+/** @deprecated Use CMSSEORow for database row type */
+export type CMSSEO = CMSSEORow;
+
 // ============================================================
 // Social
 // ============================================================
@@ -224,6 +256,9 @@ export type CMSSocialInsert = CMSInsert<CMSSocialRow>;
 
 /** Shape for updating an existing social row */
 export type CMSSocialUpdate = CMSUpdate<CMSSocialRow>;
+
+/** @deprecated Use CMSSocialRow for database row type */
+export type CMSSocial = CMSSocialRow;
 
 // ============================================================
 // Settings
@@ -259,6 +294,9 @@ export type CMSSettingsInsert = CMSInsert<CMSSettingsRow>;
 
 /** Shape for updating an existing settings row */
 export type CMSSettingsUpdate = CMSUpdate<CMSSettingsRow>;
+
+/** @deprecated Use CMSSettingsRow for database row type */
+export type CMSSettings = CMSSettingsRow;
 
 // ============================================================
 // Media

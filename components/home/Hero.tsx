@@ -4,20 +4,28 @@ import Link from "next/link";
 export default async function Hero() {
   const supabase = await createClient();
 
-  const { data } = await supabase
+  // Try to get CMS homepage data first
+  const { data: cmsHomepage } = await supabase
+    .from("cms_homepage")
+    .select("*")
+    .eq("site_id", "00000000-0000-0000-0000-000000000001")
+    .maybeSingle();
+
+  // Fall back to hero_banner for backward compatibility
+  const { data: heroBanner } = await supabase
     .from("hero_banner")
     .select("*")
     .eq("is_active", true)
     .maybeSingle();
 
-  const hero = data ?? {
-    title: "Build Your Dream Home",
-    subtitle:
-      "Premium construction, turnkey delivery, and full-site supervision for modern homes.",
-    cta_text: "Get Your Free Quote",
-    cta_link: "/quote",
-    image_url:
-      "https://images.pexels.com/photos/5843998/pexels-photo-5843998.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  // Use CMS data if available, otherwise fall back to hero_banner or hardcoded defaults
+  const hero = {
+    title: cmsHomepage?.hero_heading || heroBanner?.title || "Build Your Dream Home",
+    subtitle: cmsHomepage?.hero_subheading || heroBanner?.subtitle || "Premium construction, turnkey delivery, and full-site supervision for modern homes.",
+    cta_text: cmsHomepage?.hero_cta_text || heroBanner?.button_text || "Get Your Free Quote",
+    cta_link: cmsHomepage?.hero_cta_link || heroBanner?.button_link || "/quote",
+    image_url: cmsHomepage?.hero_background_url || heroBanner?.image_url || "https://images.pexels.com/photos/5843998/pexels-photo-5843998.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    stats: cmsHomepage?.stats || [],
   };
 
   const image =
@@ -31,7 +39,7 @@ export default async function Hero() {
     <section className="bg-white">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <div className="grid lg:grid-cols-[1fr_1.3fr] lg:items-center lg:gap-8">
-          {/* Image — first on mobile with SBBT overlay */}
+          {/* Image → first on mobile with SBBT overlay */}
           <div className="order-first lg:order-last relative">
             <div className="overflow-hidden rounded-2xl shadow-2xl shadow-slate-200/60 lg:rounded-[2rem]">
               <img
@@ -47,22 +55,28 @@ export default async function Hero() {
             </div>
           </div>
 
-          {/* Content — compact */}
+          {/* Content → compact */}
           <div className="pt-14 pb-2 lg:pt-0 lg:pb-0 space-y-2 lg:space-y-4">
             <span className="inline-flex rounded-full bg-[#eef4ff] px-3 py-1 text-[10px] font-semibold text-indigo-700 ring-1 ring-indigo-100 sm:text-xs sm:px-4 sm:py-1.5">
               Luxury Residential Construction
             </span>
 
             <h1 className="max-w-3xl text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl lg:text-4xl xl:text-5xl">
-              Build Your Dream Home Designed Around Your Lifestyle
+              {hero.title}
             </h1>
+
+            {hero.subtitle && (
+              <p className="max-w-2xl text-sm text-slate-600 sm:text-base lg:text-lg">
+                {hero.subtitle}
+              </p>
+            )}
 
             <div className="flex flex-row gap-2">
               <Link
                 href={hero.cta_link || "/quote"}
                 className="inline-flex flex-1 items-center justify-center rounded-full bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 sm:text-sm sm:px-6 sm:py-3"
               >
-                Get Free Quote
+                {hero.cta_text || "Get Free Quote"}
               </Link>
 
               <Link
@@ -75,28 +89,41 @@ export default async function Hero() {
 
             {/* Stats row */}
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-              <div className="flex items-baseline gap-1">
-                <span className="text-base font-bold text-indigo-700 sm:text-xl">
-                  500+
-                </span>
-                <span className="text-[10px] text-slate-600 sm:text-xs">Homes</span>
-              </div>
-              <div className="h-4 w-px bg-slate-200 sm:h-6" />
-              <div className="flex items-baseline gap-1">
-                <span className="text-base font-bold text-indigo-700 sm:text-xl">
-                  13+
-                </span>
-                <span className="text-[10px] text-slate-600 sm:text-xs">Years</span>
-              </div>
-              <div className="h-4 w-px bg-slate-200 sm:h-6" />
-              <div className="flex items-baseline gap-1">
-                <span className="text-base font-bold text-indigo-700 sm:text-xl">
-                  4.8★
-                </span>
-                <span className="text-[10px] text-slate-600 sm:text-xs">
-                  Google Rating
-                </span>
-              </div>
+              {hero.stats.length > 0 ? (
+                hero.stats.map((stat: { label: string; value: string }, index: number) => (
+                  <div key={index} className="flex items-baseline gap-1">
+                    <span className="text-base font-bold text-indigo-700 sm:text-xl">
+                      {stat.value}
+                    </span>
+                    <span className="text-[10px] text-slate-600 sm:text-xs">{stat.label}</span>
+                  </div>
+                ))
+              ) : (
+                <>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-base font-bold text-indigo-700 sm:text-xl">
+                      500+
+                    </span>
+                    <span className="text-[10px] text-slate-600 sm:text-xs">Homes</span>
+                  </div>
+                  <div className="h-4 w-px bg-slate-200 sm:h-6" />
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-base font-bold text-indigo-700 sm:text-xl">
+                      13+
+                    </span>
+                    <span className="text-[10px] text-slate-600 sm:text-xs">Years</span>
+                  </div>
+                  <div className="h-4 w-px bg-slate-200 sm:h-6" />
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-base font-bold text-indigo-700 sm:text-xl">
+                      4.8★
+                    </span>
+                    <span className="text-[10px] text-slate-600 sm:text-xs">
+                      Google Rating
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
