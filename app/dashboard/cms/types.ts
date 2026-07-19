@@ -1,8 +1,343 @@
-export interface HeroBanner {
-  id?: string;
-  title: string;
-  subtitle: string;
-  button_text: string;
-  button_link: string;
-  image_url: string;
+// ============================================================
+// CMS Module — TypeScript Types
+// SBBT CRM Next.js Project
+//
+// This file defines all TypeScript interfaces for the CMS module.
+// Types are organized into three layers per entity:
+//   - Row:   Shape of a database row (read)
+//   - Insert: Shape for creating a new row (omit id, timestamps, audit)
+//   - Update: Shape for updating an existing row (partial, omit id)
+//
+// All entities extend CMSBase which provides the common columns:
+//   id, site_id, created_at, updated_at, created_by, updated_by
+//
+// Multi-site support is built in via site_id (UUID).
+// ============================================================
+
+// ============================================================
+// Base Types
+// ============================================================
+
+/**
+ * Common columns present in every CMS table.
+ * Provides multi-site support (site_id) and audit trail
+ * (created_by, updated_by referencing auth.users).
+ */
+export interface CMSBase {
+  /** Auto-incrementing primary key */
+  id: number;
+  /** UUID for multi-site/tenant support. Default site: 00000000-0000-0000-0000-000000000001 */
+  site_id: string;
+  /** Timestamp of row creation (set by database) */
+  created_at: string | null;
+  /** Timestamp of last update (set by database) */
+  updated_at: string | null;
+  /** UUID of the auth.users who created this row */
+  created_by: string | null;
+  /** UUID of the auth.users who last updated this row */
+  updated_by: string | null;
 }
+
+/**
+ * Shape for inserting a new row.
+ * Omits id (auto-generated), timestamps (set by database),
+ * and audit fields (set by server action).
+ */
+export type CMSInsert<T extends CMSBase> = Omit<
+  T,
+  "id" | "created_at" | "updated_at" | "created_by" | "updated_by"
+>;
+
+/**
+ * Shape for updating an existing row.
+ * All fields optional except site_id (required for lookup).
+ */
+export type CMSUpdate<T extends CMSBase> = Partial<
+  Omit<T, "id" | "created_at" | "updated_at" | "created_by" | "updated_by">
+> & {
+  site_id: string;
+};
+
+// ============================================================
+// Company
+// ============================================================
+
+/**
+ * Company information for the site.
+ * Stores brand identity, contact details, and localization settings.
+ */
+export interface CMSCompanyRow extends CMSBase {
+  /** Display brand name (e.g. "SBBT Construction") */
+  brand_name: string;
+  /** Registered legal entity name */
+  legal_name: string;
+  /** Short brand tagline */
+  tagline: string;
+  /** URL to company logo image (stored in cms/logos/) */
+  logo_url: string;
+  /** URL to favicon image (stored in cms/favicons/) */
+  favicon_url: string;
+  /** Primary brand color (hex, e.g. "#4f46e5") */
+  primary_color: string;
+  /** Secondary brand color (hex, e.g. "#06b6d4") */
+  secondary_color: string;
+  /** Currency code (e.g. "INR", "USD") */
+  currency: string;
+  /** IANA timezone (e.g. "Asia/Kolkata") */
+  timezone: string;
+  /** Language code (e.g. "en", "hi") */
+  language: string;
+  /** Goods and Services Tax ID */
+  gst: string;
+  /** Permanent Account Number (tax ID) */
+  pan: string;
+  /** Physical address */
+  address: string;
+  /** Primary phone number */
+  phone: string;
+  /** WhatsApp number */
+  whatsapp: string;
+  /** Primary email address */
+  email: string;
+  /** Customer support email */
+  support_email: string;
+  /** Sales email */
+  sales_email: string;
+  /** Website URL */
+  website: string;
+  /** Google Maps embed URL or location URL */
+  google_maps_url: string;
+  /** Business hours description (e.g. "Mon-Sat: 9:00 AM - 6:00 PM") */
+  business_hours: string;
+}
+
+/** Shape for inserting a new company row */
+export type CMSCompanyInsert = CMSInsert<CMSCompanyRow>;
+
+/** Shape for updating an existing company row */
+export type CMSCompanyUpdate = CMSUpdate<CMSCompanyRow>;
+
+// ============================================================
+// Homepage
+// ============================================================
+
+/**
+ * A single statistic displayed on the homepage hero section.
+ * Consists of a label and its corresponding value.
+ */
+export interface CMSStat {
+  /** Display label (e.g. "Years of Experience") */
+  label: string;
+  /** Display value (e.g. "15+") */
+  value: string;
+}
+
+/**
+ * Homepage hero section content and statistics.
+ * Controls the main banner and stats display on the public homepage.
+ */
+export interface CMSHomepageRow extends CMSBase {
+  /** Main hero heading text */
+  hero_heading: string;
+  /** Hero subheading / description text */
+  hero_subheading: string;
+  /** Call-to-action button text */
+  hero_cta_text: string;
+  /** Call-to-action button link */
+  hero_cta_link: string;
+  /** URL to hero background image (stored in cms/hero/) */
+  hero_background_url: string;
+  /** Heading text displayed above the statistics section */
+  stats_heading: string;
+  /** Array of statistics as JSONB */
+  stats: CMSStat[];
+}
+
+/** Shape for inserting a new homepage row */
+export type CMSHomepageInsert = CMSInsert<CMSHomepageRow>;
+
+/** Shape for updating an existing homepage row */
+export type CMSHomepageUpdate = CMSUpdate<CMSHomepageRow>;
+
+// ============================================================
+// SEO
+// ============================================================
+
+/**
+ * SEO metadata for the site.
+ * Controls search engine indexing, social sharing, and verification.
+ */
+export interface CMSSEORow extends CMSBase {
+  /** Default meta title for the site */
+  meta_title: string;
+  /** Default meta description */
+  meta_description: string;
+  /** Comma-separated meta keywords */
+  meta_keywords: string;
+  /** URL to Open Graph image (stored in cms/og-images/) */
+  og_image_url: string;
+  /** Canonical URL for the site */
+  canonical_url: string;
+  /** Robots meta directive (e.g. "index, follow", "noindex, nofollow") */
+  robots: string;
+  /** Structured data / JSON-LD schema as JSON object */
+  schema_json: Record<string, unknown>;
+  /** Twitter card type (e.g. "summary_large_image", "summary") */
+  twitter_card: string;
+  /** Facebook App ID for social integration */
+  facebook_app_id: string;
+  /** Google Search Console verification code */
+  google_verification: string;
+  /** Bing Webmaster Tools verification code */
+  bing_verification: string;
+}
+
+/** Shape for inserting a new SEO row */
+export type CMSSeoInsert = CMSInsert<CMSSEORow>;
+
+/** Shape for updating an existing SEO row */
+export type CMSSeoUpdate = CMSUpdate<CMSSEORow>;
+
+// ============================================================
+// Social
+// ============================================================
+
+/**
+ * Social media profile links for the site.
+ * Each field stores the full URL to the respective social profile.
+ */
+export interface CMSSocialRow extends CMSBase {
+  /** Facebook page/profile URL */
+  facebook_url: string;
+  /** Instagram profile URL */
+  instagram_url: string;
+  /** LinkedIn company/page URL */
+  linkedin_url: string;
+  /** YouTube channel URL */
+  youtube_url: string;
+  /** Twitter/X profile URL */
+  twitter_url: string;
+}
+
+/** Shape for inserting a new social row */
+export type CMSSocialInsert = CMSInsert<CMSSocialRow>;
+
+/** Shape for updating an existing social row */
+export type CMSSocialUpdate = CMSUpdate<CMSSocialRow>;
+
+// ============================================================
+// Settings
+// ============================================================
+
+/**
+ * Site-wide settings and feature toggles.
+ * Controls footer content, maintenance mode, and available features.
+ */
+export interface CMSSettingsRow extends CMSBase {
+  /** Custom footer text/HTML */
+  footer_text: string;
+  /** Copyright notice text */
+  copyright_text: string;
+  /** Whether the site is in maintenance mode */
+  maintenance_mode: boolean;
+  /** Message displayed during maintenance mode */
+  maintenance_message: string;
+  /** Whether the blog feature is enabled */
+  enable_blog: boolean;
+  /** Whether the quote request feature is enabled */
+  enable_quote: boolean;
+  /** Whether WhatsApp contact button is enabled */
+  enable_whatsapp: boolean;
+  /** Whether the chatbot is enabled */
+  enable_chatbot: boolean;
+  /** Whether the call button is enabled */
+  enable_call_button: boolean;
+}
+
+/** Shape for inserting a new settings row */
+export type CMSSettingsInsert = CMSInsert<CMSSettingsRow>;
+
+/** Shape for updating an existing settings row */
+export type CMSSettingsUpdate = CMSUpdate<CMSSettingsRow>;
+
+// ============================================================
+// Media
+// ============================================================
+
+/**
+ * Represents a single file stored in the CMS storage bucket.
+ * Used by the MediaManager component for listing and management.
+ */
+export interface CMSMediaItem {
+  /** File name in storage (e.g. "logos/abc123.png") */
+  name: string;
+  /** Public URL to access the file */
+  public_url: string;
+  /** File size in bytes */
+  size: number;
+  /** MIME type (e.g. "image/png") */
+  mimetype: string;
+  /** Timestamp when the file was last modified */
+  updated_at: string;
+}
+
+/**
+ * Result of an image upload operation.
+ */
+export interface CMSUploadResult {
+  /** Public URL of the uploaded image */
+  url: string;
+  /** Storage path of the uploaded file */
+  path: string;
+}
+
+// ============================================================
+// Server Action Form State
+// ============================================================
+
+/**
+ * Standard response shape for all CMS Server Actions.
+ * Used by useActionState() in form components.
+ */
+export interface CMSFormState {
+  /** Whether the operation succeeded */
+  success: boolean;
+  /** User-facing message (success or error) */
+  message: string;
+  /** Field-level validation errors (keyed by field name) */
+  errors?: Record<string, string[]>;
+}
+
+// ============================================================
+// Default Site ID
+// ============================================================
+
+/**
+ * The default site UUID used for single-site deployments.
+ * In a multi-site setup, this would be replaced with the
+ * current site's UUID from the request context.
+ */
+export const DEFAULT_SITE_ID = "00000000-0000-0000-0000-000000000001";
+
+// ============================================================
+// Storage Bucket Configuration
+// ============================================================
+
+/**
+ * Available folders within the CMS storage bucket.
+ * Each folder corresponds to a specific content type.
+ */
+export const CMS_STORAGE_FOLDERS = {
+  LOGOS: "logos",
+  FAVICONS: "favicons",
+  HERO: "hero",
+  OG_IMAGES: "og-images",
+  GENERAL: "general",
+} as const;
+
+/** Union type of valid storage folder names */
+export type CMSStorageFolder =
+  (typeof CMS_STORAGE_FOLDERS)[keyof typeof CMS_STORAGE_FOLDERS];
+
+/** Name of the CMS storage bucket */
+export const CMS_STORAGE_BUCKET = "cms";

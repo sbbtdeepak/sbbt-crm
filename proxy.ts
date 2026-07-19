@@ -14,6 +14,7 @@ const PUBLIC_ROUTES = [
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const supabaseResponse = NextResponse.next();
 
   // Ignore Next.js internals and static assets
   if (
@@ -23,12 +24,12 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/auth") ||
     pathname.includes(".")
   ) {
-    return NextResponse.next();
+    return supabaseResponse;
   }
 
   // Public routes - allow access
   if (PUBLIC_ROUTES.includes(pathname)) {
-    return NextResponse.next();
+    return supabaseResponse;
   }
 
   // Protect /dashboard
@@ -41,18 +42,26 @@ export async function proxy(request: NextRequest) {
           getAll() {
             return request.cookies.getAll();
           },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              request.cookies.set(name, value);
+              supabaseResponse.cookies.set(name, value, options);
+            });
+          },
         },
       }
     );
 
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
+
+    return supabaseResponse;
   }
 
-  return NextResponse.next();
+  return supabaseResponse;
 }
 
 export const config = {
