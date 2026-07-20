@@ -1,10 +1,10 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { useState } from 'react';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import Link from "next/link";
+import { getCompanyPublicData } from "@/app/dashboard/cms/actions";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,9 +19,22 @@ export default function ContactPage() {
     message: '',
     location: '',
   });
+  const [company, setCompany] = useState<{
+    address?: string;
+    phone?: string;
+    email?: string;
+  } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    getCompanyPublicData().then(data => setCompany({
+      address: data.address,
+      phone: data.phone,
+      email: data.email,
+    })).catch(() => {});
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -152,9 +165,9 @@ export default function ContactPage() {
             <div>
               <h2 className="text-base font-bold text-gray-900">Contact Information</h2>
               <ul className="mt-3 space-y-2 text-gray-600 text-xs">
-                <li><span className="font-medium text-gray-900">Office:</span> SBBT Constructions, Mumbai</li>
-                <li><span className="font-medium text-gray-900">Phone:</span> +91 98765 43210</li>
-                <li><span className="font-medium text-gray-900">Email:</span> info@sbbtconstruction.com</li>
+                <li><span className="font-medium text-gray-900">Office:</span> {company?.address || "SBBT Constructions, Mumbai"}</li>
+                <li><span className="font-medium text-gray-900">Phone:</span> {company?.phone || "+91 98765 43210"}</li>
+                <li><span className="font-medium text-gray-900">Email:</span> {company?.email || "info@sbbtconstruction.com"}</li>
               </ul>
             </div>
 

@@ -96,11 +96,8 @@ export default function CompanyForm({ company }: Props) {
                 folder="logos"
                 value={company?.logo_url || ""}
                 onChange={(url) => {
-                  const input = document.createElement("input");
-                  input.type = "hidden";
-                  input.name = "logo_url";
-                  input.value = url;
-                  document.querySelector("form")?.appendChild(input);
+                  const input = document.querySelector<HTMLInputElement>('input[name="logo_url"]');
+                  if (input) input.value = url;
                 }}
                 label="Logo"
                 disabled={isPending}
@@ -113,11 +110,8 @@ export default function CompanyForm({ company }: Props) {
                 folder="favicons"
                 value={company?.favicon_url || ""}
                 onChange={(url) => {
-                  const input = document.createElement("input");
-                  input.type = "hidden";
-                  input.name = "favicon_url";
-                  input.value = url;
-                  document.querySelector("form")?.appendChild(input);
+                  const input = document.querySelector<HTMLInputElement>('input[name="favicon_url"]');
+                  if (input) input.value = url;
                 }}
                 label="Favicon"
                 disabled={isPending}

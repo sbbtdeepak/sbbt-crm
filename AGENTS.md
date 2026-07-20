@@ -1,192 +1,157 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# SBBT CRM - Development Agent Guide
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data.
+## Project Overview
 
-Before writing or modifying any code:
+**Project Name:** SBBT CRM + CMS + AI Website Builder  
+**Company:** Shree Badree Build Tech Pvt. Ltd.  
+**Website:** https://www.sbbt.in
 
-- Read the relevant documentation from `node_modules/next/dist/docs/`.
-- Follow the latest Next.js 16 conventions.
-- Respect deprecation warnings.
-- Never assume older Next.js APIs are valid.
+A production-ready Construction CRM + CMS platform evolving into an AI-powered Website Builder. Modular, scalable, and reusable architecture.
 
-<!-- END:nextjs-agent-rules -->
+## Tech Stack
 
-# SBBT CRM Project Rules
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS
+- Supabase
+- Supabase Storage
+- Server Actions
+- Vercel
 
-## General
+## Development Priorities
 
-- This is a production project.
-- Prioritize stability over speed.
-- Never rewrite working code.
-- Never perform repository-wide refactors unless explicitly requested.
-- Make the smallest possible change.
-- Always preserve existing functionality.
+Priority order (highest to lowest):
 
----
+1. **Runtime Stability**
+2. **Data Integrity**
+3. **Security**
+4. **Architecture**
+5. **Performance**
+6. **Feature Completion**
+7. **UI / Appearance**
 
-## Development Workflow
+Never sacrifice higher priorities for lower ones.
 
-Before writing code:
+## Modification Rules
 
-1. Analyze
-2. Verify assumptions
-3. Show affected files
-4. Explain root cause
-5. Show implementation plan
-6. Wait for approval
+Before modifying any file:
 
-Never skip the approval step.
+1. Identify the exact file.
+2. Explain why it must be modified.
+3. Check for existing implementation.
+4. Avoid duplicate logic.
+5. Modify the smallest possible surface area.
 
----
+Never rewrite working components without approval.
 
-## Feature Development
+## Runtime First Rule
 
-- Build one feature at a time.
-- Complete one phase before starting the next.
-- Never combine multiple milestones into one implementation.
-- Keep changes scoped only to the current feature.
+If a runtime error exists:
 
----
+- STOP feature development.
+- Fix runtime first.
+- Do not continue building new features.
 
-## Authentication
+## Feature Development Rules
 
-Authentication is frozen.
+Each feature must:
 
-Do NOT modify:
+- Be production ready
+- Be mobile responsive
+- Be SEO friendly
+- Be accessible
+- Be reusable
+- Be modular
+- Be type safe
 
-- app/auth/*
-- proxy.ts
-- app/login/*
-- lib/supabase/*
+## Code Quality Rules
 
-Unless explicitly instructed.
+Never:
 
----
+- Duplicate components
+- Duplicate utilities
+- Duplicate hooks
+- Duplicate types
+- Duplicate server actions
 
-## Supabase
+Always reuse existing code.
 
-- Use existing project architecture.
-- Do not create duplicate clients.
-- Reuse existing helpers.
-- Follow Supabase SSR best practices.
+## Authentication Protection Rules
 
----
+Authentication is stable. Do not modify authentication unless explicitly requested.
 
-## Shared Components
+Protected files:
 
-Shared components must always be:
+- `proxy.ts`
+- `app/auth/*`
+- `lib/auth/*`
+- `lib/supabase/*`
 
-- Generic
-- Reusable
-- Type-safe
-- Independent of CMS-specific types
+## CMS Rules
 
-Never duplicate components.
+When working with CMS modules:
 
-Always reuse existing components whenever possible.
+- Reuse existing Server Actions
+- Reuse existing Types
+- Reuse ImageUploader component
+- Reuse Storage utilities
 
----
+Do not create duplicate CMS logic.
 
-## TypeScript
+## Investigation Before Coding Rule
 
-- Strict TypeScript only.
-- Never introduce `any`.
-- Prefer reusable interfaces.
-- Export all public types.
+Before changing code:
 
----
-
-## UI Rules
-
-Every UI must be:
-
-- Mobile First
-- Responsive
-- Accessible
-- SEO Friendly
-- Production Ready
-
----
-
-## Database
-
-- Never delete existing tables.
-- Never perform destructive migrations.
-- Every migration must be reversible.
-- Prefer additive schema changes.
-- Future-proof schema for multi-site support.
-
----
-
-## Build Rules
-
-After every implementation:
-
-1. npm run build
-2. TypeScript check
-3. npm run lint
-4. Git diff review
-
-Stop after verification.
+1. Investigate first.
+2. Return:
+   - Root Cause
+   - Files affected
+   - Implementation plan
 
 Wait for approval.
 
----
+## Completion Rule
 
-## Code Quality
+A task is NOT complete until:
 
-Never create:
+- Build passes
+- TypeScript passes
+- Runtime verified
+- CRUD verified (if applicable)
+- No console errors
+- No React warnings
+- No hydration warnings
+- No network/API errors
+- No regressions
 
-- duplicate helpers
-- duplicate components
-- duplicate actions
-- duplicate types
+If runtime cannot be verified, report: **NOT VERIFIED**
 
-Always check before creating new files.
+Never assume success without verification.
 
----
+## Reporting Format
 
-## Architecture
+Every completed task must include:
 
-Prefer:
+- Files Changed
+- Build
+- TypeScript
+- Runtime
+- CRUD
+- Regression Check
+- Git Diff
+- Known Issues
 
-Feature → Shared Component → Utility
+## Git Commit Rule
 
-Avoid:
+Do not recommend commit until:
 
-Feature → Duplicate Component
+- Runtime is verified.
 
----
+## Scope Control Rule
 
-## Git
+Touch only files required for the task.
 
-Never commit automatically.
+Never refactor unrelated files.
 
-Wait for user approval before:
-
-- git add
-- git commit
-- git push
-
----
-
-## Documentation
-
-Whenever a new architecture or major feature is added:
-
-Update documentation before continuing.
-
----
-
-## Important
-
-If there is uncertainty:
-
-STOP.
-
-Explain the issue.
-
-Ask for approval.
-
-Never guess.
+Never introduce architectural changes without approval.

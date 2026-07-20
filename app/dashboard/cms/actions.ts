@@ -192,6 +192,53 @@ export async function saveHeroBanner(formData: FormData) {
 }
 
 // ============================================================
+// Public Company Data (for Footer, Header, Contact)
+// ============================================================
+
+export interface CompanyPublicData {
+  brand_name: string;
+  legal_name: string;
+  tagline: string;
+  logo_url: string;
+  favicon_url: string;
+  phone: string;
+  email: string;
+  address: string;
+  whatsapp: string;
+  business_hours: string;
+  primary_color: string;
+  secondary_color: string;
+}
+
+/**
+ * Server action to fetch public company data for display components.
+ * Uses the server Supabase client (authenticated via proxy/cookies).
+ */
+export async function getCompanyPublicData(): Promise<CompanyPublicData> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("cms_company")
+    .select("*")
+    .eq("site_id", DEFAULT_SITE_ID)
+    .maybeSingle();
+
+  return {
+    brand_name: data?.brand_name || "SBBT",
+    legal_name: data?.legal_name || "Shree Badree Build Tech Pvt Ltd",
+    tagline: data?.tagline || "",
+    logo_url: data?.logo_url || "",
+    favicon_url: data?.favicon_url || "",
+    phone: data?.phone || "+91 XXXXX XXXXX",
+    email: data?.email || "info@sbbt.in",
+    address: data?.address || "Delhi NCR",
+    whatsapp: data?.whatsapp || "",
+    business_hours: data?.business_hours || "",
+    primary_color: data?.primary_color || "#4f46e5",
+    secondary_color: data?.secondary_color || "#06b6d4",
+  };
+}
+
+// ============================================================
 // Company Actions
 // ============================================================
 

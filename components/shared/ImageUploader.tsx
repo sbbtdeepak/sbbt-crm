@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useActionState, startTransition } from "react";
 import { uploadImageAction, deleteImageAction } from "@/app/dashboard/cms/actions";
 import { validateImage, ImageValidationResult } from "./image-utils";
@@ -55,6 +55,8 @@ export function ImageUploader({
   const [state, setState] = useState<UploaderState>("idle");
   const [error, setError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const notifiedUploadUrl = useRef<string | null>(null);
+  const notifiedUploadError = useRef<string | null>(null);
 
   // Determine if we have an existing image
   const hasImage = Boolean(value && value.trim() !== "");
@@ -87,6 +89,10 @@ export function ImageUploader({
       setState("uploading");
       setError("");
 
+      // Reset notified refs on new upload
+      notifiedUploadUrl.current = null;
+      notifiedUploadError.current = null;
+
       // Create form data and submit to server action within transition
       const formData = new FormData();
       formData.append("file", file);
@@ -99,14 +105,18 @@ export function ImageUploader({
     [folder, uploadFormAction]
   );
 
-  // Update image URL when upload succeeds
-  if (uploadState.success && uploadState.url) {
-    setState("idle");
-    onChange(uploadState.url);
-  } else if (!uploadState.success && uploadState.error) {
-    setState("error");
-    setError(uploadState.error);
-  }
+  // Handle upload state changes in useEffect to prevent render loop
+  useEffect(() => {
+    if (uploadState.success && uploadState.url && uploadState.url !== notifiedUploadUrl.current) {
+      notifiedUploadUrl.current = uploadState.url;
+      setState("idle");
+      onChange(uploadState.url);
+    } else if (!uploadState.success && uploadState.error && uploadState.error !== notifiedUploadError.current) {
+      notifiedUploadError.current = uploadState.error;
+      setState("error");
+      setError(uploadState.error);
+    }
+  }, [uploadState.success, uploadState.url, uploadState.error, onChange]);
 
   // Handle delete
   const handleDelete = useCallback(async () => {

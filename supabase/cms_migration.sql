@@ -68,6 +68,12 @@ CREATE POLICY "cms_company_select_authenticated"
   TO authenticated
   USING (true);
 
+-- Public SELECT for website visitors
+CREATE POLICY "cms_company_select_public"
+  ON cms_company FOR SELECT
+  TO public
+  USING (true);
+
 CREATE POLICY "cms_company_insert_authenticated"
   ON cms_company FOR INSERT
   TO authenticated
@@ -116,6 +122,12 @@ ALTER TABLE cms_homepage ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "cms_homepage_select_authenticated"
   ON cms_homepage FOR SELECT
   TO authenticated
+  USING (true);
+
+-- Public SELECT for website visitors
+CREATE POLICY "cms_homepage_select_public"
+  ON cms_homepage FOR SELECT
+  TO public
   USING (true);
 
 CREATE POLICY "cms_homepage_insert_authenticated"
@@ -172,6 +184,12 @@ CREATE POLICY "cms_seo_select_authenticated"
   TO authenticated
   USING (true);
 
+-- Public SELECT for website visitors
+CREATE POLICY "cms_seo_select_public"
+  ON cms_seo FOR SELECT
+  TO public
+  USING (true);
+
 CREATE POLICY "cms_seo_insert_authenticated"
   ON cms_seo FOR INSERT
   TO authenticated
@@ -218,6 +236,12 @@ ALTER TABLE cms_social ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "cms_social_select_authenticated"
   ON cms_social FOR SELECT
   TO authenticated
+  USING (true);
+
+-- Public SELECT for website visitors
+CREATE POLICY "cms_social_select_public"
+  ON cms_social FOR SELECT
+  TO public
   USING (true);
 
 CREATE POLICY "cms_social_insert_authenticated"
@@ -272,6 +296,12 @@ CREATE POLICY "cms_settings_select_authenticated"
   TO authenticated
   USING (true);
 
+-- Public SELECT for website visitors
+CREATE POLICY "cms_settings_select_public"
+  ON cms_settings FOR SELECT
+  TO public
+  USING (true);
+
 CREATE POLICY "cms_settings_insert_authenticated"
   ON cms_settings FOR INSERT
   TO authenticated
@@ -294,7 +324,14 @@ CREATE POLICY "cms_settings_delete_authenticated"
 /*
   -- ROLLBACK: Drop all CMS tables and their indexes
 
-  -- Drop policies
+  -- Drop public policies
+  DROP POLICY IF EXISTS "cms_company_select_public" ON cms_company;
+  DROP POLICY IF EXISTS "cms_homepage_select_public" ON cms_homepage;
+  DROP POLICY IF EXISTS "cms_seo_select_public" ON cms_seo;
+  DROP POLICY IF EXISTS "cms_social_select_public" ON cms_social;
+  DROP POLICY IF EXISTS "cms_settings_select_public" ON cms_settings;
+
+  -- Drop authenticated policies
   DROP POLICY IF EXISTS "cms_company_select_authenticated" ON cms_company;
   DROP POLICY IF EXISTS "cms_company_insert_authenticated" ON cms_company;
   DROP POLICY IF EXISTS "cms_company_update_authenticated" ON cms_company;

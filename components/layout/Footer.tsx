@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getCompanyPublicData } from "@/app/dashboard/cms/actions";
+import type { CompanyPublicData } from "@/app/dashboard/cms/actions";
 
 const servicesLinks = [
   { name: "Home", href: "/" },
@@ -21,6 +24,19 @@ const legalLinks = [
 ];
 
 export default function Footer() {
+  const [company, setCompany] = useState<CompanyPublicData | null>(null);
+
+  useEffect(() => {
+    getCompanyPublicData().then(setCompany).catch(() => {});
+  }, []);
+
+  const brandName = company?.brand_name || "SBBT";
+  const legalName = company?.legal_name || "Shree Badree Build Tech Pvt Ltd";
+  const phone = company?.phone || "+91 XXXXX XXXXX";
+  const email = company?.email || "info@sbbt.in";
+  const address = company?.address || "Delhi NCR";
+  const logoUrl = company?.logo_url || "";
+
   return (
     <footer id="footer" className="bg-white text-slate-900 border-t border-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-5">
@@ -29,13 +45,17 @@ export default function Footer() {
           {/* Column 1: Company + Social */}
           <div className="col-span-1">
             <div className="flex items-center gap-1.5 mb-1">
-              <div className="h-5 w-5 rounded bg-indigo-600 flex items-center justify-center">
-                <span className="text-white font-bold text-[10px]">S</span>
-              </div>
-              <span className="text-xs font-semibold text-slate-950">SBBT</span>
+              {logoUrl ? (
+                <img src={logoUrl} alt={brandName} className="h-5 w-5 rounded object-cover" />
+              ) : (
+                <div className="h-5 w-5 rounded bg-indigo-600 flex items-center justify-center">
+                  <span className="text-white font-bold text-[10px]">{brandName.charAt(0)}</span>
+                </div>
+              )}
+              <span className="text-xs font-semibold text-slate-950">{brandName}</span>
             </div>
             <p className="text-[9px] text-slate-500 mb-1.5">
-              Shree Badree Build Tech Pvt Ltd
+              {legalName}
             </p>
             <div className="flex gap-1">
               <a href="#" aria-label="Facebook" className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-indigo-100 hover:text-indigo-600">
@@ -69,10 +89,14 @@ export default function Footer() {
           <div>
             <h3 className="text-[8px] font-semibold uppercase tracking-[0.15em] text-indigo-600 mb-1">Contact</h3>
             <div className="flex flex-col gap-0 text-[9px] text-slate-500">
-              <p>+91 XXXXX XXXXX</p>
-              <p>info@sbbt.in</p>
-              <p>Delhi NCR</p>
-              <a href="#" className="text-emerald-600 hover:text-emerald-700 transition">WhatsApp</a>
+              <p>{phone}</p>
+              <p>{email}</p>
+              <p>{address}</p>
+              {company?.whatsapp && (
+                <a href={`https://wa.me/${company.whatsapp.replace(/\D/g, '')}`} className="text-emerald-600 hover:text-emerald-700 transition">
+                  WhatsApp
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -87,7 +111,7 @@ export default function Footer() {
         </div>
 
         <p className="mt-1.5 text-center text-[8px] text-slate-400">
-          &copy; 2026 Shree Badree Build Tech Pvt Ltd
+          &copy; 2026 {legalName}
         </p>
       </div>
     </footer>

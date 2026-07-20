@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import MobileBottomNav from "./MobileBottomNav";
+import { getCompanyPublicData } from "@/app/dashboard/cms/actions";
 
 const menus = [
   { name: "Home", href: "/" },
@@ -18,8 +19,13 @@ const menus = [
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [brandName, setBrandName] = useState("SBBT");
   const pathname = usePathname();
   const isHomePage = pathname === "/";
+
+  useEffect(() => {
+    getCompanyPublicData().then(data => setBrandName(data.brand_name)).catch(() => {});
+  }, []);
 
   return (
     <>
@@ -30,7 +36,7 @@ export default function Header() {
           <Link href="/" className={`font-semibold transition ${
             isHomePage ? "text-white text-xl md:text-2xl" : "text-slate-950 text-xl md:text-2xl"
           }`}>
-            SBBT
+            {brandName}
           </Link>
 
           <nav className="hidden gap-8 md:flex">
