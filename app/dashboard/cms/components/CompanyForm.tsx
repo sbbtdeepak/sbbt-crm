@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { ImageUploader } from "@/components/shared/ImageUploader";
 import { saveCompany } from "../actions";
 import type { CMSCompanyRow } from "../types";
@@ -14,6 +14,10 @@ export default function CompanyForm({ company }: Props) {
     success: false,
     message: "",
   });
+
+  // Local state for image URLs so preview updates immediately after upload
+  const [logoUrl, setLogoUrl] = useState(company?.logo_url || "");
+  const [faviconUrl, setFaviconUrl] = useState(company?.favicon_url || "");
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -94,33 +98,23 @@ export default function CompanyForm({ company }: Props) {
             <div>
               <ImageUploader
                 folder="logos"
-                value={company?.logo_url || ""}
-                onChange={(url) => {
-                  const input = document.querySelector<HTMLInputElement>('input[name="logo_url"]');
-                  if (input) input.value = url;
-                }}
+                value={logoUrl}
+                onChange={(url) => setLogoUrl(url)}
                 label="Logo"
                 disabled={isPending}
               />
-              <input type="hidden" name="logo_url" defaultValue={company?.logo_url || ""} />
+              <input type="hidden" name="logo_url" value={logoUrl} />
             </div>
 
             <div>
               <ImageUploader
                 folder="favicons"
-                value={company?.favicon_url || ""}
-                onChange={(url) => {
-                  const input = document.querySelector<HTMLInputElement>('input[name="favicon_url"]');
-                  if (input) input.value = url;
-                }}
+                value={faviconUrl}
+                onChange={(url) => setFaviconUrl(url)}
                 label="Favicon"
                 disabled={isPending}
               />
-              <input
-                type="hidden"
-                name="favicon_url"
-                defaultValue={company?.favicon_url || ""}
-              />
+              <input type="hidden" name="favicon_url" value={faviconUrl} />
             </div>
           </div>
         </div>

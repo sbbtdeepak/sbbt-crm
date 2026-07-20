@@ -1,157 +1,318 @@
-# SBBT CRM - Development Agent Guide
+# SBBT CRM - CONTINUE DEVELOPMENT
 
-## Project Overview
-
-**Project Name:** SBBT CRM + CMS + AI Website Builder  
-**Company:** Shree Badree Build Tech Pvt. Ltd.  
-**Website:** https://www.sbbt.in
-
-A production-ready Construction CRM + CMS platform evolving into an AI-powered Website Builder. Modular, scalable, and reusable architecture.
-
-## Tech Stack
-
+Project:
+SBBT CRM
+Stack:
 - Next.js 16
 - React 19
 - TypeScript
 - Tailwind CSS
 - Supabase
-- Supabase Storage
 - Server Actions
-- Vercel
 
-## Development Priorities
+====================================================
+CURRENT PROJECT STATUS
+====================================================
 
-Priority order (highest to lowest):
+Auth
+✅ Stable
 
-1. **Runtime Stability**
-2. **Data Integrity**
-3. **Security**
-4. **Architecture**
-5. **Performance**
-6. **Feature Completion**
-7. **UI / Appearance**
+CMS Database
+✅ Complete
 
-Never sacrifice higher priorities for lower ones.
+CMS Forms
+✅ Complete
 
-## Modification Rules
+CMS Server Actions
+✅ Complete
 
-Before modifying any file:
+Public RLS Policies
+✅ Complete
 
-1. Identify the exact file.
-2. Explain why it must be modified.
-3. Check for existing implementation.
-4. Avoid duplicate logic.
-5. Modify the smallest possible surface area.
+ImageUploader
+✅ Code Fix Applied
+⚠ Runtime Verification Pending
 
-Never rewrite working components without approval.
+Company CMS Integration
+✅ Implemented
+⚠ Runtime Verification Pending
 
-## Runtime First Rule
+Homepage CMS
+⚠ Runtime Verification Pending
 
-If a runtime error exists:
+Build
+✅ PASS
 
-- STOP feature development.
-- Fix runtime first.
-- Do not continue building new features.
+TypeScript
+✅ PASS
 
-## Feature Development Rules
+====================================================
+CURRENT MILESTONE
+====================================================
 
-Each feature must:
+Goal:
 
-- Be production ready
-- Be mobile responsive
-- Be SEO friendly
-- Be accessible
-- Be reusable
-- Be modular
-- Be type safe
+Complete CMS Runtime Stabilization.
 
-## Code Quality Rules
+DO NOT start new features.
 
-Never:
+====================================================
+TOP PRIORITY
+====================================================
 
-- Duplicate components
-- Duplicate utilities
-- Duplicate hooks
-- Duplicate types
-- Duplicate server actions
+1.
+Image Upload
 
-Always reuse existing code.
+Verify:
 
-## Authentication Protection Rules
+✓ Upload
 
-Authentication is stable. Do not modify authentication unless explicitly requested.
+✓ Preview
 
-Protected files:
+✓ Save
 
-- `proxy.ts`
-- `app/auth/*`
-- `lib/auth/*`
-- `lib/supabase/*`
+✓ Refresh
 
-## CMS Rules
+✓ Database persistence
 
-When working with CMS modules:
+2.
+Company CMS
 
-- Reuse existing Server Actions
-- Reuse existing Types
-- Reuse ImageUploader component
-- Reuse Storage utilities
+Verify:
 
-Do not create duplicate CMS logic.
+✓ Header
 
-## Investigation Before Coding Rule
+✓ Footer
+
+✓ Contact Page
+
+✓ Brand Name
+
+✓ Logo
+
+✓ Phone
+
+✓ Email
+
+✓ Address
+
+✓ WhatsApp
+
+3.
+Homepage CMS
+
+Verify:
+
+✓ Hero Heading
+
+✓ Subtitle
+
+✓ CTA
+
+✓ Hero Image
+
+✓ Stats
+
+====================================================
+DEVELOPMENT RULES
+====================================================
+
+Runtime Stability
+>
+
+Data Integrity
+>
+
+Security
+>
+
+Architecture
+>
+
+Performance
+>
+
+Feature Development
+>
+
+Appearance
+
+Never violate this priority.
+
+====================================================
+MODIFICATION RULES
+====================================================
 
 Before changing code:
 
-1. Investigate first.
-2. Return:
-   - Root Cause
-   - Files affected
-   - Implementation plan
+1.
+Investigate.
+
+2.
+Identify root cause.
+
+3.
+Find exact file.
+
+4.
+Touch minimum files.
+
+5.
+Avoid duplicate logic.
+
+6.
+Wait for approval before large refactors.
+
+====================================================
+STRICTLY FORBIDDEN
+====================================================
+
+❌ Duplicate Components
+
+❌ Duplicate Types
+
+❌ Duplicate Utilities
+
+❌ Duplicate Hooks
+
+❌ Duplicate Server Actions
+
+❌ Duplicate Queries
+
+❌ Direct DOM Manipulation
+(document.querySelector, appendChild, innerHTML, etc.)
+
+❌ Unnecessary Refactoring
+
+❌ Authentication Changes
+
+❌ Architecture Changes without approval
+
+====================================================
+AUTH IS FROZEN
+====================================================
+
+Never modify:
+
+proxy.ts
+
+app/auth/*
+
+lib/auth/*
+
+lib/supabase/*
+
+unless explicitly requested.
+
+====================================================
+CMS RULES
+====================================================
+
+Reuse existing:
+
+Server Actions
+
+Types
+
+ImageUploader
+
+Storage Utilities
+
+No duplicate CMS logic.
+
+====================================================
+COMPLETION RULE
+====================================================
+
+A task is NOT complete until ALL pass:
+
+✅ Build
+
+✅ TypeScript
+
+✅ Runtime
+
+✅ CRUD
+
+✅ No Console Errors
+
+✅ No React Warnings
+
+✅ No Hydration Warnings
+
+✅ No Network Errors
+
+✅ Refresh Verified
+
+✅ Regression Check
+
+If runtime cannot be verified:
+
+Report:
+
+NOT VERIFIED
+
+Never assume success.
+
+====================================================
+REPORT FORMAT
+====================================================
+
+Files Changed
+
+Root Cause
+
+Implementation
+
+Build
+
+TypeScript
+
+Runtime
+
+CRUD
+
+Regression
+
+Git Diff
+
+Known Issues
+
+Next Recommendation
+
+====================================================
+CURRENT TASK
+====================================================
+
+Do NOT create new features.
+
+Continue from the current runtime stabilization.
+
+First verify and fix:
+
+1.
+Image Upload
+
+2.
+Company CMS Runtime
+
+3.
+Homepage CMS Runtime
+
+If any runtime issue exists:
+
+Stop.
+
+Fix only that issue.
+
+After every fix:
+
+Build
+
+TypeScript
+
+Runtime Verification
 
 Wait for approval.
 
-## Completion Rule
-
-A task is NOT complete until:
-
-- Build passes
-- TypeScript passes
-- Runtime verified
-- CRUD verified (if applicable)
-- No console errors
-- No React warnings
-- No hydration warnings
-- No network/API errors
-- No regressions
-
-If runtime cannot be verified, report: **NOT VERIFIED**
-
-Never assume success without verification.
-
-## Reporting Format
-
-Every completed task must include:
-
-- Files Changed
-- Build
-- TypeScript
-- Runtime
-- CRUD
-- Regression Check
-- Git Diff
-- Known Issues
-
-## Git Commit Rule
-
-Do not recommend commit until:
-
-- Runtime is verified.
-
-## Scope Control Rule
-
-Touch only files required for the task.
-
-Never refactor unrelated files.
-
-Never introduce architectural changes without approval.
+Do not proceed to the next task until the current runtime issue is fully resolved.
