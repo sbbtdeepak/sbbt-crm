@@ -14,7 +14,6 @@ export default function PackageForm({ pkg, onBack }: Props) {
   const [state, formAction, isPending] = useActionState(savePackage, {
     success: false,
     message: "",
-    slug: undefined,
   });
 
   const [deleteState, deleteAction, isDeleting] = useActionState(deletePackage, {
@@ -184,13 +183,13 @@ export default function PackageForm({ pkg, onBack }: Props) {
       </div>
 
       {/* Messages */}
-      {((state as { success: boolean; message: string; errors?: Record<string, string[]> }).errors || state.message && !state.success) && (
+      {((state as { success: boolean; message: string; errors?: Record<string, string[]>; slug?: string }).errors || state.message && !state.success) && (
         <div className="mb-6 p-4 rounded-md bg-red-50 text-red-800 border border-red-200" role="alert">
           <p className="font-medium">{state.message}</p>
-          {state.errors && (
+          {(state as { success: boolean; message: string; errors?: Record<string, string[]> }).errors && (
             <ul className="mt-2 list-disc list-inside text-sm">
-              {Object.entries(state.errors).map(([field, msgs]) => (
-                <li key={field}>{field}: {msgs.join(", ")}</li>
+              {Object.entries((state as { success: boolean; message: string; errors?: Record<string, string[]> }).errors || {}).map(([field, msgs]) => (
+                <li key={field}>{field}: {(msgs as string[]).join(", ")}</li>
               ))}
             </ul>
           )}
@@ -227,7 +226,7 @@ export default function PackageForm({ pkg, onBack }: Props) {
               <input
                 id="slug"
                 name="slug"
-                defaultValue={pkgData?.slug || state.slug || ""}
+                defaultValue={pkgData?.slug || (state as { success: boolean; message: string; slug?: string }).slug || ""}
                 className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="gold-package"
               />

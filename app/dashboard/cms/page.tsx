@@ -3,6 +3,7 @@ import HomepageForm from "./components/HomepageForm";
 import SEOForm from "./components/SEOForm";
 import SocialForm from "./components/SocialForm";
 import SettingsForm from "./components/SettingsForm";
+import InternalSettingsForm from "./components/InternalSettingsForm";
 import PackagesSection from "./components/PackagesSection";
 import ProjectsSection from "./components/ProjectsSection";
 import { createClient } from "@/lib/supabase/server";
@@ -12,11 +13,12 @@ import type {
   CMSSEORow,
   CMSSocialRow,
   CMSSettingsRow,
+  CMSInternalSettingsRow,
 } from "./types";
 import { DEFAULT_SITE_ID } from "./types";
 
 // Tab types
-type TabType = "company" | "homepage" | "seo" | "social" | "settings" | "packages" | "projects";
+type TabType = "company" | "homepage" | "seo" | "social" | "settings" | "internal" | "packages" | "projects";
 
 // Tab configuration
 const tabs: Array<{ id: TabType; label: string }> = [
@@ -25,6 +27,7 @@ const tabs: Array<{ id: TabType; label: string }> = [
   { id: "seo", label: "SEO" },
   { id: "social", label: "Social" },
   { id: "settings", label: "Settings" },
+  { id: "internal", label: "Internal" },
   { id: "packages", label: "Packages" },
   { id: "projects", label: "Projects" },
 ];
@@ -37,20 +40,28 @@ export default async function CMSPage({
   // Load all CMS data in parallel
   const supabase = await createClient();
 
-  const [companyResult, homepageResult, seoResult, socialResult, settingsResult] =
-    await Promise.all([
-      supabase.from("cms_company").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
-      supabase.from("cms_homepage").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
-      supabase.from("cms_seo").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
-      supabase.from("cms_social").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
-      supabase.from("cms_settings").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
-    ]);
+  const [
+    companyResult,
+    homepageResult,
+    seoResult,
+    socialResult,
+    settingsResult,
+    internalSettingsResult,
+  ] = await Promise.all([
+    supabase.from("cms_company").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
+    supabase.from("cms_homepage").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
+    supabase.from("cms_seo").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
+    supabase.from("cms_social").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
+    supabase.from("cms_settings").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
+    supabase.from("cms_internal_settings").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
+  ]);
 
   const company = companyResult.data as CMSCompanyRow | null;
   const homepage = homepageResult.data as CMSHomepageRow | null;
   const seo = seoResult.data as CMSSEORow | null;
   const social = socialResult.data as CMSSocialRow | null;
   const settings = settingsResult.data as CMSSettingsRow | null;
+  const internalSettings = internalSettingsResult.data as CMSInternalSettingsRow | null;
 
   const error =
     companyResult.error?.message ||
@@ -58,6 +69,7 @@ export default async function CMSPage({
     seoResult.error?.message ||
     socialResult.error?.message ||
     settingsResult.error?.message ||
+    internalSettingsResult.error?.message ||
     null;
 
   // Get tab from search params (default to company)
@@ -70,7 +82,7 @@ export default async function CMSPage({
       <div>
         <h1 className="text-3xl font-bold">CMS Dashboard</h1>
         <p className="text-gray-500 mt-1">
-          Manage company information, homepage, SEO, social links, settings, and packages.
+          Manage company information, homepage, SEO, social links, settings, internal configuration, packages, and projects.
         </p>
       </div>
 
@@ -118,6 +130,7 @@ export default async function CMSPage({
         {activeTab === "seo" && <SEOForm seo={seo} />}
         {activeTab === "social" && <SocialForm social={social} />}
         {activeTab === "settings" && <SettingsForm settings={settings} />}
+        {activeTab === "internal" && <InternalSettingsForm settings={internalSettings} />}
         {activeTab === "packages" && <PackagesSection />}
         {activeTab === "projects" && <ProjectsSection />}
       </div>

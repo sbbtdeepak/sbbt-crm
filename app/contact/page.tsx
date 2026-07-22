@@ -1,23 +1,17 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { getCompanyPublicData } from "@/app/dashboard/cms/actions";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 export default function ContactPage() {
   const [form, setForm] = useState({
-    name: '',
+    full_name: '',
     email: '',
-    phone: '',
+    mobile_number: '',
     message: '',
-    location: '',
+    plot_location: '',
   });
   const [company, setCompany] = useState<{
     address?: string;
@@ -46,25 +40,36 @@ export default function ContactPage() {
     setSubmitting(true);
     setError('');
 
-    const { error: supabaseError } = await supabase.from('contact_leads').insert({
-      name: form.name,
-      email: form.email,
-      phone: form.phone,
-      message: form.message,
-      location: form.location,
-      status: 'new',
-    });
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: form.full_name,
+          mobile_number: form.mobile_number,
+          email: form.email,
+          plot_location: form.plot_location,
+          message: form.message,
+          source: 'contact_form',
+          current_page: '/contact',
+        }),
+      });
 
-    if (supabaseError) {
-      setError('Failed to submit. Please try again.');
-      console.error('Error submitting contact:', supabaseError.message);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setError(result.error || result.message || 'Failed to submit. Please try again.');
+        setSubmitting(false);
+        return;
+      }
+
+      setSubmitted(true);
       setSubmitting(false);
-      return;
+      setForm({ full_name: '', email: '', mobile_number: '', message: '', plot_location: '' });
+    } catch {
+      setError('Failed to submit. Please try again.');
+      setSubmitting(false);
     }
-
-    setSubmitted(true);
-    setSubmitting(false);
-    setForm({ name: '', email: '', phone: '', message: '', location: '' });
   };
 
   if (submitted) {
@@ -98,8 +103,8 @@ export default function ContactPage() {
                 <label className="block text-xs font-medium text-gray-700">Full Name *</label>
                 <input
                   type="text"
-                  name="name"
-                  value={form.name}
+                  name="full_name"
+                  value={form.full_name}
                   onChange={handleChange}
                   required
                   className="mt-1 w-full border border-gray-300 p-2.5 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-xs"
@@ -120,8 +125,8 @@ export default function ContactPage() {
                 <label className="block text-xs font-medium text-gray-700">Phone</label>
                 <input
                   type="tel"
-                  name="phone"
-                  value={form.phone}
+                  name="mobile_number"
+                  value={form.mobile_number}
                   onChange={handleChange}
                   className="mt-1 w-full border border-gray-300 p-2.5 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-xs"
                 />
@@ -130,8 +135,8 @@ export default function ContactPage() {
                 <label className="block text-xs font-medium text-gray-700">Location (City/Area)</label>
                 <input
                   type="text"
-                  name="location"
-                  value={form.location}
+                  name="plot_location"
+                  value={form.plot_location}
                   onChange={handleChange}
                   className="mt-1 w-full border border-gray-300 p-2.5 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-xs"
                 />

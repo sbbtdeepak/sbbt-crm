@@ -22,6 +22,9 @@ export default function CompanyForm({ company }: Props) {
   const [primaryColor, setPrimaryColor] = useState(company?.primary_color || "#4f46e5");
   const [secondaryColor, setSecondaryColor] = useState(company?.secondary_color || "#06b6d4");
 
+  // Convert business hours to local state
+  const [businessHours, setBusinessHours] = useState(company?.business_hours || "");
+
   return (
     <div className="max-w-4xl mx-auto">
       <form action={formAction} className="space-y-6">
@@ -44,10 +47,7 @@ export default function CompanyForm({ company }: Props) {
           <h2 className="text-lg font-semibold mb-4">Brand Identity</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label
-                htmlFor="brand_name"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="brand_name" className="block mb-2 font-medium text-gray-700">
                 Brand Name
               </label>
               <input
@@ -61,10 +61,7 @@ export default function CompanyForm({ company }: Props) {
             </div>
 
             <div>
-              <label
-                htmlFor="legal_name"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="legal_name" className="block mb-2 font-medium text-gray-700">
                 Legal Name
               </label>
               <input
@@ -77,10 +74,7 @@ export default function CompanyForm({ company }: Props) {
             </div>
 
             <div className="md:col-span-2">
-              <label
-                htmlFor="tagline"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="tagline" className="block mb-2 font-medium text-gray-700">
                 Tagline
               </label>
               <input
@@ -103,7 +97,7 @@ export default function CompanyForm({ company }: Props) {
                 folder="logos"
                 value={logoUrl}
                 onChange={(url) => setLogoUrl(url)}
-                label="Logo"
+                label="Company Logo"
                 disabled={isPending}
               />
               <input type="hidden" name="logo_url" value={logoUrl} />
@@ -127,31 +121,42 @@ export default function CompanyForm({ company }: Props) {
           <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label
-                htmlFor="phone"
-                className="block mb-2 font-medium text-gray-700"
-              >
-                Phone
+              <label htmlFor="phone" className="block mb-2 font-medium text-gray-700">
+                Primary Mobile *
               </label>
               <input
                 id="phone"
                 name="phone"
+                type="tel"
                 defaultValue={company?.phone || ""}
+                className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="+91 98765 43210"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="alternate_mobile" className="block mb-2 font-medium text-gray-700">
+                Alternate Mobile
+              </label>
+              <input
+                id="alternate_mobile"
+                name="alternate_mobile"
+                type="tel"
+                defaultValue={company?.alternate_mobile || ""}
                 className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="+91 98765 43210"
               />
             </div>
 
             <div>
-              <label
-                htmlFor="whatsapp"
-                className="block mb-2 font-medium text-gray-700"
-              >
-                WhatsApp
+              <label htmlFor="whatsapp" className="block mb-2 font-medium text-gray-700">
+                WhatsApp Number
               </label>
               <input
                 id="whatsapp"
                 name="whatsapp"
+                type="tel"
                 defaultValue={company?.whatsapp || ""}
                 className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="+91 98765 43210"
@@ -159,11 +164,8 @@ export default function CompanyForm({ company }: Props) {
             </div>
 
             <div>
-              <label
-                htmlFor="email"
-                className="block mb-2 font-medium text-gray-700"
-              >
-                Email
+              <label htmlFor="email" className="block mb-2 font-medium text-gray-700">
+                Public Email *
               </label>
               <input
                 id="email"
@@ -172,14 +174,26 @@ export default function CompanyForm({ company }: Props) {
                 defaultValue={company?.email || ""}
                 className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="info@sbbt.in"
+                required
               />
             </div>
 
             <div>
-              <label
-                htmlFor="support_email"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="grievance_email" className="block mb-2 font-medium text-gray-700">
+                Grievance Email
+              </label>
+              <input
+                id="grievance_email"
+                name="grievance_email"
+                type="email"
+                defaultValue={company?.grievance_email || ""}
+                className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="grievance@sbbt.in"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="support_email" className="block mb-2 font-medium text-gray-700">
                 Support Email
               </label>
               <input
@@ -193,10 +207,7 @@ export default function CompanyForm({ company }: Props) {
             </div>
 
             <div>
-              <label
-                htmlFor="sales_email"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="sales_email" className="block mb-2 font-medium text-gray-700">
                 Sales Email
               </label>
               <input
@@ -210,18 +221,118 @@ export default function CompanyForm({ company }: Props) {
             </div>
 
             <div>
-              <label
-                htmlFor="website"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="website" className="block mb-2 font-medium text-gray-700">
                 Website
               </label>
               <input
                 id="website"
                 name="website"
+                type="url"
                 defaultValue={company?.website || ""}
                 className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="https://www.sbbt.in"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Location */}
+        <div className="bg-white border rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-4">Location</h2>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="address" className="block mb-2 font-medium text-gray-700">
+                Office Address
+              </label>
+              <textarea
+                id="address"
+                name="address"
+                defaultValue={company?.address || ""}
+                rows={3}
+                className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="123 Main Street, Mumbai, Maharashtra 400001"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="google_maps_url" className="block mb-2 font-medium text-gray-700">
+                Google Maps Link
+              </label>
+              <input
+                id="google_maps_url"
+                name="google_maps_url"
+                type="url"
+                defaultValue={company?.google_maps_url || ""}
+                className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="https://maps.google.com/?q=..."
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Business Metrics */}
+        <div className="bg-white border rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-4">Business Metrics</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label htmlFor="google_rating" className="block mb-2 font-medium text-gray-700">
+                Google Rating (0-5)
+              </label>
+              <input
+                id="google_rating"
+                name="google_rating"
+                type="number"
+                min="0"
+                max="5"
+                step="0.1"
+                defaultValue={company?.google_rating || ""}
+                className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="4.5"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="years_experience" className="block mb-2 font-medium text-gray-700">
+                Years of Experience
+              </label>
+              <input
+                id="years_experience"
+                name="years_experience"
+                type="number"
+                min="0"
+                defaultValue={company?.years_experience || ""}
+                className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="15"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="homes_delivered" className="block mb-2 font-medium text-gray-700">
+                Homes Delivered
+              </label>
+              <input
+                id="homes_delivered"
+                name="homes_delivered"
+                type="number"
+                min="0"
+                defaultValue={company?.homes_delivered || ""}
+                className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="projects_completed" className="block mb-2 font-medium text-gray-700">
+                Projects Completed
+              </label>
+              <input
+                id="projects_completed"
+                name="projects_completed"
+                type="number"
+                min="0"
+                defaultValue={company?.projects_completed || ""}
+                className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="1000"
               />
             </div>
           </div>
@@ -232,10 +343,7 @@ export default function CompanyForm({ company }: Props) {
           <h2 className="text-lg font-semibold mb-4">Business Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label
-                htmlFor="gst"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="gst" className="block mb-2 font-medium text-gray-700">
                 GST Number
               </label>
               <input
@@ -248,10 +356,7 @@ export default function CompanyForm({ company }: Props) {
             </div>
 
             <div>
-              <label
-                htmlFor="pan"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="pan" className="block mb-2 font-medium text-gray-700">
                 PAN Number
               </label>
               <input
@@ -264,10 +369,7 @@ export default function CompanyForm({ company }: Props) {
             </div>
 
             <div>
-              <label
-                htmlFor="timezone"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="timezone" className="block mb-2 font-medium text-gray-700">
                 Timezone
               </label>
               <select
@@ -284,10 +386,7 @@ export default function CompanyForm({ company }: Props) {
             </div>
 
             <div>
-              <label
-                htmlFor="currency"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="currency" className="block mb-2 font-medium text-gray-700">
                 Currency
               </label>
               <select
@@ -303,10 +402,7 @@ export default function CompanyForm({ company }: Props) {
             </div>
 
             <div>
-              <label
-                htmlFor="language"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="language" className="block mb-2 font-medium text-gray-700">
                 Language
               </label>
               <select
@@ -327,10 +423,7 @@ export default function CompanyForm({ company }: Props) {
           <h2 className="text-lg font-semibold mb-4">Brand Colors</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label
-                htmlFor="primary_color"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="primary_color" className="block mb-2 font-medium text-gray-700">
                 Primary Color
               </label>
               <div className="flex gap-2">
@@ -353,10 +446,7 @@ export default function CompanyForm({ company }: Props) {
             </div>
 
             <div>
-              <label
-                htmlFor="secondary_color"
-                className="block mb-2 font-medium text-gray-700"
-              >
+              <label htmlFor="secondary_color" className="block mb-2 font-medium text-gray-700">
                 Secondary Color
               </label>
               <div className="flex gap-2">
@@ -380,41 +470,15 @@ export default function CompanyForm({ company }: Props) {
           </div>
         </div>
 
-        {/* Address */}
-        <div className="bg-white border rounded-xl p-6">
-          <h2 className="text-lg font-semibold mb-4">Address</h2>
-          <div>
-            <label
-              htmlFor="address"
-              className="block mb-2 font-medium text-gray-700"
-            >
-              Physical Address
-            </label>
-            <textarea
-              id="address"
-              name="address"
-              defaultValue={company?.address || ""}
-              rows={3}
-              className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="123 Main Street, Mumbai, Maharashtra 400001"
-            />
-          </div>
-        </div>
-
         {/* Business Hours */}
         <div className="bg-white border rounded-xl p-6">
           <h2 className="text-lg font-semibold mb-4">Business Hours</h2>
           <div>
-            <label
-              htmlFor="business_hours"
-              className="block mb-2 font-medium text-gray-700"
-            >
-              Hours Description
-            </label>
             <textarea
               id="business_hours"
               name="business_hours"
-              defaultValue={company?.business_hours || ""}
+              value={businessHours}
+              onChange={(e) => setBusinessHours(e.target.value)}
               rows={2}
               className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               placeholder="Mon-Sat: 9:00 AM - 6:00 PM"

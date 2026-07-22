@@ -42,15 +42,15 @@ export function ImageUploader({
   required = false,
   className = "",
 }: ImageUploaderProps) {
-  const [uploadState, uploadFormAction] = useActionState(uploadImageAction, {
-    success: false,
-    url: undefined as string | undefined,
-    error: undefined as string | undefined,
-  });
+  const [uploadState, uploadFormAction] = useActionState(
+    uploadImageAction as unknown as (state: Record<string, unknown>, formData: FormData) => Promise<{ success: boolean; message: string; url: string }>,
+    { success: false, message: "", url: "" }
+  );
 
-  const [deleteState, deleteFormAction] = useActionState(deleteImageAction, {
-    success: false,
-  });
+  const [deleteState, deleteFormAction] = useActionState(
+    deleteImageAction as unknown as (state: Record<string, unknown>, formData: FormData) => Promise<{ success: boolean; message: string }>,
+    { success: false, message: "" }
+  );
 
   const [state, setState] = useState<UploaderState>("idle");
   const [error, setError] = useState<string>("");
@@ -111,12 +111,12 @@ export function ImageUploader({
       notifiedUploadUrl.current = uploadState.url;
       setState("idle");
       onChange(uploadState.url);
-    } else if (!uploadState.success && uploadState.error && uploadState.error !== notifiedUploadError.current) {
-      notifiedUploadError.current = uploadState.error;
+    } else if (!uploadState.success && uploadState.message && uploadState.message !== notifiedUploadError.current) {
+      notifiedUploadError.current = uploadState.message;
       setState("error");
-      setError(uploadState.error);
+      setError(uploadState.message);
     }
-  }, [uploadState.success, uploadState.url, uploadState.error, onChange]);
+  }, [uploadState.success, uploadState.url, uploadState.message, onChange]);
 
   // Handle delete
   const handleDelete = useCallback(async () => {

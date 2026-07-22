@@ -109,6 +109,18 @@ export interface CMSCompanyRow extends CMSBase {
   google_maps_url: string;
   /** Business hours description (e.g. "Mon-Sat: 9:00 AM - 6:00 PM") */
   business_hours: string;
+  /** Alternate mobile number */
+  alternate_mobile: string;
+  /** Grievance email address */
+  grievance_email: string;
+  /** Google rating (0-5) */
+  google_rating: number;
+  /** Years of experience */
+  years_experience: number;
+  /** Homes delivered count */
+  homes_delivered: number;
+  /** Projects completed count */
+  projects_completed: number;
 }
 
 /** Shape for inserting a new company row */
@@ -119,6 +131,77 @@ export type CMSCompanyUpdate = CMSUpdate<CMSCompanyRow>;
 
 /** @deprecated Use CMSCompanyRow for database row type */
 export type CMSCompany = CMSCompanyRow;
+
+/**
+ * Public company data shape for client-side consumption.
+ * Used by Header, Footer, Hero, Contact, and other public components.
+ */
+export interface CompanyPublicData {
+  brand_name: string;
+  legal_name: string;
+  tagline: string;
+  logo_url: string;
+  favicon_url: string;
+  phone: string;
+  alternate_mobile: string;
+  whatsapp: string;
+  email: string;
+  grievance_email: string;
+  support_email: string;
+  sales_email: string;
+  website: string;
+  address: string;
+  google_maps_url: string;
+  google_rating: number;
+  years_experience: number;
+  homes_delivered: number;
+  projects_completed: number;
+  gst: string;
+  pan: string;
+  business_hours: string;
+  primary_color: string;
+  secondary_color: string;
+}
+
+// ============================================================
+// Internal Settings (Admin Only)
+// ============================================================
+
+/**
+ * Internal settings for admin-only configuration.
+ * NOT exposed on the public website.
+ * Controls notification emails, integration URLs, and API readiness.
+ */
+export interface CMSInternalSettingsRow extends CMSBase {
+  /** Email address for lead notifications */
+  lead_notification_email: string;
+  /** Sales email address */
+  sales_email: string;
+  /** Quotation email address */
+  quotation_email: string;
+  /** Support email address */
+  support_email: string;
+  /** Accounts email address */
+  accounts_email: string;
+  /** Google Sheets URL for lead export */
+  google_sheet_url: string;
+  /** Webhook URL for external integrations */
+  webhook_url: string;
+  /** Whether SMTP is configured and ready */
+  smtp_ready: boolean;
+  /** Whether Resend is configured and ready */
+  resend_ready: boolean;
+  /** WhatsApp API phone number */
+  whatsapp_api_number: string;
+  /** API keys for future integrations (JSONB placeholder) */
+  api_keys: Record<string, unknown>;
+}
+
+/** Shape for inserting a new internal settings row */
+export type CMSInternalSettingsInsert = CMSInsert<CMSInternalSettingsRow>;
+
+/** Shape for updating an existing internal settings row */
+export type CMSInternalSettingsUpdate = CMSUpdate<CMSInternalSettingsRow>;
 
 // ============================================================
 // Hero Banner

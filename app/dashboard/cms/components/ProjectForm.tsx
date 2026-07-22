@@ -210,10 +210,10 @@ export default function ProjectForm({ project, onBack }: Props) {
       {((state as { success: boolean; message: string; errors?: Record<string, string[]> }).errors || state.message && !state.success) && (
         <div className="mb-6 p-4 rounded-md bg-red-50 text-red-800 border border-red-200" role="alert">
           <p className="font-medium">{state.message}</p>
-          {state.errors && (
+          {(state as { success: boolean; message: string; errors?: Record<string, string[]> }).errors && (
             <ul className="mt-2 list-disc list-inside text-sm">
-              {Object.entries(state.errors).map(([field, msgs]) => (
-                <li key={field}>{field}: {msgs.join(", ")}</li>
+              {Object.entries((state as { success: boolean; message: string; errors?: Record<string, string[]> }).errors || {}).map(([field, msgs]) => (
+                <li key={field}>{field}: {(msgs as string[]).join(", ")}</li>
               ))}
             </ul>
           )}

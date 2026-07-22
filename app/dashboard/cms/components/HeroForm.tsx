@@ -1,5 +1,6 @@
 "use client";
 
+import { useActionState } from "react";
 import { saveHeroBanner } from "../actions";
 import { HeroBanner } from "../types";
 
@@ -8,8 +9,13 @@ interface Props {
 }
 
 export default function HeroForm({ hero }: Props) {
+  const [state, formAction, isPending] = useActionState(saveHeroBanner, {
+    success: false,
+    message: "",
+  });
+
   return (
-    <form action={saveHeroBanner} className="space-y-6 rounded-xl bg-white border p-6">
+    <form action={formAction} className="space-y-6 rounded-xl bg-white border p-6">
 
       <input
         type="hidden"

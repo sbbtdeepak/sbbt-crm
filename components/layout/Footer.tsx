@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getCompanyPublicData } from "@/app/dashboard/cms/actions";
-import type { CompanyPublicData } from "@/app/dashboard/cms/actions";
+import type { CompanyPublicData } from "@/app/dashboard/cms/types";
 
 const servicesLinks = [
   { name: "Home", href: "/" },

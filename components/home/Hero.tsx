@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import LeadPopupForm from "@/components/shared/LeadPopupForm";
+import { getCompanyPublicData } from "@/app/dashboard/cms/actions";
 
 interface LeadFormState {
   name: string;
@@ -21,6 +22,11 @@ export default function Hero() {
     image_url: "https://images.pexels.com/photos/5843998/pexels-photo-5843998.jpeg?auto=compress&cs=tinysrgb&w=1200",
     stats: [] as Array<{ label: string; value: string }>,
   });
+  const [companyData, setCompanyData] = useState({
+    google_rating: 0,
+    years_experience: 0,
+    homes_delivered: 0,
+  });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupShown, setPopupShown] = useState(false);
   const [leadForm, setLeadForm] = useState<LeadFormState>({
@@ -33,6 +39,15 @@ export default function Hero() {
   const [submitMessage, setSubmitMessage] = useState("");
 
   useEffect(() => {
+    // Fetch company metrics
+    getCompanyPublicData().then(data => {
+      setCompanyData({
+        google_rating: data.google_rating,
+        years_experience: data.years_experience,
+        homes_delivered: data.homes_delivered,
+      });
+    }).catch(() => {});
+
     const supabase = createClient();
 
     // Fetch CMS Homepage data
@@ -87,7 +102,11 @@ export default function Hero() {
       const response = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(leadForm),
+        body: JSON.stringify({
+          ...leadForm,
+          source: "hero_popup",
+          current_page: "/",
+        }),
       });
 
       if (response.ok) {
@@ -140,18 +159,24 @@ export default function Hero() {
                 </p>
               )}
 
-              {/* Trust Badges - Green/Blue theme */}
+              {/* Trust Badges - Dynamically from Company CMS */}
               <div className="mt-6 flex flex-wrap items-center gap-4">
-                <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
-                  <span className="text-emerald-600 text-xs">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                  <span className="text-[11px] font-semibold text-emerald-700">4.9 Google Rating</span>
-                </div>
-                <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-3 py-1.5">
-                  <span className="text-[11px] font-semibold text-blue-700">15+ Years Experience</span>
-                </div>
-                <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
-                  <span className="text-[11px] font-semibold text-emerald-700">1000+ Homes Built</span>
-                </div>
+                {(companyData.google_rating > 0) && (
+                  <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
+                    <span className="text-emerald-600 text-xs">{'★'.repeat(Math.round(companyData.google_rating))}</span>
+                    <span className="text-[11px] font-semibold text-emerald-700">{companyData.google_rating} Google Rating</span>
+                  </div>
+                )}
+                {(companyData.years_experience > 0) && (
+                  <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-3 py-1.5">
+                    <span className="text-[11px] font-semibold text-blue-700">{companyData.years_experience}+ Years Experience</span>
+                  </div>
+                )}
+                {(companyData.homes_delivered > 0) && (
+                  <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
+                    <span className="text-[11px] font-semibold text-emerald-700">{companyData.homes_delivered.toLocaleString()} Homes Built</span>
+                  </div>
+                )}
               </div>
 
               {/* CTA Buttons */}
@@ -284,18 +309,24 @@ export default function Hero() {
             </p>
           )}
 
-          {/* Trust Badges Row - Green/Blue theme */}
+          {/* Trust Badges Row - Dynamically from Company CMS */}
           <div className="flex flex-wrap gap-1.5">
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1">
-              <span className="text-emerald-600 text-xs">&#9733;</span>
-              <span className="text-[10px] font-semibold text-emerald-700">4.9 Google Rating</span>
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-1">
-              <span className="text-[10px] font-semibold text-blue-700">15+ Years</span>
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1">
-              <span className="text-[10px] font-semibold text-emerald-700">1000+ Homes</span>
-            </span>
+            {(companyData.google_rating > 0) && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1">
+                <span className="text-emerald-600 text-xs">{'★'.repeat(Math.round(companyData.google_rating))}</span>
+                <span className="text-[10px] font-semibold text-emerald-700">{companyData.google_rating} Google Rating</span>
+              </span>
+            )}
+            {(companyData.years_experience > 0) && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-1">
+                <span className="text-[10px] font-semibold text-blue-700">{companyData.years_experience}+ Years</span>
+              </span>
+            )}
+            {(companyData.homes_delivered > 0) && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1">
+                <span className="text-[10px] font-semibold text-emerald-700">{companyData.homes_delivered.toLocaleString()} Homes</span>
+              </span>
+            )}
           </div>
 
           {/* Primary CTA */}

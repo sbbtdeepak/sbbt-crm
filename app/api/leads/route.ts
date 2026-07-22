@@ -1,39 +1,38 @@
-import { createClient } from "@/lib/supabase/server";
+import { createLeadFromAPI } from "@/app/dashboard/leads/actions";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, contact, location, budget } = body;
 
-    // Validate required fields
-    if (!name || !contact) {
+    // Use the unified lead creation logic
+    const result = await createLeadFromAPI({
+      full_name: body.full_name || body.name,
+      mobile_number: body.mobile_number || body.phone || body.contact,
+      email: body.email,
+      plot_location: body.plot_location || body.location,
+      budget: body.budget,
+      service_required: body.service_required,
+      source: body.source || "hero_popup",
+      current_page: body.current_page || request.headers.get("referer") || "",
+      utm_source: body.utm_source,
+      utm_medium: body.utm_medium,
+      utm_campaign: body.utm_campaign,
+      ip_address: body.ip_address || request.headers.get("x-forwarded-for") || "",
+      message: body.message || body.remarks,
+    });
+
+    if (!result.success) {
       return Response.json(
-        { success: false, error: "Name and contact are required" },
+        { success: false, error: result.message, errors: result.errors },
         { status: 400 }
       );
     }
 
-    const supabase = await createClient();
-
-    // Insert lead into contact_leads table (reusing existing architecture)
-    const { error } = await supabase.from("contact_leads").insert({
-      name,
-      phone: contact,
-      location: location || "",
-      budget: budget || "",
-      status: "new",
-      source: "hero_popup",
+    return Response.json({
+      success: true,
+      message: result.message,
+      lead: result.lead,
     });
-
-    if (error) {
-      console.error("Lead submission error:", error.message);
-      return Response.json(
-        { success: false, error: "Failed to submit lead" },
-        { status: 500 }
-      );
-    }
-
-    return Response.json({ success: true, message: "Lead submitted successfully" });
   } catch (error) {
     console.error("Lead API error:", error);
     return Response.json(
