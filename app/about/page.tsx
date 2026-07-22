@@ -15,7 +15,7 @@ export default function AboutPage() {
       <Header />
 
       {/* Section 1: Hero */}
-      <section className="pt-24 bg-gradient-to-br from-slate-50 to-indigo-50">
+      <section className="md:pt-24 bg-gradient-to-br from-slate-50 to-indigo-50">
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-slate-950 sm:text-3xl lg:text-4xl">

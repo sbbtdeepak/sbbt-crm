@@ -24,7 +24,6 @@ export default function HomePage() {
 
       <Packages />
 
-      {/* Compare Packages Button - expands to show PackageComparison accordion */}
       <PackageComparison />
 
       <ConstructionEstimator />

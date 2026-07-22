@@ -20,9 +20,9 @@ export default async function Projects() {
   if (!projects?.length) return null;
 
   return (
-    <section id="projects" className="bg-[#f8fafc] text-slate-900 py-4 sm:py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="mx-auto max-w-3xl text-center">
+    <section id="projects" className="bg-[#f8fafc] text-slate-900 py-6 sm:py-10" aria-label="Featured projects">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl text-center mb-4 sm:mb-6">
           <p className="text-[10px] uppercase tracking-[0.32em] text-indigo-600 sm:text-xs">
             Featured Work
           </p>
@@ -31,34 +31,34 @@ export default async function Projects() {
           </h2>
         </div>
 
-        {/* Mobile: 2-column grid, Desktop: standard grid */}
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-2.5 lg:gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 auto-cols-fr">
           {projects.map((project: Project) => (
             <article
               key={project.id}
-              className="group overflow-hidden rounded-xl border border-slate-200 bg-white p-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
+              className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md h-full"
             >
-              <div className="relative overflow-hidden">
+              <div className="relative overflow-hidden aspect-[4/3]">
                 <img
                   src={
                     project.cover_image ||
-                    "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=900"
+                    "https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg?auto=compress&cs=tinysrgb&w=900"
                   }
                   alt={project.title}
-                  className="h-[90px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-36"
+                  className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
+                  loading="lazy"
                 />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/80 to-transparent px-1.5 py-1 sm:px-2.5 sm:py-1.5">
-                  <p className="text-[7px] uppercase tracking-[0.24em] text-white sm:text-[8px]">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/80 to-transparent px-2 py-1.5 sm:px-3 sm:py-2">
+                  <p className="text-[8px] uppercase tracking-[0.24em] text-white sm:text-[10px]">
                     Project
                   </p>
                 </div>
               </div>
 
-              <div className="p-2 sm:p-2.5">
-                <h3 className="text-[10px] font-semibold text-slate-950 sm:text-xs">
+              <div className="flex flex-1 flex-col p-2.5 sm:p-3">
+                <h3 className="text-[11px] font-semibold text-slate-950 sm:text-sm">
                   {project.title}
                 </h3>
-                <p className="mt-0.5 text-[9px] uppercase text-slate-500 sm:text-[9px]">
+                <p className="mt-0.5 text-[9px] uppercase tracking-wide text-slate-500 sm:text-[10px]">
                   {project.location}
                 </p>
               </div>

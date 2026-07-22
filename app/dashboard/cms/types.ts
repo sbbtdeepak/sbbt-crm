@@ -299,6 +299,180 @@ export type CMSSettingsUpdate = CMSUpdate<CMSSettingsRow>;
 export type CMSSettings = CMSSettingsRow;
 
 // ============================================================
+// Packages
+// ============================================================
+
+/**
+ * A feature item within a package.
+ * Stored in cms_package_features table.
+ */
+export interface CMSPackageFeature {
+  /** Icon identifier (e.g. icon name "shield-check", "clock") */
+  icon: string;
+  /** Feature title (e.g. "Structural Warranty") */
+  title: string;
+  /** Feature description */
+  description: string;
+}
+
+/**
+ * A specification item within a package.
+ * Stored in cms_package_specifications table.
+ */
+export interface CMSPackageSpecification {
+  /** Specification category (e.g. "Flooring", "Electrical") */
+  category: string;
+  /** Specification item name */
+  item: string;
+  /** Brand name for the specification */
+  brand: string;
+  /** Additional remarks */
+  remarks: string;
+}
+
+/**
+ * A gallery image within a package.
+ * Stored in cms_package_gallery table.
+ */
+export interface CMSPackageGalleryItem {
+  /** URL to the image (stored in cms/packages/) */
+  image_url: string;
+  /** Image caption */
+  caption: string;
+}
+
+/**
+ * Package row from cms_packages table.
+ */
+export interface CMSPackageRow extends CMSBase {
+  /** Package name (e.g. "Silver", "Gold", "Platinum") */
+  name: string;
+  /** URL-friendly unique identifier */
+  slug: string;
+  /** Price per square foot in INR */
+  price: number;
+  /** Short description for cards/summary display */
+  short_description: string;
+  /** Full detailed description */
+  description: string;
+  /** Sort order for display (ascending) */
+  display_order: number;
+  /** Whether the package is published and visible */
+  is_active: boolean;
+  /** URL to thumbnail image (stored in cms/packages/) */
+  thumbnail_url: string;
+  /** URL to banner image (stored in cms/packages/) */
+  banner_url: string;
+  /** Meta title for SEO */
+  meta_title: string;
+  /** Meta description for SEO */
+  meta_description: string;
+  /** URL to Open Graph image (stored in cms/packages/) */
+  og_image_url: string;
+}
+
+/** Shape for inserting a new package */
+export type CMSPackageInsert = CMSInsert<CMSPackageRow>;
+
+/** Shape for updating an existing package */
+export type CMSPackageUpdate = CMSUpdate<CMSPackageRow>;
+
+/**
+ * Full package data including relations.
+ * Used for the CMS form and API responses.
+ */
+export interface CMSPackageFull {
+  /** The main package row */
+  package: CMSPackageRow;
+  /** Associated features sorted by display_order */
+  features: CMSPackageFeature[];
+  /** Associated specifications sorted by display_order */
+  specifications: CMSPackageSpecification[];
+  /** Associated gallery images sorted by display_order */
+  gallery: CMSPackageGalleryItem[];
+}
+
+/** Form state for package server actions */
+export interface CMSPackageFormState extends CMSFormState {
+  /** Server-side validation errors keyed by field path */
+  errors?: Record<string, string[]>;
+  /** Generated slug (returned for preview after name entry) */
+  slug?: string;
+}
+
+// ============================================================
+// Projects
+// ============================================================
+
+/**
+ * A gallery image within a project.
+ */
+export interface CMSProjectGalleryItem {
+  image_url: string;
+  caption: string;
+}
+
+/**
+ * A before/after image within a project.
+ */
+export interface CMSProjectBeforeAfterItem {
+  image_url: string;
+  caption: string;
+}
+
+/**
+ * Project row from cms_projects table.
+ */
+export interface CMSProjectRow extends CMSBase {
+  name: string;
+  slug: string;
+  client_name: string;
+  location: string;
+  project_type: string;
+  package_used: string;
+  plot_area: string;
+  built_up_area: string;
+  floors: string;
+  completion_date: string;
+  status: string;
+  short_description: string;
+  description: string;
+  cover_image_url: string;
+  video_url: string;
+  project_value: string;
+  duration: string;
+  team_size: string;
+  customer_rating: number;
+  is_active: boolean;
+  is_featured: boolean;
+  display_order: number;
+  meta_title: string;
+  meta_description: string;
+  og_image_url: string;
+}
+
+/** Shape for inserting a new project */
+export type CMSProjectInsert = CMSInsert<CMSProjectRow>;
+
+/** Shape for updating an existing project */
+export type CMSProjectUpdate = CMSUpdate<CMSProjectRow>;
+
+/**
+ * Full project data including relations.
+ */
+export interface CMSProjectFull {
+  project: CMSProjectRow;
+  gallery: CMSProjectGalleryItem[];
+  beforeImages: CMSProjectBeforeAfterItem[];
+  afterImages: CMSProjectBeforeAfterItem[];
+}
+
+/** Form state for project server actions */
+export interface CMSProjectFormState extends CMSFormState {
+  errors?: Record<string, string[]>;
+}
+
+// ============================================================
 // Media
 // ============================================================
 
@@ -371,6 +545,8 @@ export const CMS_STORAGE_FOLDERS = {
   HERO: "hero",
   OG_IMAGES: "og-images",
   GENERAL: "general",
+  PACKAGES: "packages",
+  PROJECTS: "projects",
 } as const;
 
 /** Union type of valid storage folder names */

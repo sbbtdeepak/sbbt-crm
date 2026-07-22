@@ -18,6 +18,9 @@ export default function CompanyForm({ company }: Props) {
   // Local state for image URLs so preview updates immediately after upload
   const [logoUrl, setLogoUrl] = useState(company?.logo_url || "");
   const [faviconUrl, setFaviconUrl] = useState(company?.favicon_url || "");
+  // Local state for color pickers to sync with text inputs
+  const [primaryColor, setPrimaryColor] = useState(company?.primary_color || "#4f46e5");
+  const [secondaryColor, setSecondaryColor] = useState(company?.secondary_color || "#06b6d4");
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -335,19 +338,14 @@ export default function CompanyForm({ company }: Props) {
                   id="primary_color"
                   name="primary_color"
                   type="color"
-                  defaultValue={company?.primary_color || "#4f46e5"}
+                  value={primaryColor}
+                  onChange={(e) => setPrimaryColor(e.target.value)}
                   className="w-16 h-10 rounded-lg border p-1 focus:ring-2 focus:ring-indigo-500"
                 />
                 <input
                   type="text"
-                  defaultValue={company?.primary_color || "#4f46e5"}
-                  onChange={(e) => {
-                    const color = e.target.value;
-                    const colorInput = document.getElementById("primary_color");
-                    if (colorInput && color.match(/^#[0-9A-F]{6}$/i)) {
-                      (colorInput as HTMLInputElement).value = color;
-                    }
-                  }}
+                  value={primaryColor}
+                  onChange={(e) => setPrimaryColor(e.target.value)}
                   className="flex-1 rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="#4f46e5"
                 />
@@ -366,19 +364,14 @@ export default function CompanyForm({ company }: Props) {
                   id="secondary_color"
                   name="secondary_color"
                   type="color"
-                  defaultValue={company?.secondary_color || "#06b6d4"}
+                  value={secondaryColor}
+                  onChange={(e) => setSecondaryColor(e.target.value)}
                   className="w-16 h-10 rounded-lg border p-1 focus:ring-2 focus:ring-indigo-500"
                 />
                 <input
                   type="text"
-                  defaultValue={company?.secondary_color || "#06b6d4"}
-                  onChange={(e) => {
-                    const color = e.target.value;
-                    const colorInput = document.getElementById("secondary_color");
-                    if (colorInput && color.match(/^#[0-9A-F]{6}$/i)) {
-                      (colorInput as HTMLInputElement).value = color;
-                    }
-                  }}
+                  value={secondaryColor}
+                  onChange={(e) => setSecondaryColor(e.target.value)}
                   className="flex-1 rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="#06b6d4"
                 />

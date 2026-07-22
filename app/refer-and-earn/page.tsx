@@ -12,7 +12,7 @@ export default function ReferAndEarnPage() {
       <Header />
 
       {/* Hero */}
-      <section className="pt-24 bg-slate-50">
+      <section className="md:pt-24 bg-slate-50">
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="text-center">
             <h1 className="text-lg font-bold text-slate-950 sm:text-xl lg:text-2xl">

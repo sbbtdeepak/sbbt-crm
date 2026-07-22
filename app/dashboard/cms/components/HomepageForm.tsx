@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { ImageUploader } from "@/components/shared/ImageUploader";
 import { saveHomepage } from "../actions";
 import type { CMSHomepageRow, CMSStat } from "../types";
@@ -15,12 +15,22 @@ export default function HomepageForm({ homepage }: Props) {
     message: "",
   });
 
-  // Default stats if none exist
-  const defaultStats: CMSStat[] = homepage?.stats || [
+  // Local state for hero background image URL
+  const [heroBackgroundUrl, setHeroBackgroundUrl] = useState(homepage?.hero_background_url || "");
+
+  // Local state for stats with controlled inputs
+  const [stats, setStats] = useState<CMSStat[]>(homepage?.stats || [
     { label: "Years Experience", value: "15+" },
     { label: "Projects Completed", value: "500+" },
     { label: "Happy Clients", value: "1000+" },
-  ];
+  ]);
+
+  // Update stat label or value
+  const updateStat = (index: number, field: "label" | "value", value: string) => {
+    const newStats = [...stats];
+    newStats[index] = { ...newStats[index], [field]: value };
+    setStats(newStats);
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -114,21 +124,15 @@ export default function HomepageForm({ homepage }: Props) {
             <div>
               <ImageUploader
                 folder="hero"
-                value={homepage?.hero_background_url || ""}
-                onChange={(url) => {
-                  const input = document.createElement("input");
-                  input.type = "hidden";
-                  input.name = "hero_background_url";
-                  input.value = url;
-                  document.querySelector("form")?.appendChild(input);
-                }}
+                value={heroBackgroundUrl}
+                onChange={(url) => setHeroBackgroundUrl(url)}
                 label="Hero Background"
                 disabled={isPending}
               />
               <input
                 type="hidden"
                 name="hero_background_url"
-                defaultValue={homepage?.hero_background_url || ""}
+                value={heroBackgroundUrl}
               />
             </div>
           </div>
@@ -155,7 +159,7 @@ export default function HomepageForm({ homepage }: Props) {
             </div>
 
             <div className="space-y-3">
-              {defaultStats.map((stat, index) => (
+              {stats.map((stat, index) => (
                 <div
                   key={index}
                   className="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 border rounded-lg"
@@ -164,38 +168,18 @@ export default function HomepageForm({ homepage }: Props) {
                     <label className="block mb-1 text-sm font-medium text-gray-600">
                       Stat {index + 1}
                     </label>
-                    <input
-                      type="hidden"
-                      name={`stats[${index}][label]`}
-                      defaultValue={stat.label}
-                    />
-                    <input
-                      type="hidden"
-                      name={`stats[${index}][value]`}
-                      defaultValue={stat.value}
-                    />
                     <div className="grid grid-cols-2 gap-2">
                       <input
                         type="text"
-                        defaultValue={stat.label}
-                        onChange={(e) => {
-                          const input = document.querySelector(
-                            `input[name="stats[${index}][label]"]`
-                          ) as HTMLInputElement;
-                          if (input) input.value = e.target.value;
-                        }}
+                        value={stat.label}
+                        onChange={(e) => updateStat(index, "label", e.target.value)}
                         className="rounded-lg border p-2 text-sm focus:ring-2 focus:ring-indigo-500"
                         placeholder="Label"
                       />
                       <input
                         type="text"
-                        defaultValue={stat.value}
-                        onChange={(e) => {
-                          const input = document.querySelector(
-                            `input[name="stats[${index}][value]"]`
-                          ) as HTMLInputElement;
-                          if (input) input.value = e.target.value;
-                        }}
+                        value={stat.value}
+                        onChange={(e) => updateStat(index, "value", e.target.value)}
                         className="rounded-lg border p-2 text-sm focus:ring-2 focus:ring-indigo-500"
                         placeholder="Value"
                       />
@@ -209,7 +193,7 @@ export default function HomepageForm({ homepage }: Props) {
             <input
               type="hidden"
               name="stats"
-              defaultValue={JSON.stringify(defaultStats)}
+              value={JSON.stringify(stats)}
             />
           </div>
         </div>

@@ -4,8 +4,16 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 
+interface PackageItem {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  short_description?: string | null;
+}
+
 export default function Packages() {
-  const [packages, setPackages] = useState<any[]>([]);
+  const [packages, setPackages] = useState<PackageItem[]>([]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -15,16 +23,16 @@ export default function Packages() {
       .eq("is_active", true)
       .order("price")
       .then(({ data }) => {
-        if (data) setPackages(data);
+        if (data) setPackages(data as PackageItem[]);
       });
   }, []);
 
   if (packages.length === 0) return null;
 
   return (
-    <section className="bg-[#f8fafc] text-slate-900 py-4 sm:py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="mx-auto max-w-3xl text-center">
+    <section className="bg-[#f8fafc] text-slate-900 py-6 sm:py-10" aria-label="Construction packages">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-[80px]">
+        <div className="mx-auto max-w-3xl text-center mb-4 sm:mb-6">
           <p className="text-[10px] uppercase tracking-[0.32em] text-indigo-600 sm:text-xs">
             Premium Packages
           </p>
@@ -33,42 +41,33 @@ export default function Packages() {
           </h2>
         </div>
 
-        {/* Mobile: 2-column grid, Desktop: standard responsive */}
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-3">
-          {packages.map((pkg: any) => (
+        {/* Auto-fit grid with equal height cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 auto-cols-fr">
+          {packages.map((pkg) => (
             <div
               key={pkg.id}
-              className="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
+              className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md h-full"
             >
-              <div className="overflow-hidden">
-                {pkg.image_url ? (
-                  <img
-                    src={pkg.image_url}
-                    alt={pkg.name}
-                    className="h-20 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-32"
-                  />
-                ) : (
-                  <div className="flex h-20 w-full items-center justify-center bg-slate-100 text-slate-400 text-[10px] sm:h-32">
-                    No image
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-1 flex-col px-2 pb-2 pt-1.5 sm:px-3 sm:pb-3 sm:pt-2.5">
+              <div className="flex flex-1 flex-col px-3 pb-3 pt-3 sm:px-4 sm:pb-4 sm:pt-4">
                 <p className="text-[9px] uppercase tracking-[0.24em] text-indigo-600 sm:text-xs">
                   Package
                 </p>
                 <h3 className="mt-0.5 text-xs font-semibold text-slate-950 sm:text-sm">
                   {pkg.name}
                 </h3>
-                <p className="mt-1 text-[10px] font-semibold text-emerald-600 sm:text-sm">
+                {pkg.short_description && (
+                  <p className="mt-1 text-[10px] text-slate-500 leading-tight line-clamp-2 sm:text-xs flex-1">
+                    {pkg.short_description}
+                  </p>
+                )}
+                <p className="mt-2 pt-2 text-[11px] font-semibold text-emerald-600 sm:text-sm">
                   ₹{Number(pkg.price).toLocaleString()}/sqft
                 </p>
 
-                {/* View Details button only - no Estimate/Quote on Home page */}
                 <Link
                   href={`/packages/${pkg.slug}`}
-                  className="mt-auto inline-flex w-full items-center justify-center rounded-full bg-indigo-600 px-2 py-1 text-[9px] font-semibold text-white transition hover:bg-indigo-500 sm:py-1.5"
+                  className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-indigo-600 px-2 py-1.5 text-[9px] font-semibold text-white transition hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:py-2 sm:text-xs"
+                  aria-label={`View details for ${pkg.name} package`}
                 >
                   View Details →
                 </Link>

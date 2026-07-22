@@ -71,7 +71,7 @@ export default function ContactPage() {
     return (
       <div className="bg-gray-50 min-h-screen">
         <Header />
-        <div className="max-w-xl mx-auto px-4 py-12 text-center pt-24">
+      <div className="max-w-xl mx-auto px-4 py-12 text-center md:pt-24">
           <div className="bg-white p-8 rounded-xl shadow-md">
             <h1 className="text-xl font-bold text-green-600">Thank You!</h1>
             <p className="mt-2 text-gray-600 text-sm">Your message has been sent. We will get back to you shortly.</p>
@@ -86,7 +86,7 @@ export default function ContactPage() {
     <div className="bg-gray-50 min-h-screen">
       <Header />
 
-      <div className="pt-24 max-w-4xl mx-auto px-6 py-8">
+      <div className="md:pt-24 max-w-4xl mx-auto px-6 py-8">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Contact Form */}
           <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">

@@ -43,7 +43,7 @@ export default function JoinUsPage() {
       <Header />
 
       {/* Hero */}
-      <section className="pt-24 bg-slate-50">
+      <section className="md:pt-24 bg-slate-50">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <div className="text-center">
             <h1 className="text-xl font-bold text-slate-950 sm:text-2xl lg:text-3xl">

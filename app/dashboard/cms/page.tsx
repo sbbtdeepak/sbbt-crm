@@ -3,6 +3,8 @@ import HomepageForm from "./components/HomepageForm";
 import SEOForm from "./components/SEOForm";
 import SocialForm from "./components/SocialForm";
 import SettingsForm from "./components/SettingsForm";
+import PackagesSection from "./components/PackagesSection";
+import ProjectsSection from "./components/ProjectsSection";
 import { createClient } from "@/lib/supabase/server";
 import type {
   CMSCompanyRow,
@@ -14,7 +16,7 @@ import type {
 import { DEFAULT_SITE_ID } from "./types";
 
 // Tab types
-type TabType = "company" | "homepage" | "seo" | "social" | "settings";
+type TabType = "company" | "homepage" | "seo" | "social" | "settings" | "packages" | "projects";
 
 // Tab configuration
 const tabs: Array<{ id: TabType; label: string }> = [
@@ -23,6 +25,8 @@ const tabs: Array<{ id: TabType; label: string }> = [
   { id: "seo", label: "SEO" },
   { id: "social", label: "Social" },
   { id: "settings", label: "Settings" },
+  { id: "packages", label: "Packages" },
+  { id: "projects", label: "Projects" },
 ];
 
 export default async function CMSPage({
@@ -66,7 +70,7 @@ export default async function CMSPage({
       <div>
         <h1 className="text-3xl font-bold">CMS Dashboard</h1>
         <p className="text-gray-500 mt-1">
-          Manage company information, homepage, SEO, social links, and settings.
+          Manage company information, homepage, SEO, social links, settings, and packages.
         </p>
       </div>
 
@@ -114,6 +118,8 @@ export default async function CMSPage({
         {activeTab === "seo" && <SEOForm seo={seo} />}
         {activeTab === "social" && <SocialForm social={social} />}
         {activeTab === "settings" && <SettingsForm settings={settings} />}
+        {activeTab === "packages" && <PackagesSection />}
+        {activeTab === "projects" && <ProjectsSection />}
       </div>
     </div>
   );

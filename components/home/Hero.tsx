@@ -1,133 +1,332 @@
-import { createClient } from "@/lib/supabase/server";
+"use client";
+
+import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import LeadPopupForm from "@/components/shared/LeadPopupForm";
 
-export default async function Hero() {
-  const supabase = await createClient();
+interface LeadFormState {
+  name: string;
+  contact: string;
+  location: string;
+  budget: string;
+}
 
-  // Try to get CMS homepage data first
-  const { data: cmsHomepage } = await supabase
-    .from("cms_homepage")
-    .select("*")
-    .eq("site_id", "00000000-0000-0000-0000-000000000001")
-    .maybeSingle();
+export default function Hero() {
+  const [hero, setHero] = useState({
+    title: "Build Your Dream Home with Expert Craftsmanship",
+    subtitle: "Premium construction, turnkey delivery, and full-site supervision for modern homes across Delhi NCR.",
+    cta_text: "Get Your Free Quote",
+    cta_link: "/quote",
+    image_url: "https://images.pexels.com/photos/5843998/pexels-photo-5843998.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    stats: [] as Array<{ label: string; value: string }>,
+  });
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupShown, setPopupShown] = useState(false);
+  const [leadForm, setLeadForm] = useState<LeadFormState>({
+    name: "",
+    contact: "",
+    location: "",
+    budget: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
 
-  // Fall back to hero_banner for backward compatibility
-  const { data: heroBanner } = await supabase
-    .from("hero_banner")
-    .select("*")
-    .eq("is_active", true)
-    .maybeSingle();
+  useEffect(() => {
+    const supabase = createClient();
 
-  // Use CMS data if available, otherwise fall back to hero_banner or hardcoded defaults
-  const hero = {
-    title: cmsHomepage?.hero_heading || heroBanner?.title || "Build Your Dream Home",
-    subtitle: cmsHomepage?.hero_subheading || heroBanner?.subtitle || "Premium construction, turnkey delivery, and full-site supervision for modern homes.",
-    cta_text: cmsHomepage?.hero_cta_text || heroBanner?.button_text || "Get Your Free Quote",
-    cta_link: cmsHomepage?.hero_cta_link || heroBanner?.button_link || "/quote",
-    image_url: cmsHomepage?.hero_background_url || heroBanner?.image_url || "https://images.pexels.com/photos/5843998/pexels-photo-5843998.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    stats: cmsHomepage?.stats || [],
+    // Fetch CMS Homepage data
+    supabase
+      .from("cms_homepage")
+      .select("*")
+      .eq("site_id", "00000000-0000-0000-0000-000000000001")
+      .maybeSingle()
+      .then(({ data: cmsHomepage }) => {
+        // Fetch hero banner as fallback
+        supabase
+          .from("hero_banner")
+          .select("*")
+          .eq("is_active", true)
+          .maybeSingle()
+          .then(({ data: heroBanner }) => {
+            setHero({
+              title: cmsHomepage?.hero_heading || heroBanner?.title || "Build Your Dream Home with Expert Craftsmanship",
+              subtitle: cmsHomepage?.hero_subheading || heroBanner?.subtitle || "Premium construction, turnkey delivery, and full-site supervision for modern homes across Delhi NCR.",
+              cta_text: cmsHomepage?.hero_cta_text || heroBanner?.button_text || "Get Your Free Quote",
+              cta_link: cmsHomepage?.hero_cta_link || heroBanner?.button_link || "/quote",
+              image_url: cmsHomepage?.hero_background_url || heroBanner?.image_url || "https://images.pexels.com/photos/5843998/pexels-photo-5843998.jpeg?auto=compress&cs=tinysrgb&w=1200",
+              stats: cmsHomepage?.stats || [],
+            });
+          });
+      });
+
+  }, []);
+
+  // Show popup after 10 seconds
+  useEffect(() => {
+    if (popupShown) return;
+
+    const timer = setTimeout(() => {
+      setIsPopupOpen(true);
+      setPopupShown(true);
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, [popupShown]);
+
+  const handleLeadFormChange = (field: keyof LeadFormState, value: string) => {
+    setLeadForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const image =
-    hero.image_url?.startsWith("http")
-      ? hero.image_url
-      : "https://images.pexels.com/photos/5843998/pexels-photo-5843998.jpeg?auto=compress&cs=tinysrgb&w=1200";
+  const handleLeadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitMessage("");
+
+    try {
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(leadForm),
+      });
+
+      if (response.ok) {
+        setSubmitMessage("Quote request submitted successfully! We'll contact you soon.");
+        setLeadForm({ name: "", contact: "", location: "", budget: "" });
+        setTimeout(() => setIsPopupOpen(false), 2000);
+      } else {
+        setSubmitMessage("Failed to submit. Please try again.");
+      }
+    } catch {
+      setSubmitMessage("Failed to submit. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const image = hero.image_url?.startsWith("http")
+    ? hero.image_url
+    : "https://images.pexels.com/photos/5843998/pexels-photo-5843998.jpeg?auto=compress&cs=tinysrgb&w=1200";
 
   return (
-    // pt-14 for mobile header space compensation (transparent header on home)
-    // Desktop uses standard pt-28
-    <section className="bg-white">
-      <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="grid lg:grid-cols-[1fr_1.3fr] lg:items-center lg:gap-8">
-          {/* Image → first on mobile with SBBT overlay */}
-          <div className="order-first lg:order-last relative">
-            <div className="overflow-hidden rounded-2xl shadow-2xl shadow-slate-200/60 lg:rounded-[2rem]">
-              <img
-                src={image}
-                alt="Luxury home construction"
-                className="aspect-[4/3] w-full object-cover lg:aspect-[4/5]"
-              />
+    <>
+      {/* ============================================ */}
+      {/* DESKTOP HERO - Premium Asymmetrical Layout   */}
+      {/* ============================================ */}
+      <section className="hidden md:block bg-white relative overflow-hidden" aria-label="Hero banner">
+        {/* Subtle background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/40 via-white to-emerald-50/30 pointer-events-none" />
+        
+        {/* Main content */}
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-[80px] pt-20 pb-0">
+          <div className="grid lg:grid-cols-[25fr_75fr] gap-8 xl:gap-12 items-center min-h-[600px]">
+            
+            {/* LEFT CONTENT - 35% */}
+            <div className="relative z-10 pb-8">
+              {/* Trust Pill */}
+              <span className="inline-flex rounded-full bg-[#eef4ff] px-3 py-1.5 text-[10px] font-semibold text-indigo-700 ring-1 ring-indigo-100 sm:text-xs sm:px-4 sm:py-1.5">
+                ✦ Luxury Residential Construction
+              </span>
+
+              {/* Heading */}
+              <h1 className="mt-4 sm:mt-6 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl lg:text-4xl xl:text-5xl leading-[1.1]">
+                {hero.title}
+              </h1>
+
+              {/* Subheading */}
+              {hero.subtitle && (
+                <p className="mt-3 sm:mt-4 max-w-xl text-sm text-slate-600 sm:text-base lg:text-lg leading-relaxed">
+                  {hero.subtitle}
+                </p>
+              )}
+
+              {/* Trust Badges - Green/Blue theme */}
+              <div className="mt-6 flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
+                  <span className="text-emerald-600 text-xs">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                  <span className="text-[11px] font-semibold text-emerald-700">4.9 Google Rating</span>
+                </div>
+                <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-3 py-1.5">
+                  <span className="text-[11px] font-semibold text-blue-700">15+ Years Experience</span>
+                </div>
+                <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
+                  <span className="text-[11px] font-semibold text-emerald-700">1000+ Homes Built</span>
+                </div>
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                <Link
+                  href={hero.cta_link || "/quote"}
+                  className="inline-flex w-full sm:w-auto items-center justify-center rounded-full bg-gradient-to-r from-emerald-600 to-teal-500 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+                  aria-label={hero.cta_text || "Get Free Quote"}
+                >
+                  {hero.cta_text || "Get Your Free Quote"}
+                </Link>
+
+                <Link
+                  href="/packages"
+                  className="inline-flex w-full sm:w-auto items-center justify-center rounded-full border border-slate-200 bg-white/80 backdrop-blur-sm px-8 py-3.5 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-indigo-300 hover:bg-slate-50 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                  View Packages →
+                </Link>
+              </div>
             </div>
-            {/* SBBT logo overlay on image */}
-            <div className="absolute top-3 left-3 flex items-center gap-2 rounded-xl bg-white/80 backdrop-blur-sm px-3 py-1.5 shadow-sm">
-              <span className="text-sm font-bold text-indigo-700">SBBT</span>
-              <span className="text-[10px] text-slate-600 leading-tight">Shree Badree<br />Build Tech</span>
+
+            {/* RIGHT HERO IMAGE - 75% (increased ~15% from 65%) */}
+            <div className="relative">
+              <div className="relative overflow-hidden rounded-3xl shadow-2xl shadow-slate-200/80">
+                <img
+                  src={image}
+                  alt="Luxury home construction"
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  style={{ minHeight: "500px", maxHeight: "650px" }}
+                />
+                {/* Gradient overlay for text blending */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-white/5 pointer-events-none" />
+              </div>
             </div>
           </div>
 
-          {/* Content → compact */}
-          <div className="pt-14 pb-2 lg:pt-0 lg:pb-0 space-y-2 lg:space-y-4">
-            <span className="inline-flex rounded-full bg-[#eef4ff] px-3 py-1 text-[10px] font-semibold text-indigo-700 ring-1 ring-indigo-100 sm:text-xs sm:px-4 sm:py-1.5">
-              Luxury Residential Construction
-            </span>
-
-            <h1 className="max-w-3xl text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl lg:text-4xl xl:text-5xl">
-              {hero.title}
-            </h1>
-
-            {hero.subtitle && (
-              <p className="max-w-2xl text-sm text-slate-600 sm:text-base lg:text-lg">
-                {hero.subtitle}
-              </p>
-            )}
-
-            <div className="flex flex-row gap-2">
-              <Link
-                href={hero.cta_link || "/quote"}
-                className="inline-flex flex-1 items-center justify-center rounded-full bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 sm:text-sm sm:px-6 sm:py-3"
-              >
-                {hero.cta_text || "Get Free Quote"}
-              </Link>
-
-              <Link
-                href="/packages"
-                className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-900 shadow-sm transition hover:border-indigo-300 hover:bg-slate-50 sm:text-sm sm:px-6 sm:py-3"
-              >
-                View Packages
-              </Link>
-            </div>
-
-            {/* Stats row */}
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-              {hero.stats.length > 0 ? (
-                hero.stats.map((stat: { label: string; value: string }, index: number) => (
-                  <div key={index} className="flex items-baseline gap-1">
-                    <span className="text-base font-bold text-indigo-700 sm:text-xl">
-                      {stat.value}
-                    </span>
-                    <span className="text-[10px] text-slate-600 sm:text-xs">{stat.label}</span>
+          {/* Floating Quote Form Below Hero */}
+          <div className="relative -mt-14 pb-12 z-20">
+            <div className="max-w-4xl mx-auto">
+              <form onSubmit={handleLeadSubmit} className="rounded-3xl bg-white/90 backdrop-blur-2xl border border-slate-200/80 shadow-2xl shadow-slate-900/10 p-6 sm:p-8">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">Name</label>
+                    <input
+                      type="text"
+                      placeholder="Your Name"
+                      value={leadForm.name}
+                      onChange={(e) => handleLeadFormChange("name", e.target.value)}
+                      required
+                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition bg-white"
+                    />
                   </div>
-                ))
-              ) : (
-                <>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-base font-bold text-indigo-700 sm:text-xl">
-                      500+
-                    </span>
-                    <span className="text-[10px] text-slate-600 sm:text-xs">Homes</span>
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">Mobile Number</label>
+                    <input
+                      type="tel"
+                      placeholder="+91 XXXXX XXXXX"
+                      value={leadForm.contact}
+                      onChange={(e) => handleLeadFormChange("contact", e.target.value)}
+                      required
+                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition bg-white"
+                    />
                   </div>
-                  <div className="h-4 w-px bg-slate-200 sm:h-6" />
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-base font-bold text-indigo-700 sm:text-xl">
-                      13+
-                    </span>
-                    <span className="text-[10px] text-slate-600 sm:text-xs">Years</span>
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">Plot Location</label>
+                    <input
+                      type="text"
+                      placeholder="Delhi / NCR"
+                      value={leadForm.location}
+                      onChange={(e) => handleLeadFormChange("location", e.target.value)}
+                      required
+                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition bg-white"
+                    />
                   </div>
-                  <div className="h-4 w-px bg-slate-200 sm:h-6" />
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-base font-bold text-indigo-700 sm:text-xl">
-                      4.8★
-                    </span>
-                    <span className="text-[10px] text-slate-600 sm:text-xs">
-                      Google Rating
-                    </span>
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">Budget (₹)</label>
+                    <input
+                      type="text"
+                      placeholder="Approx. budget"
+                      value={leadForm.budget}
+                      onChange={(e) => handleLeadFormChange("budget", e.target.value)}
+                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition bg-white"
+                    />
                   </div>
-                </>
-              )}
+                  <div className="col-span-2 md:col-span-1">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-600 to-teal-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:scale-105 active:scale-95 disabled:opacity-50"
+                    >
+                      {isSubmitting ? "Submitting..." : "GET QUOTE NOW"}
+                    </button>
+                  </div>
+                </div>
+                {submitMessage && (
+                  <p className="mt-3 text-xs text-center text-slate-600 bg-slate-50 rounded-xl py-2">{submitMessage}</p>
+                )}
+              </form>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* ============================================ */}
+      {/* MOBILE HERO - Premium Compact Layout         */}
+      {/* ============================================ */}
+      <section className="md:hidden bg-white relative pt-0.5" aria-label="Hero banner">
+        {/* Hero Image - 16:9 */}
+        <div className="px-3">
+          <div className="aspect-[16/9] overflow-hidden rounded-2xl shadow-xl shadow-slate-200/60">
+            <img
+              src={image}
+              alt="Luxury home construction"
+              className="w-full h-full object-cover"
+              loading="eager"
+            />
+          </div>
+        </div>
+
+        {/* Hero Text - Immediately below image */}
+        <div className="px-4 pt-4 pb-6 space-y-3">
+          <h1 className="text-lg font-bold tracking-tight text-slate-950 leading-snug">
+            {hero.title}
+          </h1>
+
+          {hero.subtitle && (
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {hero.subtitle}
+            </p>
+          )}
+
+          {/* Trust Badges Row - Green/Blue theme */}
+          <div className="flex flex-wrap gap-1.5">
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1">
+              <span className="text-emerald-600 text-xs">&#9733;</span>
+              <span className="text-[10px] font-semibold text-emerald-700">4.9 Google Rating</span>
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-1">
+              <span className="text-[10px] font-semibold text-blue-700">15+ Years</span>
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1">
+              <span className="text-[10px] font-semibold text-emerald-700">1000+ Homes</span>
+            </span>
+          </div>
+
+          {/* Primary CTA */}
+          <button
+            onClick={() => setIsPopupOpen(true)}
+            className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-emerald-600 to-teal-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:scale-[1.02] active:scale-95"
+            aria-label="Get Quote Now"
+          >
+            GET QUOTE NOW
+          </button>
+
+          {/* Secondary CTA */}
+          <Link
+            href="/packages"
+            className="inline-flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-indigo-300 hover:bg-slate-50"
+          >
+            View Our Packages →
+          </Link>
+        </div>
+      </section>
+
+      {/* Lead Popup Form */}
+      <LeadPopupForm
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+        leadForm={leadForm}
+        onFormChange={handleLeadFormChange}
+        onSubmit={handleLeadSubmit}
+        isSubmitting={isSubmitting}
+        submitMessage={submitMessage}
+      />
+    </>
   );
 }
