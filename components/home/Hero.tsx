@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import LeadPopupForm from "@/components/shared/LeadPopupForm";
 import { getCompanyPublicData } from "@/app/dashboard/cms/actions";
@@ -201,12 +202,14 @@ export default function Hero() {
             {/* RIGHT HERO IMAGE - 75% (increased ~15% from 65%) */}
             <div className="relative">
               <div className="relative overflow-hidden rounded-3xl shadow-2xl shadow-slate-200/80">
-                <img
+                <Image
                   src={image}
                   alt="Luxury home construction"
                   className="w-full h-full object-cover"
-                  loading="eager"
-                  style={{ minHeight: "500px", maxHeight: "650px" }}
+                  width={1200}
+                  height={650}
+                  priority
+                  style={{ minHeight: "500px", maxHeight: "650px", width: "100%", height: "auto" }}
                 />
                 {/* Gradient overlay for text blending */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-white/5 pointer-events-none" />
@@ -288,11 +291,13 @@ export default function Hero() {
         {/* Hero Image - 16:9 */}
         <div className="px-3">
           <div className="aspect-[16/9] overflow-hidden rounded-2xl shadow-xl shadow-slate-200/60">
-            <img
+            <Image
               src={image}
               alt="Luxury home construction"
               className="w-full h-full object-cover"
-              loading="eager"
+              width={800}
+              height={450}
+              priority
             />
           </div>
         </div>

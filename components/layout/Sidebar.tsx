@@ -14,6 +14,7 @@ const menuItems = [
   { name: "Packages", href: "/dashboard/packages" },
   { name: "Projects", href: "/dashboard/projects" },
   { name: "Leads", href: "/dashboard/leads" },
+  { name: "Estimate Engine", href: "/dashboard/estimate-engine" },
   { name: "Quotations", href: "/dashboard/quotations" },
   { name: "Testimonials", href: "/dashboard/testimonials" },
   { name: "Blogs", href: "/dashboard/blogs" },

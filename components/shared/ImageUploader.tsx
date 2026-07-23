@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useActionState, startTransition } from "react";
+import Image from "next/image";
 import { uploadImageAction, deleteImageAction } from "@/app/dashboard/cms/actions";
 import { validateImage, ImageValidationResult } from "./image-utils";
 import type { CMSStorageFolder } from "@/app/dashboard/cms/types";
@@ -185,10 +186,12 @@ export function ImageUploader({
         {hasImage ? (
           // Image Preview Mode
           <div className="relative rounded-lg overflow-hidden border border-gray-300 bg-gray-50">
-            <img
+            <Image
               src={value}
               alt="Uploaded"
               className="w-full h-48 object-cover"
+              width={400}
+              height={192}
               onError={() => {
                 setState("error");
                 setError("Failed to load image");
