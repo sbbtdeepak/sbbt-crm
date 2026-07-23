@@ -10,6 +10,7 @@ interface SidebarProps {
 const menuItems = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "CMS", href: "/dashboard/cms" },
+  { name: "Master Data", href: "/dashboard/master-data" },
   { name: "Packages", href: "/dashboard/packages" },
   { name: "Projects", href: "/dashboard/projects" },
   { name: "Leads", href: "/dashboard/leads" },

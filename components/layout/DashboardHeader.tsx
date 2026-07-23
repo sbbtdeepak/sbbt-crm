@@ -1,6 +1,7 @@
 "use client";
 
 import type { MouseEventHandler } from "react";
+import NotificationBell from "./NotificationBell";
 
 interface DashboardHeaderProps {
   title: string;
@@ -25,6 +26,7 @@ export default function DashboardHeader({ title, onMenuClick }: DashboardHeaderP
         <div className="text-base font-semibold text-slate-900 sm:text-lg">{title}</div>
 
         <div className="hidden items-center gap-3 sm:flex">
+          <NotificationBell />
           <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
             Dashboard
           </span>

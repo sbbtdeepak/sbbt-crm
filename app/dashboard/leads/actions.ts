@@ -9,6 +9,11 @@ import {
   LeadQueryResult,
   LEAD_STATUSES,
 } from "./types";
+import {
+  notifyNewLead,
+  notifyLeadStatusChange,
+  notifyLeadRemarkAdded,
+} from "./lib/providers/provider-registry";
 
 // ============================================================
 // Constants
@@ -218,6 +223,13 @@ export async function createLead(
   // Revalidate the leads page
   revalidatePath("/dashboard/leads");
 
+  // Fire notification asynchronously (fire-and-forget, don't block response)
+  if (data) {
+    notifyNewLead(data as LeadRow, source).catch((err) =>
+      console.error("Notification error:", err)
+    );
+  }
+
   return {
     success: true,
     message: "Your enquiry has been submitted successfully! We will contact you soon.",
@@ -333,6 +345,13 @@ export async function createLeadFromAPI(body: {
   }
 
   revalidatePath("/dashboard/leads");
+
+  // Fire notification asynchronously (fire-and-forget, don't block response)
+  if (data) {
+    notifyNewLead(data as LeadRow, source).catch((err) =>
+      console.error("Notification error:", err)
+    );
+  }
 
   return {
     success: true,
@@ -466,6 +485,19 @@ export async function updateLeadStatus(
     throw new Error(`Invalid status: ${status}`);
   }
 
+  // Fetch current lead to get old status and full data
+  const { data: currentLead, error: fetchError } = await supabase
+    .from("contact_leads")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (fetchError) {
+    throw new Error(fetchError.message);
+  }
+
+  const oldStatus = currentLead?.status || "unknown";
+
   const { error } = await supabase
     .from("contact_leads")
     .update({
@@ -479,6 +511,13 @@ export async function updateLeadStatus(
   }
 
   revalidatePath("/dashboard/leads");
+
+  // Fire status change notification asynchronously
+  if (currentLead && oldStatus !== status) {
+    notifyLeadStatusChange(currentLead as LeadRow, oldStatus, status).catch(
+      (err) => console.error("Status change notification error:", err)
+    );
+  }
 }
 
 // ============================================================
@@ -538,6 +577,13 @@ export async function addLeadRemarks(
   }
 
   revalidatePath("/dashboard/leads");
+
+  // Fire remark notification asynchronously
+  if (existingLead) {
+    notifyLeadRemarkAdded(existingLead as LeadRow, remark.trim()).catch(
+      (err) => console.error("Remark notification error:", err)
+    );
+  }
 }
 
 // ============================================================
