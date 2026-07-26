@@ -1,14 +1,10 @@
 "use client";
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from 'react';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import Link from "next/link";
 
 type Project = {
   id: string;
@@ -27,10 +23,15 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const supabase = createClient();
     const fetchProjects = async () => {
+      // Fetch projects with their first gallery image as thumbnail fallback
       const { data, error } = await supabase
-        .from('projects')
-        .select(`*`)
+        .from('cms_projects')
+        .select(`
+          *,
+          cms_project_gallery!left(image_url)
+        `)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -39,7 +40,17 @@ export default function ProjectsPage() {
         return;
       }
 
-      setProjects(data || []);
+      // Map projects: if no thumbnail, use first gallery image
+      const mappedProjects = (data || []).map((p: Record<string, unknown>) => {
+        const gallery = p.cms_project_gallery as Array<{ image_url: string }> | undefined;
+        const firstGalleryImage = gallery?.[0]?.image_url;
+        return {
+          ...p,
+          thumbnail: (p.thumbnail as string) || firstGalleryImage || null,
+        } as Project;
+      });
+
+      setProjects(mappedProjects);
       setLoading(false);
     };
 
@@ -70,12 +81,10 @@ export default function ProjectsPage() {
           {projects.length === 0 ? (
             <div className="text-center py-12 text-gray-400 text-xs">No projects added yet.</div>
           ) : (
-            // Responsive grid: mobile=2 cols, desktop=auto-fit
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
               {projects.map((project) => (
-                <a href={`/projects/${project.id}`} key={project.id}>
+                <Link href={`/projects/${project.id}`} key={project.id}>
                   <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer group">
-                    {/* Image container with aspect ratio */}
                     <div className="relative overflow-hidden aspect-[4/3]">
                       {project.thumbnail ? (
                         <img src={project.thumbnail} alt={project.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" />
@@ -96,7 +105,7 @@ export default function ProjectsPage() {
                       <p className="mt-1 text-[9px] font-medium text-indigo-600 sm:text-xs">₹{project.project_value?.toLocaleString() || 0}</p>
                     </div>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           )}

@@ -14,7 +14,7 @@ export async function createProject(formData: FormData) {
       .map((x) => x.trim())
       .filter(Boolean) || [];
 
-  const { error } = await supabase.from("projects").insert({
+  const { error } = await supabase.from("cms_projects").insert({
     name: formData.get("name"),
     client_name: formData.get("client_name"),
     cid: formData.get("cid"),

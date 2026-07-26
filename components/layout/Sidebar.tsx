@@ -11,16 +11,9 @@ const menuItems = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "CMS", href: "/dashboard/cms" },
   { name: "Master Data", href: "/dashboard/master-data" },
-  { name: "Packages", href: "/dashboard/packages" },
-  { name: "Projects", href: "/dashboard/projects" },
   { name: "Leads", href: "/dashboard/leads" },
   { name: "Estimate Engine", href: "/dashboard/estimate-engine" },
   { name: "Quotations", href: "/dashboard/quotations" },
-  { name: "Testimonials", href: "/dashboard/testimonials" },
-  { name: "Blogs", href: "/dashboard/blogs" },
-  { name: "SEO", href: "/dashboard/seo" },
-  { name: "Media", href: "/dashboard/media" },
-  { name: "Settings", href: "/dashboard/settings" },
   { name: "Profile", href: "/dashboard/profile" },
 ];
 

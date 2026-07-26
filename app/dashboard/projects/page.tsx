@@ -1,20 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
-import ProjectsContent from "./components/ProjectsContent";
+import { redirect } from "next/navigation";
 
-export default async function ProjectsPage() {
-  const supabase = await createClient();
-
-  const { data: projects, error } = await supabase
-    .from("projects")
-    .select("*")
-    .order("created_at", {
-      ascending: false,
-    });
-
-  return (
-    <ProjectsContent
-      projects={projects ?? []}
-      error={error?.message}
-    />
-  );
+export default function ProjectsPage() {
+  redirect("/dashboard/cms?tab=projects");
 }

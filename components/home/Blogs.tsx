@@ -1,25 +1,34 @@
-﻿import { createClient } from "@/lib/supabase/server";
+﻿"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 
 interface Blog {
-  id: string;
+  id: number;
   title: string;
   slug: string;
-  featured_image?: string | null;
-  excerpt?: string | null;
-  published: boolean;
+  featured_image_url: string;
+  excerpt: string;
+  is_published: boolean;
 }
 
-export default async function Blogs() {
-  const supabase = await createClient();
+export default function Blogs() {
+  const [blogs, setBlogs] = useState<Blog[]>([]);
 
-  const { data } = await supabase
-    .from("blogs")
-    .select("*")
-    .eq("published", true)
-    .limit(3);
+  useEffect(() => {
+    const supabase = createClient();
 
-  const blogs = (data || []) as Blog[];
+    supabase
+      .from("cms_blogs")
+      .select("*")
+      .eq("is_published", true)
+      .order("display_order", { ascending: true })
+      .limit(3)
+      .then(({ data }) => {
+        setBlogs((data || []) as Blog[]);
+      });
+  }, []);
 
   if (blogs.length === 0) return null;
 
@@ -45,15 +54,18 @@ export default async function Blogs() {
               className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md h-full"
             >
               <div className="relative overflow-hidden aspect-video">
-                <img
-                  src={
-                    blog.featured_image ||
-                    "https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg?auto=compress&cs=tinysrgb&w=900"
-                  }
-                  alt={blog.title}
-                  className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
+                {blog.featured_image_url ? (
+                  <img
+                    src={blog.featured_image_url}
+                    alt={blog.title}
+                    className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-indigo-100 to-slate-100 flex items-center justify-center">
+                    <span className="text-slate-400 text-sm">No Image</span>
+                  </div>
+                )}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/75 to-transparent px-3 py-2 sm:px-4 sm:py-3">
                   <p className="text-[8px] uppercase tracking-[0.3em] text-white sm:text-[10px]">
                     Construction guide

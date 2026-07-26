@@ -1,22 +1,35 @@
-﻿import { createClient } from "@/lib/supabase/server";
+﻿"use client";
+
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 interface Testimonial {
-  id: string;
+  id: number;
   client_name: string;
+  designation: string;
   project_name: string;
-  content: string;
-  is_featured?: boolean;
+  testimonial: string;
+  image_url: string;
+  rating: number;
+  is_featured: boolean;
+  display_order: number;
 }
 
-export default async function Testimonials() {
-  const supabase = await createClient();
+export default function Testimonials() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
-  const { data } = await supabase
-    .from("testimonials")
-    .select("*")
-    .eq("is_featured", true);
+  useEffect(() => {
+    const supabase = createClient();
 
-  const testimonials = (data || []) as Testimonial[];
+    supabase
+      .from("cms_testimonials")
+      .select("*")
+      .eq("is_featured", true)
+      .order("display_order", { ascending: true })
+      .then(({ data }) => {
+        setTestimonials((data || []) as Testimonial[]);
+      });
+  }, []);
 
   if (testimonials.length === 0) return null;
 
@@ -49,7 +62,7 @@ export default async function Testimonials() {
                 </p>
               </div>
               <p className="mt-3 text-xs leading-5 text-slate-700 italic flex-1">
-                &ldquo;{item.content}&rdquo;
+                &ldquo;{item.testimonial}&rdquo;
               </p>
               <footer className="mt-3 border-t border-slate-200 pt-2">
                 <p className="font-semibold text-slate-950 text-xs">{item.client_name}</p>
@@ -74,7 +87,7 @@ export default async function Testimonials() {
                   </p>
                 </div>
                 <p className="mt-2 text-xs leading-4 text-slate-700 italic">
-                  &ldquo;{item.content}&rdquo;
+                  &ldquo;{item.testimonial}&rdquo;
                 </p>
                 <footer className="mt-2 border-t border-slate-200 pt-1.5">
                   <p className="font-semibold text-slate-950 text-xs">{item.client_name}</p>

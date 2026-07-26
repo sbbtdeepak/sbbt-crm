@@ -17,6 +17,8 @@ export default function ContactPage() {
     address?: string;
     phone?: string;
     email?: string;
+    google_maps_url?: string;
+    business_hours?: string;
   } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -27,6 +29,8 @@ export default function ContactPage() {
       address: data.address,
       phone: data.phone,
       email: data.email,
+      google_maps_url: data.google_maps_url,
+      business_hours: data.business_hours,
     })).catch(() => {});
   }, []);
 
@@ -36,7 +40,6 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setSubmitting(true);
     setError('');
 
@@ -76,9 +79,10 @@ export default function ContactPage() {
     return (
       <div className="bg-gray-50 min-h-screen">
         <Header />
-      <div className="max-w-xl mx-auto px-4 py-12 text-center md:pt-24">
+        <div className="max-w-xl mx-auto px-4 py-12 text-center md:pt-24">
           <div className="bg-white p-8 rounded-xl shadow-md">
-            <h1 className="text-xl font-bold text-green-600">Thank You!</h1>
+            <div className="text-green-500 text-5xl mb-3">✓</div>
+            <h1 className="text-xl font-bold text-gray-900">Thank You!</h1>
             <p className="mt-2 text-gray-600 text-sm">Your message has been sent. We will get back to you shortly.</p>
           </div>
         </div>
@@ -86,6 +90,31 @@ export default function ContactPage() {
       </div>
     );
   }
+
+  // Parse business hours if stored as JSON, otherwise display as text
+  const renderBusinessHours = () => {
+    if (!company?.business_hours) {
+      return (
+        <>
+          <p className="text-gray-600 mt-1 text-xs">Mon–Sat: 9:00 AM – 6:00 PM</p>
+          <p className="text-gray-600 text-xs">Sunday: Closed</p>
+        </>
+      );
+    }
+
+    try {
+      const hours = JSON.parse(company.business_hours);
+      if (Array.isArray(hours)) {
+        return hours.map((h: { day: string; hours: string }, idx: number) => (
+          <p key={idx} className="text-gray-600 text-xs">{h.day}: {h.hours}</p>
+        ));
+      }
+    } catch {
+      // Treat as plain text
+      return <p className="text-gray-600 mt-1 text-xs">{company.business_hours}</p>;
+    }
+    return <p className="text-gray-600 mt-1 text-xs">{company.business_hours}</p>;
+  };
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -170,24 +199,39 @@ export default function ContactPage() {
             <div>
               <h2 className="text-base font-bold text-gray-900">Contact Information</h2>
               <ul className="mt-3 space-y-2 text-gray-600 text-xs">
-                <li><span className="font-medium text-gray-900">Office:</span> {company?.address || "SBBT Constructions, Mumbai"}</li>
-                <li><span className="font-medium text-gray-900">Phone:</span> {company?.phone || "+91 98765 43210"}</li>
-                <li><span className="font-medium text-gray-900">Email:</span> {company?.email || "info@sbbtconstruction.com"}</li>
+                <li><span className="font-medium text-gray-900">Office:</span> {company?.address || ""}</li>
+                <li><span className="font-medium text-gray-900">Phone:</span> {company?.phone || ""}</li>
+                <li><span className="font-medium text-gray-900">Email:</span> {company?.email || ""}</li>
               </ul>
             </div>
 
+            {/* Google Maps Embed */}
             <div className="bg-white p-3 rounded-xl shadow-md border border-gray-100">
               <h3 className="font-semibold text-gray-900 mb-1.5 text-xs">Find Us</h3>
-              <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-xs">
-                Google Map Location
-              </div>
-              <p className="mt-1.5 text-[10px] text-gray-400">(Add your Google Map embed code here later)</p>
+              {company?.google_maps_url ? (
+                <div className="w-full h-48 rounded-lg overflow-hidden">
+                  <iframe
+                    src={company.google_maps_url}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Office Location"
+                  />
+                </div>
+              ) : (
+                <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-xs">
+                  Map not configured in CMS
+                </div>
+              )}
             </div>
 
+            {/* Business Hours from CMS */}
             <div className="bg-indigo-50 p-4 rounded-xl">
               <h3 className="font-bold text-indigo-800 text-xs">Office Hours</h3>
-              <p className="text-gray-600 mt-1 text-xs">Mon–Sat: 9:00 AM – 6:00 PM</p>
-              <p className="text-gray-600 text-xs">Sunday: Closed</p>
+              {renderBusinessHours()}
             </div>
           </div>
         </div>

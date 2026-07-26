@@ -125,7 +125,7 @@ export function ImageUploader({
       const storagePath = extractStoragePath(value);
       if (storagePath) {
         const formData = new FormData();
-        formData.append("path", storagePath);
+        formData.append("url", value);
         startTransition(() => {
           deleteFormAction(formData);
         });

@@ -681,7 +681,7 @@ PUBLIC WEBSITE (app/page.tsx + components/home/*)
 
 | Phase | Files | Description |
 |-------|-------|-------------|
-| **Phase 1** | `supabase/cms_migration.sql` | Database migration script |
+| **Phase 1** | `supabase_v2/010_cms_company.sql` ... `supabase_v2/064_cms_testimonials.sql` | Database migration scripts |
 | **Phase 2** | `app/dashboard/cms/types.ts` | All TypeScript types |
 | **Phase 3** | `app/dashboard/cms/lib/storage.ts` | Storage utility |
 | **Phase 4** | `components/shared/ImageUploader.tsx` | Reusable image upload |

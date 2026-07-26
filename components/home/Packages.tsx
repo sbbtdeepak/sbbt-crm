@@ -1,75 +1,65 @@
-﻿"use client";
+'use client';
 
-import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
+import Link from 'next/link';
+import type { CMSPackageFull } from '@/app/dashboard/cms/types';
 
-interface PackageItem {
-  id: string;
-  name: string;
-  slug: string;
-  price: number;
-  short_description?: string | null;
+interface HomePackagesProps {
+  packages: CMSPackageFull[];
 }
 
-export default function Packages() {
-  const [packages, setPackages] = useState<PackageItem[]>([]);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase
-      .from("packages")
-      .select("*")
-      .eq("is_active", true)
-      .order("price")
-      .then(({ data }) => {
-        if (data) setPackages(data as PackageItem[]);
-      });
-  }, []);
-
+export default function HomePackages({ packages }: HomePackagesProps) {
   if (packages.length === 0) return null;
 
   return (
-    <section className="bg-[#f8fafc] text-slate-900 py-6 sm:py-10" aria-label="Construction packages">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-[80px]">
-        <div className="mx-auto max-w-3xl text-center mb-4 sm:mb-6">
-          <p className="text-[10px] uppercase tracking-[0.32em] text-indigo-600 sm:text-xs">
-            Premium Packages
+    <section className="py-16 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900">Our Construction Packages</h2>
+          <p className="text-gray-600 mt-3 max-w-2xl mx-auto">
+            Choose from our carefully designed packages tailored to your construction needs
           </p>
-          <h2 className="mt-1.5 text-lg font-semibold tracking-tight text-slate-950 sm:text-xl">
-            Construction packages designed for your needs.
-          </h2>
         </div>
 
-        {/* Auto-fit grid with equal height cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 auto-cols-fr">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {packages.map((pkg) => (
-            <div
-              key={pkg.id}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md h-full"
-            >
-              <div className="flex flex-1 flex-col px-3 pb-3 pt-3 sm:px-4 sm:pb-4 sm:pt-4">
-                <p className="text-[9px] uppercase tracking-[0.24em] text-indigo-600 sm:text-xs">
-                  Package
-                </p>
-                <h3 className="mt-0.5 text-xs font-semibold text-slate-950 sm:text-sm">
-                  {pkg.name}
-                </h3>
-                {pkg.short_description && (
-                  <p className="mt-1 text-[10px] text-slate-500 leading-tight line-clamp-2 sm:text-xs flex-1">
-                    {pkg.short_description}
-                  </p>
-                )}
-                <p className="mt-2 pt-2 text-[11px] font-semibold text-emerald-600 sm:text-sm">
-                  ₹{Number(pkg.price).toLocaleString()}/sqft
-                </p>
+            <div key={pkg.package.id} className="bg-white rounded-2xl shadow-md p-6 flex flex-col">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{pkg.package.name}</h3>
+              <div className="text-2xl font-bold text-indigo-600 mb-3">
+                ₹{pkg.package.price.toLocaleString('en-IN')}
+                {pkg.package.price > 0 && <span className="text-sm font-normal text-gray-500"> /sq.ft</span>}
+              </div>
+              <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                {pkg.package.description || 'Complete construction solution with premium specifications.'}
+              </p>
 
+              {/* Section count badges */}
+              {pkg.sections.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {pkg.sections.slice(0, 5).map((s, i) => (
+                    <span key={i} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                      {s.title}
+                    </span>
+                  ))}
+                  {pkg.sections.length > 5 && (
+                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">
+                      +{pkg.sections.length - 5} more
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <div className="mt-auto flex gap-3">
                 <Link
-                  href={`/packages/${pkg.slug}`}
-                  className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-indigo-600 px-2 py-1.5 text-[9px] font-semibold text-white transition hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:py-2 sm:text-xs"
-                  aria-label={`View details for ${pkg.name} package`}
+                  href={`/packages#${pkg.package.slug}`}
+                  className="flex-1 text-center px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 text-sm font-medium transition-colors"
                 >
-                  View Details →
+                  View Details
+                </Link>
+                <Link
+                  href="/quote"
+                  className="flex-1 text-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium transition-colors"
+                >
+                  Get Quote
                 </Link>
               </div>
             </div>

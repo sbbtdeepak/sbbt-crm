@@ -47,7 +47,6 @@ export async function listMasterData(table: TableName) {
     .from(table)
     .select("*")
     .eq("site_id", DEFAULT_SITE_ID)
-    .order("display_order", { ascending: true, nullsFirst: false })
     .order("name", { ascending: true, nullsFirst: false });
 
   if (error) {

@@ -382,76 +382,52 @@ export type CMSSettingsUpdate = CMSUpdate<CMSSettingsRow>;
 export type CMSSettings = CMSSettingsRow;
 
 // ============================================================
-// Packages
+// Packages V3 (Clean Rebuild)
 // ============================================================
 
 /**
- * A feature item within a package.
- * Stored in cms_package_features table.
+ * An item within a package section.
+ * Stored in cms_package_items table.
+ * Each item has: item name, brand, specification, remarks.
  */
-export interface CMSPackageFeature {
-  /** Icon identifier (e.g. icon name "shield-check", "clock") */
-  icon: string;
-  /** Feature title (e.g. "Structural Warranty") */
-  title: string;
-  /** Feature description */
-  description: string;
-}
-
-/**
- * A specification item within a package.
- * Stored in cms_package_specifications table.
- */
-export interface CMSPackageSpecification {
-  /** Specification category (e.g. "Flooring", "Electrical") */
-  category: string;
-  /** Specification item name */
+export interface CMSPackageItem {
+  /** Item name (e.g. "AAC Blocks") */
   item: string;
-  /** Brand name for the specification */
+  /** Brand name (e.g. "Magicrete") */
   brand: string;
-  /** Additional remarks */
+  /** Specification (e.g. "4\" / 6\"") */
+  specification: string;
+  /** Remarks (e.g. "Included", "Premium") */
   remarks: string;
 }
 
 /**
- * A gallery image within a package.
- * Stored in cms_package_gallery table.
+ * A section within a package (e.g. "Structure", "Kitchen").
+ * Stored in cms_package_sections table.
  */
-export interface CMSPackageGalleryItem {
-  /** URL to the image (stored in cms/packages/) */
-  image_url: string;
-  /** Image caption */
-  caption: string;
+export interface CMSPackageSection {
+  /** Section ID (0 if new/unsaved) */
+  id?: number;
+  /** Section title (e.g. "Structure", "Flooring") */
+  title: string;
+  /** Items within this section */
+  items: CMSPackageItem[];
+  /** Display order */
+  display_order: number;
 }
 
 /**
- * Package row from cms_packages table.
+ * Package row from cms_packages (V3 clean schema).
+ * Future-ready: state_id for state-wise packages.
  */
 export interface CMSPackageRow extends CMSBase {
-  /** Package name (e.g. "Silver", "Gold", "Platinum") */
+  state_id: string | null;
   name: string;
-  /** URL-friendly unique identifier */
   slug: string;
-  /** Price per square foot in INR */
   price: number;
-  /** Short description for cards/summary display */
-  short_description: string;
-  /** Full detailed description */
   description: string;
-  /** Sort order for display (ascending) */
   display_order: number;
-  /** Whether the package is published and visible */
   is_active: boolean;
-  /** URL to thumbnail image (stored in cms/packages/) */
-  thumbnail_url: string;
-  /** URL to banner image (stored in cms/packages/) */
-  banner_url: string;
-  /** Meta title for SEO */
-  meta_title: string;
-  /** Meta description for SEO */
-  meta_description: string;
-  /** URL to Open Graph image (stored in cms/packages/) */
-  og_image_url: string;
 }
 
 /** Shape for inserting a new package */
@@ -461,18 +437,14 @@ export type CMSPackageInsert = CMSInsert<CMSPackageRow>;
 export type CMSPackageUpdate = CMSUpdate<CMSPackageRow>;
 
 /**
- * Full package data including relations.
+ * Full package data including sections + items.
  * Used for the CMS form and API responses.
  */
 export interface CMSPackageFull {
   /** The main package row */
   package: CMSPackageRow;
-  /** Associated features sorted by display_order */
-  features: CMSPackageFeature[];
-  /** Associated specifications sorted by display_order */
-  specifications: CMSPackageSpecification[];
-  /** Associated gallery images sorted by display_order */
-  gallery: CMSPackageGalleryItem[];
+  /** Associated sections (with nested items) */
+  sections: CMSPackageSection[];
 }
 
 /** Form state for package server actions */
@@ -556,6 +528,80 @@ export interface CMSProjectFormState extends CMSFormState {
 }
 
 // ============================================================
+// Blogs
+// ============================================================
+
+/**
+ * Blog post for the site.
+ * Stores published articles and construction-related content.
+ */
+export interface CMSBlogRow extends CMSBase {
+  /** Blog post title */
+  title: string;
+  /** URL-friendly unique identifier */
+  slug: string;
+  /** Short excerpt/summary for cards and previews */
+  excerpt: string;
+  /** Full blog post HTML/markdown content */
+  content: string;
+  /** URL to featured image (stored in cms/blogs/) */
+  featured_image_url: string;
+  /** Author display name */
+  author: string;
+  /** Comma-separated tags for categorization */
+  tags: string;
+  /** Meta title for SEO */
+  meta_title: string;
+  /** Meta description for SEO */
+  meta_description: string;
+  /** Whether the blog is published and publicly visible */
+  is_published: boolean;
+  /** Sort order for display (ascending) */
+  display_order: number;
+}
+
+/** Shape for inserting a new blog row */
+export type CMSBlogInsert = CMSInsert<CMSBlogRow>;
+
+/** Shape for updating an existing blog row */
+export type CMSBlogUpdate = CMSUpdate<CMSBlogRow>;
+
+// ============================================================
+// Testimonials
+// ============================================================
+
+/**
+ * Customer testimonial for the site.
+ * Stores client reviews, ratings, and feedback.
+ */
+export interface CMSTestimonialRow extends CMSBase {
+  /** Name of the client providing the testimonial */
+  client_name: string;
+  /** Professional designation/title of the client */
+  designation: string;
+  /** Name of the project the testimonial refers to */
+  project_name: string;
+  /** Location of the client/project */
+  location: string;
+  /** Rating out of 5 */
+  rating: number;
+  /** The testimonial content/quotation */
+  testimonial: string;
+  /** URL to client image/photo (stored in cms/testimonials/) */
+  image_url: string;
+  /** Whether the testimonial is featured on the homepage */
+  is_featured: boolean;
+  /** Sort order for display (ascending) */
+  display_order: number;
+}
+
+/** Shape for inserting a new testimonial row */
+export type CMSTestimonialInsert = CMSInsert<CMSTestimonialRow>;
+
+/** Shape for updating an existing testimonial row */
+export type CMSTestimonialUpdate = CMSUpdate<CMSTestimonialRow>;
+
+// ============================================================
 // Media
 // ============================================================
 
@@ -630,6 +676,8 @@ export const CMS_STORAGE_FOLDERS = {
   GENERAL: "general",
   PACKAGES: "packages",
   PROJECTS: "projects",
+  BLOGS: "blogs",
+  TESTIMONIALS: "testimonials",
 } as const;
 
 /** Union type of valid storage folder names */

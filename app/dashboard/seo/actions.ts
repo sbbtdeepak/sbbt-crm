@@ -6,44 +6,35 @@ import { createClient } from "@/lib/supabase/server";
 export async function saveSeo(formData: FormData) {
   const supabase = await createClient();
 
-  const page =
-    formData.get("page")?.toString().trim() || "home";
-
   const payload = {
-    page,
-
     meta_title:
       formData.get("meta_title")?.toString().trim() || "",
-
     meta_description:
       formData.get("meta_description")?.toString().trim() || "",
-
     meta_keywords:
       formData.get("meta_keywords")?.toString().trim() || "",
-
-    og_image:
+    og_image_url:
       formData.get("og_image")?.toString().trim() || "",
-
     canonical_url:
       formData.get("canonical_url")?.toString().trim() || "",
   };
 
   const { data: existing } = await supabase
-    .from("seo_settings")
+    .from("cms_seo")
     .select("id")
-    .eq("page", page)
+    .limit(1)
     .maybeSingle();
 
   let error;
 
   if (existing) {
     ({ error } = await supabase
-      .from("seo_settings")
+      .from("cms_seo")
       .update(payload)
       .eq("id", existing.id));
   } else {
     ({ error } = await supabase
-      .from("seo_settings")
+      .from("cms_seo")
       .insert(payload));
   }
 

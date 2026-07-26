@@ -33,11 +33,11 @@ export async function uploadProjectImages(
       data: { publicUrl },
     } = supabase.storage.from(BUCKET_NAME).getPublicUrl(storagePath);
 
-    const { error: insertError } = await supabase.from("project_images").insert({
+    const { error: insertError } = await supabase.from("cms_project_gallery").insert({
       project_id: projectId,
       image_url: publicUrl,
       storage_path: storagePath,
-      sort_order: startOrder + index,
+      display_order: startOrder + index,
     });
 
     if (insertError) {
@@ -56,7 +56,7 @@ export async function deleteProjectImagesByIds(
   }
 
   const { data: images, error: fetchError } = await supabase
-    .from("project_images")
+    .from("cms_project_gallery")
     .select("id, storage_path")
     .in("id", imageIds);
 
@@ -77,7 +77,7 @@ export async function deleteProjectImagesByIds(
   }
 
   const { error: deleteError } = await supabase
-    .from("project_images")
+    .from("cms_project_gallery")
     .delete()
     .in("id", imageIds);
 
@@ -91,7 +91,7 @@ export async function deleteAllProjectImages(
   projectId: string
 ) {
   const { data: images, error: fetchError } = await supabase
-    .from("project_images")
+    .from("cms_project_gallery")
     .select("storage_path")
     .eq("project_id", projectId);
 
@@ -112,7 +112,7 @@ export async function deleteAllProjectImages(
   }
 
   const { error: deleteError } = await supabase
-    .from("project_images")
+    .from("cms_project_gallery")
     .delete()
     .eq("project_id", projectId);
 
@@ -126,10 +126,10 @@ export async function getNextImageSortOrder(
   projectId: string
 ) {
   const { data, error } = await supabase
-    .from("project_images")
-    .select("sort_order")
+    .from("cms_project_gallery")
+    .select("display_order")
     .eq("project_id", projectId)
-    .order("sort_order", { ascending: false })
+    .order("display_order", { ascending: false })
     .limit(1)
     .maybeSingle();
 
@@ -137,5 +137,5 @@ export async function getNextImageSortOrder(
     throw new Error(error.message);
   }
 
-  return data ? data.sort_order + 1 : 0;
+  return data ? (data.display_order ?? 0) + 1 : 0;
 }

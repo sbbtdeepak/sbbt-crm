@@ -102,7 +102,7 @@ export default function ProjectForm({ project, onBack }: Props) {
   const handleDelete = useCallback(() => {
     if (confirm("Are you sure you want to delete this project?")) {
       const form = new FormData();
-      form.set("id", projectData?.id?.toString() || "");
+      form.set("project_id", projectData?.id?.toString() || "");
       deleteAction(form);
     }
   }, [projectData, deleteAction]);
@@ -110,16 +110,16 @@ export default function ProjectForm({ project, onBack }: Props) {
   // Handle toggle active
   const handleToggleActive = useCallback(() => {
     const form = new FormData();
-    form.set("id", projectData?.id?.toString() || "");
-    form.set("is_active", projectData?.is_active ? "on" : "off");
+    form.set("project_id", projectData?.id?.toString() || "");
+    form.set("is_active", projectData?.is_active ? "off" : "on");
     toggleAction(form);
   }, [projectData, toggleAction]);
 
   // Handle toggle featured
   const handleToggleFeatured = useCallback(() => {
     const form = new FormData();
-    form.set("id", projectData?.id?.toString() || "");
-    form.set("is_featured", projectData?.is_featured ? "on" : "off");
+    form.set("project_id", projectData?.id?.toString() || "");
+    form.set("is_featured", projectData?.is_featured ? "off" : "on");
     featuredAction(form);
   }, [projectData, featuredAction]);
 
@@ -235,7 +235,7 @@ export default function ProjectForm({ project, onBack }: Props) {
       )}
 
       <form action={formAction} className="space-y-6">
-        {isEdit && <input type="hidden" name="id" value={projectData?.id} />}
+        {isEdit && <input type="hidden" name="project_id" value={projectData?.id} />}
 
         {/* Basic Information */}
         <div className="bg-white border rounded-xl p-6">

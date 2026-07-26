@@ -16,11 +16,11 @@ interface LeadFormState {
 
 export default function Hero() {
   const [hero, setHero] = useState({
-    title: "Build Your Dream Home with Expert Craftsmanship",
-    subtitle: "Premium construction, turnkey delivery, and full-site supervision for modern homes across Delhi NCR.",
+    title: "",
+    subtitle: "",
     cta_text: "Get Your Free Quote",
     cta_link: "/quote",
-    image_url: "https://images.pexels.com/photos/5843998/pexels-photo-5843998.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    image_url: "",
     stats: [] as Array<{ label: string; value: string }>,
   });
   const [companyData, setCompanyData] = useState({
@@ -58,22 +58,14 @@ export default function Hero() {
       .eq("site_id", "00000000-0000-0000-0000-000000000001")
       .maybeSingle()
       .then(({ data: cmsHomepage }) => {
-        // Fetch hero banner as fallback
-        supabase
-          .from("hero_banner")
-          .select("*")
-          .eq("is_active", true)
-          .maybeSingle()
-          .then(({ data: heroBanner }) => {
-            setHero({
-              title: cmsHomepage?.hero_heading || heroBanner?.title || "Build Your Dream Home with Expert Craftsmanship",
-              subtitle: cmsHomepage?.hero_subheading || heroBanner?.subtitle || "Premium construction, turnkey delivery, and full-site supervision for modern homes across Delhi NCR.",
-              cta_text: cmsHomepage?.hero_cta_text || heroBanner?.button_text || "Get Your Free Quote",
-              cta_link: cmsHomepage?.hero_cta_link || heroBanner?.button_link || "/quote",
-              image_url: cmsHomepage?.hero_background_url || heroBanner?.image_url || "https://images.pexels.com/photos/5843998/pexels-photo-5843998.jpeg?auto=compress&cs=tinysrgb&w=1200",
-              stats: cmsHomepage?.stats || [],
-            });
-          });
+        setHero({
+          title: cmsHomepage?.hero_heading || "",
+          subtitle: cmsHomepage?.hero_subheading || "",
+          cta_text: cmsHomepage?.hero_cta_text || "Get Your Free Quote",
+          cta_link: cmsHomepage?.hero_cta_link || "/quote",
+          image_url: cmsHomepage?.hero_background_url || "",
+          stats: cmsHomepage?.stats || [],
+        });
       });
 
   }, []);
@@ -124,9 +116,7 @@ export default function Hero() {
     }
   };
 
-  const image = hero.image_url?.startsWith("http")
-    ? hero.image_url
-    : "https://images.pexels.com/photos/5843998/pexels-photo-5843998.jpeg?auto=compress&cs=tinysrgb&w=1200";
+  const hasImage = Boolean(hero.image_url && hero.image_url.startsWith("http"));
 
   return (
     <>
@@ -202,15 +192,25 @@ export default function Hero() {
             {/* RIGHT HERO IMAGE - 75% (increased ~15% from 65%) */}
             <div className="relative">
               <div className="relative overflow-hidden rounded-3xl shadow-2xl shadow-slate-200/80">
-                <Image
-                  src={image}
-                  alt="Luxury home construction"
-                  className="w-full h-full object-cover"
-                  width={1200}
-                  height={650}
-                  priority
-                  style={{ minHeight: "500px", maxHeight: "650px", width: "100%", height: "auto" }}
-                />
+                {hasImage ? (
+                  <Image
+                    src={hero.image_url}
+                    alt="Luxury home construction"
+                    className="w-full h-full object-cover"
+                    width={1200}
+                    height={650}
+                    priority
+                    style={{ minHeight: "500px", maxHeight: "650px", width: "100%", height: "auto" }}
+                  />
+                ) : (
+                  <div className="w-full bg-gradient-to-br from-indigo-100 to-emerald-50 flex items-center justify-center" style={{ minHeight: "500px", maxHeight: "650px" }}>
+                    <div className="text-center px-8">
+                      <div className="text-5xl mb-4">🏗️</div>
+                      <p className="text-lg font-semibold text-slate-600">Building Excellence</p>
+                      <p className="text-sm text-slate-400 mt-1">Premium Construction Services</p>
+                    </div>
+                  </div>
+                )}
                 {/* Gradient overlay for text blending */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-white/5 pointer-events-none" />
               </div>
@@ -291,14 +291,24 @@ export default function Hero() {
         {/* Hero Image - 16:9 */}
         <div className="px-3">
           <div className="aspect-[16/9] overflow-hidden rounded-2xl shadow-xl shadow-slate-200/60">
-            <Image
-              src={image}
-              alt="Luxury home construction"
-              className="w-full h-full object-cover"
-              width={800}
-              height={450}
-              priority
-            />
+            {hasImage ? (
+              <Image
+                src={hero.image_url}
+                alt="Luxury home construction"
+                className="w-full h-full object-cover"
+                width={800}
+                height={450}
+                priority
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-indigo-100 to-emerald-50 flex items-center justify-center">
+                <div className="text-center px-6">
+                  <div className="text-4xl mb-3">🏗️</div>
+                  <p className="text-base font-semibold text-slate-600">Building Excellence</p>
+                  <p className="text-xs text-slate-400 mt-1">Premium Construction Services</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

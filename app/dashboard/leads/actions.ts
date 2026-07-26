@@ -198,11 +198,11 @@ export async function createLead(
     remarks: sanitizeInput(message),
     site_id: "00000000-0000-0000-0000-000000000001",
     created_by: userId,
-    // Legacy columns for backward compatibility
-    name: sanitizeInput(full_name),
-    phone: sanitizeInput(mobile_number),
-    location: sanitizeInput(plot_location),
-    message: sanitizeInput(message),
+
+
+
+
+
   };
 
   // Insert the lead
@@ -323,11 +323,11 @@ export async function createLeadFromAPI(body: {
     remarks: sanitizeInput(message),
     site_id: "00000000-0000-0000-0000-000000000001",
     created_by: userId,
-    // Legacy columns for backward compatibility
-    name: sanitizeInput(full_name),
-    phone: sanitizeInput(mobile_number),
-    location: sanitizeInput(plot_location),
-    message: sanitizeInput(message),
+
+
+
+
+
   };
 
   const { data, error } = await supabase

@@ -6,7 +6,10 @@ import SettingsForm from "./components/SettingsForm";
 import InternalSettingsForm from "./components/InternalSettingsForm";
 import PackagesSection from "./components/PackagesSection";
 import ProjectsSection from "./components/ProjectsSection";
+import BlogsSection from "./components/BlogsSection";
+import TestimonialsSection from "./components/TestimonialsSection";
 import { createClient } from "@/lib/supabase/server";
+import { getAllPackages } from "./actions";
 import type {
   CMSCompanyRow,
   CMSHomepageRow,
@@ -14,11 +17,12 @@ import type {
   CMSSocialRow,
   CMSSettingsRow,
   CMSInternalSettingsRow,
+  CMSPackageFull,
 } from "./types";
 import { DEFAULT_SITE_ID } from "./types";
 
 // Tab types
-type TabType = "company" | "homepage" | "seo" | "social" | "settings" | "internal" | "packages" | "projects";
+type TabType = "company" | "homepage" | "seo" | "social" | "settings" | "internal" | "packages" | "projects" | "blogs" | "testimonials";
 
 // Tab configuration
 const tabs: Array<{ id: TabType; label: string }> = [
@@ -30,6 +34,8 @@ const tabs: Array<{ id: TabType; label: string }> = [
   { id: "internal", label: "Internal" },
   { id: "packages", label: "Packages" },
   { id: "projects", label: "Projects" },
+  { id: "blogs", label: "Blogs" },
+  { id: "testimonials", label: "Testimonials" },
 ];
 
 export default async function CMSPage({
@@ -47,6 +53,7 @@ export default async function CMSPage({
     socialResult,
     settingsResult,
     internalSettingsResult,
+    packagesResult,
   ] = await Promise.all([
     supabase.from("cms_company").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
     supabase.from("cms_homepage").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
@@ -54,6 +61,7 @@ export default async function CMSPage({
     supabase.from("cms_social").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
     supabase.from("cms_settings").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
     supabase.from("cms_internal_settings").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
+    getAllPackages(),
   ]);
 
   const company = companyResult.data as CMSCompanyRow | null;
@@ -62,6 +70,7 @@ export default async function CMSPage({
   const social = socialResult.data as CMSSocialRow | null;
   const settings = settingsResult.data as CMSSettingsRow | null;
   const internalSettings = internalSettingsResult.data as CMSInternalSettingsRow | null;
+  const packages = packagesResult as unknown as CMSPackageFull[];
 
   const error =
     companyResult.error?.message ||
@@ -82,7 +91,7 @@ export default async function CMSPage({
       <div>
         <h1 className="text-3xl font-bold">CMS Dashboard</h1>
         <p className="text-gray-500 mt-1">
-          Manage company information, homepage, SEO, social links, settings, internal configuration, packages, and projects.
+           Manage company information, homepage, SEO, social links, settings, internal configuration, packages, projects, blogs, and testimonials.
         </p>
       </div>
 
@@ -131,8 +140,10 @@ export default async function CMSPage({
         {activeTab === "social" && <SocialForm social={social} />}
         {activeTab === "settings" && <SettingsForm settings={settings} />}
         {activeTab === "internal" && <InternalSettingsForm settings={internalSettings} />}
-        {activeTab === "packages" && <PackagesSection />}
+        {activeTab === "packages" && <PackagesSection initialPackages={packages} />}
         {activeTab === "projects" && <ProjectsSection />}
+        {activeTab === "blogs" && <BlogsSection />}
+        {activeTab === "testimonials" && <TestimonialsSection />}
       </div>
     </div>
   );

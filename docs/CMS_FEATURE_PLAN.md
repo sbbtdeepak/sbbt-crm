@@ -248,7 +248,7 @@ Each action will:
 | `app/dashboard/cms/components/MediaManager.tsx` | Image management |
 | `app/dashboard/cms/lib/storage.ts` | Supabase Storage utility |
 | `components/shared/ImageUploader.tsx` | Reusable image upload component |
-| `supabase/cms_migration.sql` | Database migration script |
+| `supabase_v2/010_cms_company.sql` ... `supabase_v2/064_cms_testimonials.sql` | V2 migration chain |
 
 ### Files to MODIFY (3)
 
