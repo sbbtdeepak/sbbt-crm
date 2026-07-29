@@ -3,100 +3,147 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+/* ───── Types ───── */
 interface Testimonial {
-  id: number;
-  client_name: string;
-  designation: string;
-  project_name: string;
-  testimonial: string;
-  image_url: string;
+  id: string;
+  clientName: string;
+  content: string;
   rating: number;
-  is_featured: boolean;
-  display_order: number;
+  projectType: string;
+  location: string;
+  imageUrl?: string;
 }
 
+/* ───── Star Rating ───── */
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <div className="flex gap-0.5" aria-label={`${rating} out of 5 stars`}>
+      {Array.from({ length: 5 }, (_, i) => (
+        <svg
+          key={i}
+          className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${
+            i < rating ? "text-amber-400" : "text-slate-200"
+          }`}
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+      ))}
+    </div>
+  );
+}
+
+/* ───── Single Card ───── */
+function TestimonialCard({ t }: { t: Testimonial }) {
+  return (
+    <div
+      className="flex-shrink-0 w-[280px] sm:w-[320px] lg:w-[360px] rounded-2xl bg-white border border-slate-100 p-5 sm:p-6 shadow-sm
+                 transition-all duration-300 hover:shadow-md"
+    >
+      {/* Stars */}
+      <StarRating rating={t.rating} />
+
+      {/* Quote */}
+      <blockquote className="mt-3 text-sm sm:text-base text-slate-700 leading-relaxed line-clamp-4">
+        &ldquo;{t.content}&rdquo;
+      </blockquote>
+
+      {/* Author */}
+      <div className="mt-4 flex items-center gap-3 border-t border-slate-50 pt-4">
+        {t.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={t.imageUrl}
+            alt={t.clientName}
+            className="h-9 w-9 sm:h-10 sm:w-10 rounded-full object-cover ring-2 ring-slate-100"
+          />
+        ) : (
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold">
+            {t.clientName
+              .split(/\s+/)
+              .map((w) => w[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase()}
+          </div>
+        )}
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-slate-900 truncate">
+            {t.clientName}
+          </p>
+          <p className="text-xs text-slate-400 truncate">
+            {t.projectType} &middot; {t.location}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───── Scrolling Row ───── */
+function Scroller({ items }: { items: Testimonial[] }) {
+  const doubled = [...items, ...items];
+
+  return (
+    <div className="overflow-hidden">
+      <div className="flex w-max gap-4 sm:gap-5 animate-slider-scroll">
+        {doubled.map((t, i) => (
+          <TestimonialCard key={`ts-${t.id}-${i}`} t={t} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ───── Section ───── */
 export default function Testimonials() {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [items, setItems] = useState<Testimonial[]>([]);
 
   useEffect(() => {
     const supabase = createClient();
-
     supabase
       .from("cms_testimonials")
-      .select("*")
-      .eq("is_featured", true)
+      .select("id, client_name, content, rating, project_type, location, image_url")
+      .eq("is_active", true)
       .order("display_order", { ascending: true })
       .then(({ data }) => {
-        setTestimonials((data || []) as Testimonial[]);
+        if (data && data.length > 0) {
+          setItems(
+            data.map((r: Record<string, unknown>) => ({
+              id: String(r.id),
+              clientName: (r.client_name as string) || "",
+              content: (r.content as string) || "",
+              rating: (r.rating as number) || 5,
+              projectType: (r.project_type as string) || "",
+              location: (r.location as string) || "",
+              imageUrl: (r.image_url as string) || undefined,
+            }))
+          );
+        }
       });
   }, []);
 
-  if (testimonials.length === 0) return null;
+  if (items.length === 0) return null;
 
   return (
-    <section id="testimonials" className="bg-white py-6 sm:py-10 text-slate-900" aria-label="Customer testimonials">
+    <section className="bg-white py-12 sm:py-16 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center mb-4 sm:mb-6">
+        <div className="mx-auto max-w-3xl text-center mb-8 sm:mb-10">
           <p className="text-[10px] uppercase tracking-[0.32em] text-indigo-600 sm:text-xs">
-            Customer confidence
+            Testimonials
           </p>
-          <h2 className="mt-1.5 text-lg font-semibold tracking-tight text-slate-950 sm:text-xl">
-            What clients say about our craftsmanship.
+          <h2 className="mt-2 text-lg font-semibold tracking-tight text-slate-950 sm:text-2xl lg:text-3xl">
+            What Our Clients Say
           </h2>
-          <p className="mt-1.5 text-xs leading-5 text-slate-600 sm:text-sm">
-            Featured stories from clients who trusted us with their most important construction projects.
-          </p>
         </div>
+      </div>
 
-        {/* Desktop Grid */}
-        <div className="mt-4 hidden md:grid gap-4 md:grid-cols-2 xl:grid-cols-3 auto-cols-fr">
-          {testimonials.map((item) => (
-            <blockquote
-              key={item.id}
-              className="group rounded-2xl border border-slate-200 bg-[#f8fafc] p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md h-full flex flex-col"
-            >
-              <div className="flex items-center gap-2 text-indigo-600">
-                <span className="text-lg" aria-hidden="true">&ldquo;</span>
-                <p className="text-[10px] uppercase tracking-[0.24em] text-indigo-600">
-                  Featured testimonial
-                </p>
-              </div>
-              <p className="mt-3 text-xs leading-5 text-slate-700 italic flex-1">
-                &ldquo;{item.testimonial}&rdquo;
-              </p>
-              <footer className="mt-3 border-t border-slate-200 pt-2">
-                <p className="font-semibold text-slate-950 text-xs">{item.client_name}</p>
-                <p className="mt-0.5 text-[10px] text-slate-500">{item.project_name}</p>
-              </footer>
-            </blockquote>
-          ))}
-        </div>
-
-        {/* Mobile Swipe Carousel */}
-        <div className="mt-4 md:hidden">
-          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 hide-scrollbar">
-            {testimonials.map((item) => (
-              <blockquote
-                key={item.id}
-                className="snap-start flex-shrink-0 w-[calc(100vw-32px-60px)] max-w-sm rounded-2xl border border-slate-200 bg-[#f8fafc] p-4 shadow-sm"
-              >
-                <div className="flex items-center gap-1.5 text-indigo-600">
-                  <span className="text-base" aria-hidden="true">&ldquo;</span>
-                  <p className="text-[9px] uppercase tracking-[0.24em] text-indigo-600">
-                    Testimonial
-                  </p>
-                </div>
-                <p className="mt-2 text-xs leading-4 text-slate-700 italic">
-                  &ldquo;{item.testimonial}&rdquo;
-                </p>
-                <footer className="mt-2 border-t border-slate-200 pt-1.5">
-                  <p className="font-semibold text-slate-950 text-xs">{item.client_name}</p>
-                  <p className="mt-0 text-[9px] text-slate-500">{item.project_name}</p>
-                </footer>
-              </blockquote>
-            ))}
-          </div>
-        </div>
+      {/* Full-width scroller */}
+      <div className="relative">
+        <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+        <Scroller items={items} />
       </div>
     </section>
   );

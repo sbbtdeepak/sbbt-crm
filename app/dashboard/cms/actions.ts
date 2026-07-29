@@ -452,7 +452,7 @@ export async function saveHeroBanner(prevState: { success: boolean; message: str
     is_active: true,
   };
 
-  // Try to update existing active banner, or insert new
+  // try to update existing active banner, or insert new
   const { data: existing } = await supabase
     .from('cms_homepage')
     .select('*')
@@ -1357,6 +1357,173 @@ export async function toggleTestimonialFeatured(_prevState: { success: boolean; 
   revalidatePath('/dashboard/cms');
   revalidatePath('/', 'layout');
   return { success: true, message: 'Testimonial featured status toggled.' };
+}
+
+// ============================================================
+// Brand Actions
+// ============================================================
+
+export async function getBrands() {
+const supabase = await createClient();
+const { data, error } = await supabase
+.from('cms_brands')
+.select('*')
+.order('display_order', { ascending: true });
+
+if (error) {
+console.error('Error fetching brands:', error);
+return [];
+}
+
+return data || [];
+}
+
+export async function saveBrand(prevState: { success: boolean; message: string }, formData: FormData) {
+const supabase = await createClient();
+
+const brandId = formData.get('id') as string;
+const name = formData.get('name') as string || '';
+const category = formData.get('category') as string || '';
+const logoUrl = formData.get('logo_url') as string || '';
+const websiteUrl = formData.get('website_url') as string || '';
+const displayOrder = parseInt(formData.get('display_order') as string) || 0;
+const isActive = formData.get('is_active') === 'on';
+
+if (!name) {
+return { success: false, message: 'Brand name is required.' };
+}
+
+  if (brandId) {
+    const updatePayload = {
+      name,
+      category,
+      logo_url: logoUrl,
+      website_url: websiteUrl,
+      display_order: displayOrder,
+      is_active: isActive,
+      updated_at: new Date().toISOString(),
+    };
+    console.log('[saveBrand][DEBUG] UPDATE payload:', updatePayload);
+    const { data, error } = await supabase
+      .from('cms_brands')
+      .update(updatePayload)
+      .eq('id', parseInt(brandId))
+      .select();
+
+    console.log('[saveBrand][DEBUG] UPDATE response:', { data, error: error ? { message: error.message, name: error.name } : null });
+
+    if (error) {
+      console.error('Error updating brand:', error);
+      return { success: false, message: `Failed to save brand: ${error.message}` };
+    }
+  } else {
+    const insertPayload = {
+      site_id: DEFAULT_SITE_ID,
+      name,
+      category,
+      logo_url: logoUrl,
+      website_url: websiteUrl,
+      display_order: displayOrder,
+      is_active: isActive,
+    };
+    console.log('[saveBrand][DEBUG] INSERT payload:', insertPayload);
+    const { data, error } = await supabase
+      .from('cms_brands')
+      .insert(insertPayload)
+      .select();
+
+    console.log('[saveBrand][DEBUG] INSERT response:', { data, error: error ? { message: error.message, name: error.name } : null });
+
+    if (error) {
+      console.error('Error inserting brand:', error);
+      return { success: false, message: `Failed to save brand: ${error.message}` };
+    }
+  }
+
+revalidatePath('/dashboard/cms');
+revalidatePath('/', 'layout');
+return { success: true, message: 'Brand saved successfully.' };
+}
+
+export async function deleteBrand(_prevState: { success: boolean; message: string }, formData: FormData) {
+const supabase = await createClient();
+
+const brandId = formData.get('id') as string;
+
+if (!brandId) {
+return { success: false, message: 'No brand ID provided.' };
+}
+
+const { error } = await supabase
+.from('cms_brands')
+.delete()
+.eq('id', parseInt(brandId));
+
+if (error) {
+console.error('Error deleting brand:', error);
+return { success: false, message: `Failed to delete brand: ${error.message}` };
+}
+
+revalidatePath('/dashboard/cms');
+revalidatePath('/', 'layout');
+return { success: true, message: 'Brand deleted successfully.' };
+}
+
+export async function toggleBrandActive(_prevState: { success: boolean; message: string }, formData: FormData) {
+  const supabase = await createClient();
+
+  const brandId = formData.get('id') as string;
+  const isActive = formData.get('is_active') === 'on';
+
+  const { error } = await supabase
+    .from('cms_brands')
+    .update({ is_active: isActive, updated_at: new Date().toISOString() })
+    .eq('id', parseInt(brandId));
+
+  if (error) {
+    console.error('Error toggling brand:', error);
+    return { success: false, message: `Failed to toggle brand: ${error.message}` };
+  }
+
+  revalidatePath('/dashboard/cms');
+  revalidatePath('/', 'layout');
+  return { success: true, message: 'Brand active status toggled.' };
+}
+
+export async function duplicateBrand(_prevState: { success: boolean; message: string }, formData: FormData) {
+  const supabase = await createClient();
+
+  const name = formData.get('name') as string || '';
+  const category = formData.get('category') as string || '';
+  const logoUrl = formData.get('logo_url') as string || '';
+  const websiteUrl = formData.get('website_url') as string || '';
+  const displayOrder = parseInt(formData.get('display_order') as string) || 0;
+  const isActive = formData.get('is_active') === 'on';
+
+  if (!name) {
+    return { success: false, message: 'Brand name is required for duplication.' };
+  }
+
+  const { error } = await supabase
+    .from('cms_brands')
+    .insert({
+      site_id: DEFAULT_SITE_ID,
+      name: name + ' (Copy)',
+      category,
+      logo_url: logoUrl,
+      website_url: websiteUrl,
+      display_order: displayOrder,
+      is_active: false,
+    });
+
+  if (error) {
+    console.error('Error duplicating brand:', error);
+    return { success: false, message: `Failed to duplicate brand: ${error.message}` };
+  }
+
+  revalidatePath('/dashboard/cms');
+  revalidatePath('/', 'layout');
+  return { success: true, message: 'Brand duplicated successfully.' };
 }
 
 // ─── Internal Settings ───────────────────────────────────────────────────────

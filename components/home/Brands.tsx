@@ -1,27 +1,22 @@
 "use client";
 
-const BRANDS = [
-  { name: "UltraTech", category: "Cement" },
-  { name: "ACC", category: "Cement" },
-  { name: "Ambuja", category: "Cement" },
-  { name: "Tata Steel", category: "Steel" },
-  { name: "Rathi Steel", category: "Steel" },
-  { name: "Kajaria", category: "Tiles" },
-  { name: "Somany", category: "Tiles" },
-  { name: "Asian Paints", category: "Paints" },
-  { name: "Berger", category: "Paints" },
-  { name: "Havells", category: "Electricals" },
-  { name: "Polycab", category: "Electricals" },
-  { name: "Astral", category: "Plumbing" },
-  { name: "Prince", category: "Plumbing" },
-  { name: "Jaquar", category: "Bath Fittings" },
-  { name: "Hindware", category: "Bath Fittings" },
-  { name: "Greenlam", category: "Laminates" },
-  { name: "CenturyPly", category: "Plywood" },
-  { name: "Action Tesa", category: "Hardware" },
-  { name: "Anchor", category: "Switches" },
-  { name: "Crompton", category: "Fans & Lighting" },
-] as const;
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+
+/* ------------------------------------------------------------------ */
+/*  Brands – Premium two-row infinite auto-scroller (CMS-ready)        */
+/* ------------------------------------------------------------------ */
+
+export interface Brand {
+  id: string;
+  name: string;
+  category: string;
+  logoUrl?: string;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
 
 function getInitials(name: string): string {
   return name
@@ -38,11 +33,124 @@ function getBrandColor(name: string): string {
   return `hsl(${hue}, 40%, 92%)`;
 }
 
-export default function Brands() {
+/* ------------------------------------------------------------------ */
+/*  Single brand card — premium look                                    */
+/* ------------------------------------------------------------------ */
+
+function BrandCard({ brand }: { brand: Brand }) {
+  if (brand.logoUrl) {
+    return (
+      <div
+        className="flex-shrink-0 flex items-center justify-center rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-300 ease-out hover:scale-105 hover:shadow-md hover:border-indigo-200 hover:-translate-y-1
+                   w-[140px] h-[100px] sm:w-[160px] sm:h-[110px] lg:w-[180px] lg:h-[120px]"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={brand.logoUrl}
+          alt={brand.name}
+          loading="lazy"
+          className="max-h-[52px] sm:max-h-[60px] lg:max-h-[72px] w-auto object-contain object-center transition-transform duration-300 ease-out"
+        />
+      </div>
+    );
+  }
+
   return (
-    <section className="bg-white py-8 sm:py-12 text-slate-900 overflow-hidden">
+    <div
+      className="flex-shrink-0 flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-300 ease-out hover:scale-105 hover:shadow-md hover:border-indigo-200 hover:-translate-y-1
+                 w-[140px] h-[100px] sm:w-[160px] sm:h-[110px] lg:w-[180px] lg:h-[120px]"
+    >
+      <div
+        className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl transition-transform duration-300 ease-out group-hover:scale-110"
+        style={{ backgroundColor: getBrandColor(brand.name) }}
+      >
+        <span className="text-sm sm:text-base font-bold text-slate-700">
+          {getInitials(brand.name)}
+        </span>
+      </div>
+      <p className="text-xs sm:text-sm font-semibold text-slate-900 leading-tight text-center truncate max-w-[120px]">
+        {brand.name}
+      </p>
+      <p className="text-[10px] sm:text-xs text-slate-400 leading-tight text-center">
+        {brand.category}
+      </p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Scrolling row                                                      */
+/* ------------------------------------------------------------------ */
+
+function ScrollingRow({
+  brands,
+  reverse,
+  className,
+}: {
+  brands: Brand[];
+  reverse?: boolean;
+  className?: string;
+}) {
+  const doubled = [...brands, ...brands];
+
+  return (
+    <div className={`overflow-hidden ${className ?? ""}`}>
+      <div
+        className={`flex w-max gap-4 sm:gap-5 lg:gap-6 will-change-transform ${
+          reverse ? "animate-brands-scroll-reverse" : "animate-brands-scroll"
+        }`}
+      >
+        {doubled.map((brand, idx) => (
+          <BrandCard
+            key={`${reverse ? "r" : "l"}-${brand.id}-${idx}`}
+            brand={brand}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Section                                                            */
+/* ------------------------------------------------------------------ */
+
+export default function Brands() {
+  const [brands, setBrands] = useState<Brand[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase
+      .from("cms_brands")
+      .select("id, name, category, logo_url")
+      .eq("is_active", true)
+      .order("display_order", { ascending: true })
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setBrands(
+            data.map((b: Record<string, unknown>) => ({
+              id: String(b.id),
+              name: (b.name as string) || "",
+              category: (b.category as string) || "",
+              logoUrl: (b.logo_url as string) || undefined,
+            }))
+          );
+        }
+      });
+  }, []);
+
+  if (brands.length === 0) return null;
+
+  const mid = Math.ceil(brands.length / 2);
+  const rowA = brands.slice(0, mid);
+  const rowB = brands.slice(mid);
+
+  return (
+    <section className="bg-white py-12 sm:py-16 text-slate-900 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center mb-6 sm:mb-8">
+        {/* Heading */}
+        <div className="mx-auto max-w-3xl text-center mb-10 sm:mb-12">
           <p className="text-[10px] uppercase tracking-[0.32em] text-indigo-600 sm:text-xs">
             Our Partners
           </p>
@@ -51,117 +159,17 @@ export default function Brands() {
           </h2>
         </div>
 
+        {/* Scroller */}
         <div className="relative">
-          <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
-          <div className="overflow-hidden">
-            {/* Desktop: 2 rows, each row auto-scrolling */}
-            {/* Row 1 */}
-            <div className="hidden sm:flex animate-marquee gap-4 mb-4 hover:[animation-play-state:paused]">
-              {[...BRANDS, ...BRANDS, ...BRANDS].map((brand, idx) => (
-                <div
-                  key={`row1-${brand.name}-${idx}`}
-                  className="flex-shrink-0 w-36 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  <div
-                    className="flex h-9 w-9 items-center justify-center rounded-xl mx-auto"
-                    style={{ backgroundColor: getBrandColor(brand.name) }}
-                  >
-                    <span className="text-xs font-bold text-slate-700">
-                      {getInitials(brand.name)}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-center text-xs font-semibold text-slate-900 leading-tight">
-                    {brand.name}
-                  </p>
-                  <p className="text-center text-[9px] text-slate-400 leading-tight">
-                    {brand.category}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Row 2 offset */}
-            <div className="hidden sm:flex animate-marquee gap-4 [animation-delay:-4s] [animation-direction:reverse] hover:[animation-play-state:paused]">
-              {[...BRANDS, ...BRANDS, ...BRANDS].map((brand, idx) => (
-                <div
-                  key={`row2-${brand.name}-${idx}`}
-                  className="flex-shrink-0 w-36 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  <div
-                    className="flex h-9 w-9 items-center justify-center rounded-xl mx-auto"
-                    style={{ backgroundColor: getBrandColor(brand.name) }}
-                  >
-                    <span className="text-xs font-bold text-slate-700">
-                      {getInitials(brand.name)}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-center text-xs font-semibold text-slate-900 leading-tight">
-                    {brand.name}
-                  </p>
-                  <p className="text-center text-[9px] text-slate-400 leading-tight">
-                    {brand.category}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Mobile: 2 rows, larger cards, auto-scroll */}
-            {/* Row 1 mobile */}
-            <div className="sm:hidden animate-marquee flex gap-3 mb-3">
-              {[...BRANDS, ...BRANDS, ...BRANDS].map((brand, idx) => (
-                <div
-                  key={`mob1-${brand.name}-${idx}`}
-                  className="flex-shrink-0 w-32 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm"
-                >
-                  <div
-                    className="flex h-8 w-8 items-center justify-center rounded-xl mx-auto"
-                    style={{ backgroundColor: getBrandColor(brand.name) }}
-                  >
-                    <span className="text-[10px] font-bold text-slate-700">
-                      {getInitials(brand.name)}
-                    </span>
-                  </div>
-                  <p className="mt-1.5 text-center text-[10px] font-semibold text-slate-900 leading-tight">
-                    {brand.name}
-                  </p>
-                  <p className="text-center text-[8px] text-slate-400 leading-tight">
-                    {brand.category}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Row 2 mobile */}
-            <div className="sm:hidden animate-marquee flex gap-3 [animation-delay:-4s] [animation-direction:reverse]">
-              {[...BRANDS, ...BRANDS, ...BRANDS].map((brand, idx) => (
-                <div
-                  key={`mob2-${brand.name}-${idx}`}
-                  className="flex-shrink-0 w-32 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm"
-                >
-                  <div
-                    className="flex h-8 w-8 items-center justify-center rounded-xl mx-auto"
-                    style={{ backgroundColor: getBrandColor(brand.name) }}
-                  >
-                    <span className="text-[10px] font-bold text-slate-700">
-                      {getInitials(brand.name)}
-                    </span>
-                  </div>
-                  <p className="mt-1.5 text-center text-[10px] font-semibold text-slate-900 leading-tight">
-                    {brand.name}
-                  </p>
-                  <p className="text-center text-[8px] text-slate-400 leading-tight">
-                    {brand.category}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ScrollingRow brands={rowA} className="mb-4 sm:mb-5" />
+          <ScrollingRow brands={rowB} reverse />
         </div>
 
-        <p className="mt-4 text-center text-[10px] sm:text-xs text-slate-400">
-          &hellip;and many more trusted names in the construction industry.
+        <p className="mt-8 text-center text-[10px] sm:text-xs text-slate-400">
+          &hellip;and many more trusted names in construction industry.
         </p>
       </div>
     </section>

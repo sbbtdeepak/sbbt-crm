@@ -1,4 +1,9 @@
-// ============================================================
+#!/usr/bin/env node
+// Restore types.ts with correct casing + added CMSBrandRow + BRANDS folder
+const fs = require('fs');
+const path = require('path');
+
+const content = `// ============================================================
 // CMS Module — TypeScript Types
 // SBBT CRM Next.js Project
 //
@@ -24,36 +29,21 @@
  * (created_by, updated_by referencing auth.users).
  */
 export interface CMSBase {
-  /** Auto-incrementing primary key */
   id: number;
-  /** UUID for multi-site/tenant support. Default site: 00000000-0000-0000-0000-000000000001 */
   site_id: string;
-  /** Timestamp of row creation (set by database) */
   created_at: string | null;
-  /** Timestamp of last update (set by database) */
   updated_at: string | null;
-  /** UUID of auth.users who created this row */
   created_by: string | null;
-  /** UUID of auth.users who last updated this row */
   updated_by: string | null;
 }
 
-/**
- * Shape for inserting new row.
- * Omits id (auto-generated), timestamps (set by database),
- * and audit fields (set by server action).
- */
 export type CMSInsert<T extends CMSBase> = Omit<
   T,
-  "id" | "created_at" | "updated_at" | "created_by" | "updated_by"
+  'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'
 >;
 
-/**
- * Shape for updating existing row.
- * All fields optional except site_id (required for lookup).
- */
 export type CMSUpdate<T extends CMSBase> = Partial<
-  Omit<T, "id" | "created_at" | "updated_at" | "created_by" | "updated_by">
+  Omit<T, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>
 > & {
   site_id: string;
 };
@@ -62,80 +52,41 @@ export type CMSUpdate<T extends CMSBase> = Partial<
 // Company
 // ============================================================
 
-/**
- * Company information for site.
- * Stores brand identity, contact details, and localization settings.
- */
 export interface CMSCompanyRow extends CMSBase {
-  /** Display brand name (e.g. "SBBT Construction") */
   brand_name: string;
-  /** Registered legal entity name */
   legal_name: string;
-  /** Short brand tagline */
   tagline: string;
-  /** URL to company logo image (stored in cms/logos/) */
   logo_url: string;
-  /** URL to favicon image (stored in cms/favicons/) */
   favicon_url: string;
-  /** Primary brand color (hex, e.g. "#4f46e5") */
   primary_color: string;
-  /** Secondary brand color (hex, e.g. "#06b6d4") */
   secondary_color: string;
-  /** Currency code (e.g. "INR", "USD") */
   currency: string;
-  /** IANA timezone (e.g. "Asia/Kolkata") */
   timezone: string;
-  /** Language code (e.g. "en", "hi") */
   language: string;
-  /** Goods and Services Tax ID */
   gst: string;
-  /** Permanent Account Number (tax ID) */
   pan: string;
-  /** Physical address */
   address: string;
-  /** Primary phone number */
   phone: string;
-  /** WhatsApp number */
   whatsapp: string;
-  /** Primary email address */
   email: string;
-  /** Customer support email */
   support_email: string;
-  /** Sales email */
   sales_email: string;
-  /** Website URL */
   website: string;
-  /** Google Maps embed URL or location URL */
   google_maps_url: string;
-  /** Business hours description (e.g. "Mon-Sat: 9:00 AM - 6:00 PM") */
   business_hours: string;
-  /** Alternate mobile number */
   alternate_mobile: string;
-  /** Grievance email address */
   grievance_email: string;
-  /** Google rating (0-5) */
   google_rating: number;
-  /** Years of experience */
   years_experience: number;
-  /** Homes delivered count */
   homes_delivered: number;
-  /** Projects completed count */
   projects_completed: number;
 }
 
-/** Shape for inserting new company row */
 export type CMSCompanyInsert = CMSInsert<CMSCompanyRow>;
-
-/** Shape for updating existing company row */
 export type CMSCompanyUpdate = CMSUpdate<CMSCompanyRow>;
-
-/** @deprecated Use CMSCompanyRow for database row type */
+/** @deprecated Use CMSCompanyRow */
 export type CMSCompany = CMSCompanyRow;
 
-/**
- * Public company data shape for client-side consumption.
- * Used by Header, Footer, Hero, Contact, and other public components.
- */
 export interface CompanyPublicData {
   brand_name: string;
   legal_name: string;
@@ -167,62 +118,33 @@ export interface CompanyPublicData {
 // Internal Settings (Admin Only)
 // ============================================================
 
-/**
- * Internal settings for admin-only configuration.
- * NOT exposed on public website.
- * Controls notification emails, integration URLs, and API readiness.
- */
 export interface CMSInternalSettingsRow extends CMSBase {
-  /** Email address for lead notifications */
   lead_notification_email: string;
-  /** Sales email address */
   sales_email: string;
-  /** Quotation email address */
   quotation_email: string;
-  /** Support email address */
   support_email: string;
-  /** Accounts email address */
   accounts_email: string;
-  /** Google Sheets URL for lead export */
   google_sheet_url: string;
-  /** Webhook URL for external integrations */
   webhook_url: string;
-  /** Whether SMTP is configured and ready */
   smtp_ready: boolean;
-  /** Whether Resend is configured and ready */
   resend_ready: boolean;
-  /** WhatsApp API phone number */
   whatsapp_api_number: string;
-  /** API keys for future integrations (JSONB placeholder) */
   api_keys: Record<string, unknown>;
 }
 
-/** Shape for inserting new internal settings row */
 export type CMSInternalSettingsInsert = CMSInsert<CMSInternalSettingsRow>;
-
-/** Shape for updating existing internal settings row */
 export type CMSInternalSettingsUpdate = CMSUpdate<CMSInternalSettingsRow>;
 
 // ============================================================
 // Hero Banner
 // ============================================================
 
-/**
- * Hero banner content for homepage.
- * Controls main hero section displayed on public homepage.
- */
 export interface HeroBanner {
-  /** Auto-incrementing primary key */
   id: number;
-  /** Main hero heading text */
   title: string;
-  /** Hero subheading / description text */
   subtitle: string;
-  /** Call-to-action button text */
   button_text: string;
-  /** Call-to-action button link */
   button_link: string;
-  /** URL to hero background image */
   image_url: string;
 }
 
@@ -230,196 +152,105 @@ export interface HeroBanner {
 // Homepage
 // ============================================================
 
-/**
- * single statistic displayed on homepage hero section.
- * Consists of label and its corresponding value.
- */
 export interface CMSStat {
-  /** Display label (e.g. "Years of Experience") */
   label: string;
-  /** Display value (e.g. "15+") */
   value: string;
 }
 
-/**
- * Homepage hero section content and statistics.
- * Controls main banner and stats display on public homepage.
- */
 export interface CMSHomepageRow extends CMSBase {
-  /** Main hero heading text */
   hero_heading: string;
-  /** Hero subheading / description text */
   hero_subheading: string;
-  /** Call-to-action button text */
   hero_cta_text: string;
-  /** Call-to-action button link */
   hero_cta_link: string;
-  /** URL to hero background image (stored in cms/hero/) */
   hero_background_url: string;
-  /** Heading text displayed above statistics section */
   stats_heading: string;
-  /** Array of statistics as JSONB */
   stats: CMSStat[];
 }
 
-/** Shape for inserting new homepage row */
 export type CMSHomepageInsert = CMSInsert<CMSHomepageRow>;
-
-/** Shape for updating existing homepage row */
 export type CMSHomepageUpdate = CMSUpdate<CMSHomepageRow>;
-
-/** @deprecated Use CMSHomepageRow for database row type */
+/** @deprecated Use CMSHomepageRow */
 export type CMSHomepage = CMSHomepageRow;
 
 // ============================================================
 // SEO
 // ============================================================
 
-/**
- * SEO metadata for site.
- * Controls search engine indexing, social sharing, and verification.
- */
 export interface CMSSEORow extends CMSBase {
-  /** Default meta title for site */
   meta_title: string;
-  /** Default meta description */
   meta_description: string;
-  /** Comma-separated meta keywords */
   meta_keywords: string;
-  /** URL to Open Graph image (stored in cms/og-images/) */
   og_image_url: string;
-  /** Canonical URL for site */
   canonical_url: string;
-  /** Robots meta directive (e.g. "index, follow", "noindex, nofollow") */
   robots: string;
-  /** Structured data / JSON-LD schema as JSON object */
   schema_json: Record<string, unknown>;
-  /** Twitter card type (e.g. "summary_large_image", "summary") */
   twitter_card: string;
-  /** Facebook App ID for social integration */
   facebook_app_id: string;
-  /** Google Search Console verification code */
   google_verification: string;
-  /** Bing Webmaster Tools verification code */
   bing_verification: string;
 }
 
-/** Shape for inserting new SEO row */
 export type CMSSeoInsert = CMSInsert<CMSSEORow>;
-
-/** Shape for updating existing SEO row */
 export type CMSSeoUpdate = CMSUpdate<CMSSEORow>;
-
-/** @deprecated Use CMSSEORow for database row type */
+/** @deprecated Use CMSSEORow */
 export type CMSSEO = CMSSEORow;
 
 // ============================================================
 // Social
 // ============================================================
 
-/**
- * Social media profile links for site.
- * Each field stores full URL to respective social profile.
- */
 export interface CMSSocialRow extends CMSBase {
-  /** Facebook page/profile URL */
   facebook_url: string;
-  /** Instagram profile URL */
   instagram_url: string;
-  /** LinkedIn company/page URL */
   linkedin_url: string;
-  /** YouTube channel URL */
   youtube_url: string;
-  /** Twitter/X profile URL */
   twitter_url: string;
 }
 
-/** Shape for inserting new social row */
 export type CMSSocialInsert = CMSInsert<CMSSocialRow>;
-
-/** Shape for updating existing social row */
 export type CMSSocialUpdate = CMSUpdate<CMSSocialRow>;
-
-/** @deprecated Use CMSSocialRow for database row type */
+/** @deprecated Use CMSSocialRow */
 export type CMSSocial = CMSSocialRow;
 
 // ============================================================
 // Settings
 // ============================================================
 
-/**
- * Site-wide settings and feature toggles.
- * Controls footer content, maintenance mode, and available features.
- */
 export interface CMSSettingsRow extends CMSBase {
-  /** Custom footer text/HTML */
   footer_text: string;
-  /** Copyright notice text */
   copyright_text: string;
-  /** Whether site is in maintenance mode */
   maintenance_mode: boolean;
-  /** Message displayed during maintenance mode */
   maintenance_message: string;
-  /** Whether blog feature is enabled */
   enable_blog: boolean;
-  /** Whether quote request feature is enabled */
   enable_quote: boolean;
-  /** Whether WhatsApp contact button is enabled */
   enable_whatsapp: boolean;
-  /** Whether chatbot is enabled */
   enable_chatbot: boolean;
-  /** Whether call button is enabled */
   enable_call_button: boolean;
 }
 
-/** Shape for inserting new settings row */
 export type CMSSettingsInsert = CMSInsert<CMSSettingsRow>;
-
-/** Shape for updating existing settings row */
 export type CMSSettingsUpdate = CMSUpdate<CMSSettingsRow>;
-
-/** @deprecated Use CMSSettingsRow for database row type */
+/** @deprecated Use CMSSettingsRow */
 export type CMSSettings = CMSSettingsRow;
 
 // ============================================================
 // Packages V3 (Clean Rebuild)
 // ============================================================
 
-/**
- * item within package section.
- * Stored in cms_package_items table.
- * Each item has: item name, brand, specification, remarks.
- */
 export interface CMSPackageItem {
-  /** Item name (e.g. "AAC Blocks") */
   item: string;
-  /** Brand name (e.g. "Magicrete") */
   brand: string;
-  /** Specification (e.g. "4\" / 6\"") */
   specification: string;
-  /** Remarks (e.g. "Included", "Premium") */
   remarks: string;
 }
 
-/**
- * section within a package (e.g. "Structure", "Kitchen").
- * Stored in cms_package_sections table.
- */
 export interface CMSPackageSection {
-  /** Section ID (0 if new/unsaved) */
   id?: number;
-  /** Section title (e.g. "Structure", "Flooring") */
   title: string;
-  /** Items within this section */
   items: CMSPackageItem[];
-  /** Display order */
   display_order: number;
 }
 
-/**
- * Package row from cms_packages (V3 clean schema).
- * Future-ready: state_id for state-wise packages.
- */
 export interface CMSPackageRow extends CMSBase {
   state_id: string | null;
   name: string;
@@ -430,28 +261,16 @@ export interface CMSPackageRow extends CMSBase {
   is_active: boolean;
 }
 
-/** Shape for inserting new package */
 export type CMSPackageInsert = CMSInsert<CMSPackageRow>;
-
-/** Shape for updating existing package */
 export type CMSPackageUpdate = CMSUpdate<CMSPackageRow>;
 
-/**
- * Full package data including sections + items.
- * Used for the CMS form and API responses.
- */
 export interface CMSPackageFull {
-  /** main package row */
   package: CMSPackageRow;
-  /** Associated sections (with nested items) */
   sections: CMSPackageSection[];
 }
 
-/** Form state for package server actions */
 export interface CMSPackageFormState extends CMSFormState {
-  /** Server-side validation errors keyed by field path */
   errors?: Record<string, string[]>;
-  /** Generated slug (returned for preview after name entry) */
   slug?: string;
 }
 
@@ -459,25 +278,16 @@ export interface CMSPackageFormState extends CMSFormState {
 // Projects
 // ============================================================
 
-/**
- * gallery image within project.
- */
 export interface CMSProjectGalleryItem {
   image_url: string;
   caption: string;
 }
 
-/**
- * before/after image within project.
- */
 export interface CMSProjectBeforeAfterItem {
   image_url: string;
   caption: string;
 }
 
-/**
- * Project row from cms_projects table.
- */
 export interface CMSProjectRow extends CMSBase {
   name: string;
   slug: string;
@@ -506,15 +316,9 @@ export interface CMSProjectRow extends CMSBase {
   og_image_url: string;
 }
 
-/** Shape for inserting new project */
 export type CMSProjectInsert = CMSInsert<CMSProjectRow>;
-
-/** Shape for updating existing project */
 export type CMSProjectUpdate = CMSUpdate<CMSProjectRow>;
 
-/**
- * Full project data including relations.
- */
 export interface CMSProjectFull {
   project: CMSProjectRow;
   gallery: CMSProjectGalleryItem[];
@@ -522,7 +326,6 @@ export interface CMSProjectFull {
   afterImages: CMSProjectBeforeAfterItem[];
 }
 
-/** Form state for project server actions */
 export interface CMSProjectFormState extends CMSFormState {
   errors?: Record<string, string[]>;
 }
@@ -531,74 +334,40 @@ export interface CMSProjectFormState extends CMSFormState {
 // Blogs
 // ============================================================
 
-/**
- * Blog post for site.
- * Stores published articles and construction-related content.
- */
 export interface CMSBlogRow extends CMSBase {
-  /** Blog post title */
   title: string;
-  /** URL-friendly unique identifier */
   slug: string;
-  /** Short excerpt/summary for cards and previews */
   excerpt: string;
-  /** Full blog post HTML/markdown content */
   content: string;
-  /** URL to featured image (stored in cms/blogs/) */
   featured_image_url: string;
-  /** Author display name */
   author: string;
-  /** Comma-separated tags for categorization */
   tags: string;
-  /** Meta title for SEO */
   meta_title: string;
-  /** Meta description for SEO */
   meta_description: string;
-  /** Whether blog is published and publicly visible */
   is_published: boolean;
-  /** Sort order for display (ascending) */
   display_order: number;
 }
 
-/** Shape for inserting new blog row */
 export type CMSBlogInsert = CMSInsert<CMSBlogRow>;
-
-/** Shape for updating existing blog row */
 export type CMSBlogUpdate = CMSUpdate<CMSBlogRow>;
 
 // ============================================================
 // Testimonials
 // ============================================================
 
-/**
- * Customer testimonial for site.
- * Stores client reviews, ratings, and feedback.
- */
 export interface CMSTestimonialRow extends CMSBase {
-  /** Name of client providing testimonial */
   client_name: string;
-  /** Professional designation/title of client */
   designation: string;
-  /** Name of project testimonial refers to */
   project_name: string;
-  /** Location of client/project */
   location: string;
-  /** Rating out of 5 */
   rating: number;
-  /** testimonial content/quotation */
   testimonial: string;
-  /** URL to client image/photo (stored in cms/testimonials/) */
   image_url: string;
-  /** Whether testimonial is featured on homepage */
   is_featured: boolean;
-  /** Sort order for display (ascending) */
   display_order: number;
 }
 
-/** Shape for inserting new testimonial row */
 export type CMSTestimonialInsert = CMSInsert<CMSTestimonialRow>;
-
-/** Shape for updating existing testimonial row */
 export type CMSTestimonialUpdate = CMSUpdate<CMSTestimonialRow>;
 
 // ============================================================
@@ -610,17 +379,11 @@ export type CMSTestimonialUpdate = CMSUpdate<CMSTestimonialRow>;
  * Stores brand name, category, optional logo, and display order.
  */
 export interface CMSBrandRow extends CMSBase {
-  /** Brand display name (e.g. "UltraTech") */
   name: string;
-  /** Brand category (e.g. "Cement", "Steel") */
   category: string;
-  /** URL to brand logo image (stored in cms/brands/) */
   logo_url: string;
-  /** Brand website URL (optional) */
   website_url: string;
-  /** Sort order for display (ascending) */
   display_order: number;
-  /** Whether brand is active and shown on homepage */
   is_active: boolean;
 }
 
@@ -634,30 +397,16 @@ export type CMSBrandUpdate = CMSUpdate<CMSBrandRow>;
 // Media
 // ============================================================
 
-/**
- * Represents single file stored in the CMS storage bucket.
- * Used by the MediaManager component for listing and management.
- */
 export interface CMSMediaItem {
-  /** File name in storage (e.g. "logos/abc123.png") */
   name: string;
-  /** Public URL to access file */
   public_url: string;
-  /** File size in bytes */
   size: number;
-  /** MIME type (e.g. "image/png") */
   mimetype: string;
-  /** Timestamp when file was last modified */
   updated_at: string;
 }
 
-/**
- * result of image upload operation.
- */
 export interface CMSUploadResult {
-  /** Public URL of uploaded image */
   url: string;
-  /** Storage path of uploaded file */
   path: string;
 }
 
@@ -665,16 +414,9 @@ export interface CMSUploadResult {
 // Server Action Form State
 // ============================================================
 
-/**
- * Standard response shape for all CMS Server Actions.
- * Used by useActionState() in form components.
- */
 export interface CMSFormState {
-  /** Whether operation succeeded */
   success: boolean;
-  /** User-facing message (success or error) */
   message: string;
-  /** Field-level validation errors (keyed by field name) */
   errors?: Record<string, string[]>;
 }
 
@@ -682,37 +424,30 @@ export interface CMSFormState {
 // Default Site ID
 // ============================================================
 
-/**
- * default site UUID used for single-site deployments.
- * In multi-site setup, this would be replaced with the
- * current site's UUID from request context.
- */
-export const DEFAULT_SITE_ID = "00000000-0000-0000-0000-000000000001";
+export const DEFAULT_SITE_ID = '00000000-0000-0000-0000-000000000001';
 
 // ============================================================
 // Storage Bucket Configuration
 // ============================================================
 
-/**
- * Available folders within the CMS storage bucket.
- * Each folder corresponds to specific content type.
- */
 export const CMS_STORAGE_FOLDERS = {
-  LOGOS: "logos",
-  FAVICONS: "favicons",
-  HERO: "hero",
-  OG_IMAGES: "og-images",
-  GENERAL: "general",
-  PACKAGES: "packages",
-  PROJECTS: "projects",
-  BLOGS: "blogs",
-  TESTIMONIALS: "testimonials",
-  BRANDS: "brands",
+  LOGOS: 'logos',
+  FAVICONS: 'favicons',
+  HERO: 'hero',
+  OG_IMAGES: 'og-images',
+  GENERAL: 'general',
+  PACKAGES: 'packages',
+  PROJECTS: 'projects',
+  BLOGS: 'blogs',
+  TESTIMONIALS: 'testimonials',
+  BRANDS: 'brands',
 } as const;
 
-/** Union type of valid storage folder names */
 export type CMSStorageFolder =
   (typeof CMS_STORAGE_FOLDERS)[keyof typeof CMS_STORAGE_FOLDERS];
 
-/** Name of the CMS storage bucket */
-export const CMS_STORAGE_BUCKET = "cms";
+export const CMS_STORAGE_BUCKET = 'cms';
+`;
+
+fs.writeFileSync(path.resolve('App/dashboard/cms/types.ts'), content, 'utf8');
+console.log('types.ts written successfully');

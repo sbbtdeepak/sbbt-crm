@@ -10,6 +10,34 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* ── Brands infinite scroll animations ── */
+  --animate-brands-scroll: brands-scroll 28s linear infinite;
+  --animate-brands-scroll-reverse: brands-scroll-reverse 28s linear infinite;
+
+  /* ── Slider scroll animations ── */
+  --animate-slider-scroll: slider-scroll 40s linear infinite;
+  --animate-slider-scroll-reverse: slider-scroll 40s linear infinite reverse;
+}
+
+@keyframes brands-scroll {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes brands-scroll-reverse {
+  0%   { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes slider-scroll {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes slider-scroll-reverse {
+  0%   { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -25,14 +53,12 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Focus styles for accessibility */
 *:focus-visible {
   outline: 2px solid #6366f1;
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* Skip to content link */
 .skip-to-content {
   position: absolute;
   left: -9999px;
@@ -49,21 +75,8 @@ body {
   left: 0;
 }
 
-/* Marquee animation */
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(calc(-50%));
-  }
-}
+/* ───── Utility classes ───── */
 
-.animate-marquee {
-  animation: marquee 8s linear infinite;
-}
-
-/* Hide scrollbar utility */
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -72,73 +85,46 @@ body {
   display: none;
 }
 
-/* Scroll snap utilities */
 .snap-start {
   scroll-snap-align: start;
 }
 
-/* Bottom sheet animation */
 @keyframes slide-up {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
 }
-
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
 }
 
-/* Popup modal animation */
 @keyframes popup-scale {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
-
 .animate-popup-scale {
   animation: popup-scale 0.3s ease-out;
 }
 
-/* Glass strip utility */
 .glass-strip {
   @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg shadow-black/5;
 }
 
-/* Premium card utility */
 .premium-card {
   @apply rounded-2xl bg-white border border-slate-100 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md;
 }
 
-/* Premium image utility */
 .premium-image {
   @apply w-full object-cover rounded-lg;
 }
 
-/* Subtle fade in animation */
 @keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 .animate-fade-in-up {
   animation: fade-in-up 0.5s ease-out;
 }
 
-/* Stagger children animations */
 .stagger-children > * {
   opacity: 0;
   animation: fade-in-up 0.5s ease-out forwards;

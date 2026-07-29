@@ -3,11 +3,11 @@
 import Link from 'next/link';
 import type { CMSPackageFull } from '@/app/dashboard/cms/types';
 
-interface HomePackagesProps {
+interface HomePackagesprops {
   packages: CMSPackageFull[];
 }
 
-export default function HomePackages({ packages }: HomePackagesProps) {
+export default function HomePackages({ packages }: HomePackagesprops) {
   if (packages.length === 0) return null;
 
   return (

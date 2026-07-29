@@ -8,6 +8,7 @@ import PackagesSection from "./components/PackagesSection";
 import ProjectsSection from "./components/ProjectsSection";
 import BlogsSection from "./components/BlogsSection";
 import TestimonialsSection from "./components/TestimonialsSection";
+import BrandsSection from "./components/BrandsSection";
 import { createClient } from "@/lib/supabase/server";
 import { getAllPackages } from "./actions";
 import type {
@@ -22,7 +23,7 @@ import type {
 import { DEFAULT_SITE_ID } from "./types";
 
 // Tab types
-type TabType = "company" | "homepage" | "seo" | "social" | "settings" | "internal" | "packages" | "projects" | "blogs" | "testimonials";
+type TabType = "company" | "homepage" | "seo" | "social" | "settings" | "internal" | "packages" | "projects" | "blogs" | "testimonials" | "brands";
 
 // Tab configuration
 const tabs: Array<{ id: TabType; label: string }> = [
@@ -36,6 +37,7 @@ const tabs: Array<{ id: TabType; label: string }> = [
   { id: "projects", label: "Projects" },
   { id: "blogs", label: "Blogs" },
   { id: "testimonials", label: "Testimonials" },
+  { id: "brands", label: "Brands" },
 ];
 
 export default async function CMSPage({
@@ -47,13 +49,13 @@ export default async function CMSPage({
   const supabase = await createClient();
 
   const [
-    companyResult,
-    homepageResult,
-    seoResult,
-    socialResult,
-    settingsResult,
-    internalSettingsResult,
-    packagesResult,
+    companyresult,
+    homepageresult,
+    seoresult,
+    socialresult,
+    settingsresult,
+    internalSettingsresult,
+    packagesresult,
   ] = await Promise.all([
     supabase.from("cms_company").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
     supabase.from("cms_homepage").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
@@ -64,21 +66,21 @@ export default async function CMSPage({
     getAllPackages(),
   ]);
 
-  const company = companyResult.data as CMSCompanyRow | null;
-  const homepage = homepageResult.data as CMSHomepageRow | null;
-  const seo = seoResult.data as CMSSEORow | null;
-  const social = socialResult.data as CMSSocialRow | null;
-  const settings = settingsResult.data as CMSSettingsRow | null;
-  const internalSettings = internalSettingsResult.data as CMSInternalSettingsRow | null;
-  const packages = packagesResult as unknown as CMSPackageFull[];
+  const company = companyresult.data as CMSCompanyRow | null;
+  const homepage = homepageresult.data as CMSHomepageRow | null;
+  const seo = seoresult.data as CMSSEORow | null;
+  const social = socialresult.data as CMSSocialRow | null;
+  const settings = settingsresult.data as CMSSettingsRow | null;
+  const internalSettings = internalSettingsresult.data as CMSInternalSettingsRow | null;
+  const packages = packagesresult as unknown as CMSPackageFull[];
 
   const error =
-    companyResult.error?.message ||
-    homepageResult.error?.message ||
-    seoResult.error?.message ||
-    socialResult.error?.message ||
-    settingsResult.error?.message ||
-    internalSettingsResult.error?.message ||
+    companyresult.error?.message ||
+    homepageresult.error?.message ||
+    seoresult.error?.message ||
+    socialresult.error?.message ||
+    settingsresult.error?.message ||
+    internalSettingsresult.error?.message ||
     null;
 
   // Get tab from search params (default to company)
@@ -143,7 +145,8 @@ export default async function CMSPage({
         {activeTab === "packages" && <PackagesSection initialPackages={packages} />}
         {activeTab === "projects" && <ProjectsSection />}
         {activeTab === "blogs" && <BlogsSection />}
-        {activeTab === "testimonials" && <TestimonialsSection />}
+  {activeTab === "testimonials" && <TestimonialsSection />}
+  {activeTab === "brands" && <BrandsSection />}
       </div>
     </div>
   );

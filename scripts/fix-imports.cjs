@@ -1,0 +1,1 @@
+const fs=require("fs");\nlet fc=fs.readFileSync("Lib/import/package-columns.ts","utf8");\nfc=fc.replace(/^Import /gm,"import ").replace(/^Export /gm,"export ");\nfs.writeFileSync("Lib/import/package-columns.ts",fc);\nconsole.log("Fixed columns");\n
