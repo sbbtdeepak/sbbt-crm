@@ -84,10 +84,16 @@ export async function POST(request: Request) {
 
     // Step 4: Fetch existing packages
     const supabase = await createClient();
-    const { data: existingPackages } = await supabase
+    const { data: existingPackages, error: existingError } = await supabase
       .from("cms_packages")
       .select("id, name, slug")
       .eq("site_id", DEFAULT_SITE_ID);
+
+    if (existingError) {
+      console.error("[DEBUG] Failed to fetch existing packages:", existingError);
+    }
+    console.log("[DEBUG] Existing packages fetched:", existingPackages?.length || 0);
+    console.log("[DEBUG] Existing package names:", existingPackages?.map((p) => p.name) || []);
 
     const existingBySlug = new Map<string, { id: number; name: string; slug: string }>();
     const existingByName = new Map<string, { id: number; name: string; slug: string }>();
@@ -204,50 +210,76 @@ export async function POST(request: Request) {
 
       if (existing) {
         // Update existing package
-        const { error: updateError } = await supabase
+        console.log(`[DEBUG] Updating existing package: ${pkgName}`);
+        const updatePayload = {
+          name: pkgName,
+          slug,
+          price: Number(firstRow.data.package_price) || 0,
+          description: String(firstRow.data.package_description || ""),
+          display_order: Number(firstRow.data.package_display_order) || 0,
+          is_active: firstRow.data.package_is_active !== false,
+          updated_at: new Date().toISOString(),
+        };
+        console.log(`[DEBUG] UPDATE package payload:`, updatePayload);
+        const { data: updateData, error: updateError } = await supabase
           .from("cms_packages")
-          .update({
-            name: pkgName,
-            slug,
-            price: Number(firstRow.data.package_price) || 0,
-            description: String(firstRow.data.package_description || ""),
-            display_order: Number(firstRow.data.package_display_order) || 0,
-            is_active: String(firstRow.data.package_is_active).toLowerCase() !== "no",
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", existing.id);
+          .update(updatePayload)
+          .eq("id", existing.id)
+          .select("id")
+          .single();
+
+        console.log(`[DEBUG] UPDATE response:`, updateData);
+        console.log(`[DEBUG] UPDATE error:`, updateError);
 
         if (updateError) {
+          console.error(`[DEBUG] UPDATE FAILED for package "${pkgName}":`, updateError);
           errors.push(`Failed to update package "${pkgName}": ${updateError.message}`);
           skipped++;
           dryRunResult.push({ package: pkgName, slug, action: "skip", reason: updateError.message });
           continue;
         }
-        packageId = existing.id;
+        if (!updateData) {
+          console.error(`[DEBUG] UPDATE returned no data for package "${pkgName}"`);
+          errors.push(`Failed to update package "${pkgName}": No data returned`);
+          skipped++;
+          dryRunResult.push({ package: pkgName, slug, action: "skip", reason: "No data returned" });
+          continue;
+        }
+        packageId = updateData.id;
+        console.log(`[DEBUG] Package updated, id=${packageId}`);
         updated++;
       } else {
         // Insert new package
+        console.log(`[DEBUG] INSERTING new package: ${pkgName}`);
+        const insertPayload = {
+          site_id: DEFAULT_SITE_ID,
+          state_id: null,
+          name: pkgName,
+          slug,
+          price: Number(firstRow.data.package_price) || 0,
+          description: String(firstRow.data.package_description || ""),
+          display_order: Number(firstRow.data.package_display_order) || 0,
+          is_active: firstRow.data.package_is_active !== false,
+        };
+        console.log(`[DEBUG] INSERT package payload:`, insertPayload);
         const { data: newPkg, error: insertError } = await supabase
           .from("cms_packages")
-          .insert({
-            site_id: DEFAULT_SITE_ID,
-            name: pkgName,
-            slug,
-            price: Number(firstRow.data.package_price) || 0,
-            description: String(firstRow.data.package_description || ""),
-            display_order: Number(firstRow.data.package_display_order) || 0,
-            is_active: String(firstRow.data.package_is_active).toLowerCase() !== "no",
-          })
+          .insert(insertPayload)
           .select("id")
           .single();
 
+        console.log(`[DEBUG] INSERT response:`, newPkg);
+        console.log(`[DEBUG] INSERT error:`, insertError);
+
         if (insertError || !newPkg) {
+          console.error(`[DEBUG] INSERT FAILED for package "${pkgName}":`, insertError?.message || "Unknown error");
           errors.push(`Failed to create package "${pkgName}": ${insertError?.message || "Unknown error"}`);
           skipped++;
           dryRunResult.push({ package: pkgName, slug, action: "skip", reason: insertError?.message || "Unknown error" });
           continue;
         }
         packageId = newPkg.id;
+        console.log(`[DEBUG] Package inserted, id=${packageId}`);
         imported++;
       }
 
@@ -265,6 +297,8 @@ export async function POST(request: Request) {
 
       // Insert sections + items
       let sectionOrder = 0;
+      let sectionsInserted = 0;
+      let itemsInserted = 0;
       for (const [sectionTitle, sectionRows] of sectionGroups) {
         const firstSectionRow = sectionRows[0];
         const { data: section, error: sectionError } = await supabase
@@ -278,10 +312,13 @@ export async function POST(request: Request) {
           .single();
 
         if (sectionError || !section) {
+          console.error(`[DEBUG] Section insert FAILED for "${sectionTitle}" in package "${pkgName}":`, sectionError?.message || "Unknown");
           warnings.push(`Failed to create section "${sectionTitle}": ${sectionError?.message || "Unknown"}`);
           sectionOrder++;
           continue;
         }
+
+        sectionsInserted++;
 
         const items = sectionRows.map((row, idx) => ({
           section_id: section.id,
@@ -294,10 +331,16 @@ export async function POST(request: Request) {
 
         const { error: itemsError } = await supabase.from("cms_package_items").insert(items);
         if (itemsError) {
+          console.error(`[DEBUG] Items insert FAILED for "${sectionTitle}" in package "${pkgName}":`, itemsError.message);
           warnings.push(`Failed to insert items for "${sectionTitle}": ${itemsError.message}`);
+        } else {
+          itemsInserted += items.length;
         }
         sectionOrder++;
       }
+
+      console.log(`[DEBUG] Sections inserted: ${sectionsInserted}`);
+      console.log(`[DEBUG] Items inserted: ${itemsInserted}`);
 
       dryRunResult.push({
         package: pkgName,
@@ -306,6 +349,19 @@ export async function POST(request: Request) {
         sections: Array.from(sectionGroups.keys()).length,
         items: rows.length,
       });
+    }
+
+    // After ALL inserts execute — verify what actually landed in the database
+    const { data: allPackages, error: countError } = await supabase
+      .from("cms_packages")
+      .select("name")
+      .eq("site_id", DEFAULT_SITE_ID);
+
+    console.log(`[DEBUG] After import`);
+    console.log(`[DEBUG] Total package count:`, allPackages?.length || 0);
+    console.log(`[DEBUG] Package names:`, allPackages?.map((p) => p.name) || []);
+    if (countError) {
+      console.error(`[DEBUG] Failed to query package count after import:`, countError);
     }
 
     const durationMs = Date.now() - startTime;
@@ -333,8 +389,11 @@ export async function POST(request: Request) {
       durationMs,
     });
 
+    // Do NOT return success when insert failed — surface errors to the caller
+    const hasInsertErrors = errors.length > 0;
+
     return NextResponse.json({
-      success: true,
+      success: !hasInsertErrors,
       imported,
       updated,
       skipped,
@@ -342,7 +401,7 @@ export async function POST(request: Request) {
       errors,
       warnings,
       durationMs,
-    });
+    }, hasInsertErrors ? { status: 500 } : { status: 200 });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Import failed";
     return NextResponse.json({ error: message }, { status: 500 });
