@@ -29,6 +29,9 @@ export const metadata: Metadata = {
     "SBBT",
     "Shree Badree Build Tech",
   ],
+  verification: {
+  google: "EJ_yUsSJb9oLPEtB3AP6d-mfmPLx6IRRAtEzDuoUkcc",
+},
   openGraph: {
     type: "website",
     locale: "en_IN",
