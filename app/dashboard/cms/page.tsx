@@ -9,8 +9,9 @@ import ProjectsSection from "./components/ProjectsSection";
 import BlogsSection from "./components/BlogsSection";
 import TestimonialsSection from "./components/TestimonialsSection";
 import BrandsSection from "./components/BrandsSection";
+import MediaManager from "./components/MediaManager";
 import { createClient } from "@/lib/supabase/server";
-import { getAllPackages } from "./actions";
+import { getAllPackages, getMediaItems } from "./actions";
 import type {
   CMSCompanyRow,
   CMSHomepageRow,
@@ -19,11 +20,12 @@ import type {
   CMSSettingsRow,
   CMSInternalSettingsRow,
   CMSPackageFull,
+  CMSMediaItem,
 } from "./types";
 import { DEFAULT_SITE_ID } from "./types";
 
 // Tab types
-type TabType = "company" | "homepage" | "seo" | "social" | "settings" | "internal" | "packages" | "projects" | "blogs" | "testimonials" | "brands";
+type TabType = "company" | "homepage" | "seo" | "social" | "settings" | "internal" | "packages" | "projects" | "blogs" | "testimonials" | "brands" | "media";
 
 // Tab configuration
 const tabs: Array<{ id: TabType; label: string }> = [
@@ -38,6 +40,7 @@ const tabs: Array<{ id: TabType; label: string }> = [
   { id: "blogs", label: "Blogs" },
   { id: "testimonials", label: "Testimonials" },
   { id: "brands", label: "Brands" },
+  { id: "media", label: "Media" },
 ];
 
 export default async function CMSPage({
@@ -56,6 +59,7 @@ export default async function CMSPage({
     settingsresult,
     internalSettingsresult,
     packagesresult,
+    mediavresult,
   ] = await Promise.all([
     supabase.from("cms_company").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
     supabase.from("cms_homepage").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
@@ -64,6 +68,7 @@ export default async function CMSPage({
     supabase.from("cms_settings").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
     supabase.from("cms_internal_settings").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
     getAllPackages(),
+    getMediaItems(),
   ]);
 
   const company = companyresult.data as CMSCompanyRow | null;
@@ -73,6 +78,7 @@ export default async function CMSPage({
   const settings = settingsresult.data as CMSSettingsRow | null;
   const internalSettings = internalSettingsresult.data as CMSInternalSettingsRow | null;
   const packages = packagesresult as unknown as CMSPackageFull[];
+  const mediaItems = mediavresult as CMSMediaItem[];
 
   const error =
     companyresult.error?.message ||
@@ -93,7 +99,8 @@ export default async function CMSPage({
       <div>
         <h1 className="text-3xl font-bold">CMS Dashboard</h1>
         <p className="text-gray-500 mt-1">
-           Manage company information, homepage, SEO, social links, settings, internal configuration, packages, projects, blogs, and testimonials.
+          Manage company information, homepage, SEO, social links, settings,
+          internal configuration, packages, projects, blogs, testimonials, and media.
         </p>
       </div>
 
@@ -145,8 +152,9 @@ export default async function CMSPage({
         {activeTab === "packages" && <PackagesSection initialPackages={packages} />}
         {activeTab === "projects" && <ProjectsSection />}
         {activeTab === "blogs" && <BlogsSection />}
-  {activeTab === "testimonials" && <TestimonialsSection />}
-  {activeTab === "brands" && <BrandsSection />}
+        {activeTab === "testimonials" && <TestimonialsSection />}
+        {activeTab === "brands" && <BrandsSection />}
+        {activeTab === "media" && <MediaManager initialItems={mediaItems} activeFolder="" />}
       </div>
     </div>
   );

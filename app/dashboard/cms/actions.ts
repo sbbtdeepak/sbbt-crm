@@ -7,8 +7,10 @@ import type {
   CMSInternalSettingsRow,
   CMSProjectFull,
   CMSPackageFull,
+  CMSStat,
+  CMSMediaItem,
 } from './types';
-import { DEFAULT_SITE_ID } from './types';
+import { DEFAULT_SITE_ID, CMS_STORAGE_FOLDERS, CMS_STORAGE_BUCKET } from './types';
 
 // ============================================================
 // Company (Public) Actions
@@ -338,6 +340,72 @@ export async function deleteImageAction(_prevState: unknown, formData: FormData)
 }
 
 // ============================================================
+// Media Manager Actions
+// ============================================================
+
+/**
+ * List all files in the CMS storage bucket.
+ * Optionally filter by folder prefix (e.g. "logos", "hero").
+ */
+export async function getMediaItems(folder?: string): Promise<CMSMediaItem[]> {
+  const supabase = await createClient();
+
+  const bucket = CMS_STORAGE_BUCKET;
+  const { data, error } = await supabase.storage.from(bucket).list(folder ? folder + '/' : '', {
+    limit: 100,
+    sortBy: { column: 'updated_at', order: 'desc' },
+  });
+
+  if (error) {
+    console.error('Error listing media:', error);
+    return [];
+  }
+
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl('');
+  const bucketBaseUrl = publicUrlData.publicUrl;
+
+  return data.map((file) => ({
+    name: file.name,
+    public_url: `${bucketBaseUrl}${file.name}`,
+    size: file.metadata?.size ?? 0,
+    mimetype: file.metadata?.mimetype ?? 'application/octet-stream',
+    updated_at: file.updated_at ?? new Date().toISOString(),
+  })) as CMSMediaItem[];
+}
+
+/**
+ * Delete a media file from the CMS storage bucket by its path.
+ */
+export async function deleteMediaItem(
+  prevState: { success: boolean; message: string },
+  formData: FormData
+): Promise<{ success: boolean; message: string }> {
+  const supabase = await createClient();
+
+  const path = formData.get('path') as string;
+
+  if (!path) {
+    return { success: false, message: 'No file path provided.' };
+  }
+
+  const { error } = await supabase.storage
+    .from(CMS_STORAGE_BUCKET)
+    .remove([path]);
+
+  if (error) {
+    console.error('Error deleting media item:', error);
+    return { success: false, message: `Delete failed: ${error.message}` };
+  }
+
+  revalidatePath('/dashboard/cms');
+  return { success: true, message: 'File deleted successfully.' };
+}
+
+// ============================================================
 // Social Media Actions
 // ============================================================
 
@@ -511,6 +579,15 @@ export async function saveHomepage(prevState: { success: boolean; message: strin
     .eq('site_id', DEFAULT_SITE_ID)
     .maybeSingle();
 
+  // Parse stats from JSON string (sent by HomepageForm as hidden input)
+  let stats: CMSStat[] = [];
+  try {
+    const statsRaw = formData.get('stats') as string;
+    if (statsRaw) stats = JSON.parse(statsRaw) as CMSStat[];
+  } catch {
+    // ignore parse errors, keep empty array
+  }
+
   const updateData = {
     site_id: DEFAULT_SITE_ID,
     hero_heading: formData.get('hero_heading') as string || '',
@@ -519,6 +596,7 @@ export async function saveHomepage(prevState: { success: boolean; message: strin
     hero_cta_link: formData.get('hero_cta_link') as string || '',
     hero_background_url: formData.get('hero_background_url') as string || '',
     stats_heading: formData.get('stats_heading') as string || '',
+    stats,
   };
 
   if (currentData) {
@@ -560,6 +638,18 @@ export async function saveSEO(prevState: { success: boolean; message: string }, 
     .eq('site_id', DEFAULT_SITE_ID)
     .maybeSingle();
 
+  // Parse schema_json from JSON string (sent by SEOForm as textarea)
+  let schemaJson: Record<string, unknown> = {};
+  try {
+    const schemaRaw = formData.get('schema_json') as string;
+    if (schemaRaw && schemaRaw.trim() !== '') {
+      schemaJson = JSON.parse(schemaRaw);
+    }
+  } catch {
+    // Return error for invalid JSON
+    return { success: false, message: 'Schema JSON is invalid. Please fix the JSON syntax.' };
+  }
+
   const updateData = {
     site_id: DEFAULT_SITE_ID,
     meta_title: formData.get('meta_title') as string || '',
@@ -568,6 +658,7 @@ export async function saveSEO(prevState: { success: boolean; message: string }, 
     og_image_url: formData.get('og_image_url') as string || '',
     canonical_url: formData.get('canonical_url') as string || '',
     robots: formData.get('robots') as string || 'index, follow',
+    schema_json: schemaJson,
     twitter_card: formData.get('twitter_card') as string || 'summary_large_image',
     facebook_app_id: formData.get('facebook_app_id') as string || '',
     google_verification: formData.get('google_verification') as string || '',

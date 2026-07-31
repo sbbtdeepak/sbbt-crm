@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import LeadPopupForm from "@/components/shared/LeadPopupForm";
 import { getCompanyPublicData } from "@/app/dashboard/cms/actions";
+import { trackGetQuoteClick } from "@/lib/analytics";
 
 interface LeadFormState {
   name: string;
@@ -103,6 +104,7 @@ export default function Hero() {
       });
 
       if (response.ok) {
+        trackGetQuoteClick();
         setSubmitMessage("Quote request submitted successfully! We'll contact you soon.");
         setLeadForm({ name: "", contact: "", location: "", budget: "" });
         setTimeout(() => setIsPopupOpen(false), 2000);

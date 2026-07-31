@@ -1,9 +1,18 @@
-"use client";
+'use client';
+
+import { useParams } from 'next/navigation';
+import { breadcrumbSchema } from '@/lib/seo/schema';
+
+const breadcrumbs = (projectName: string) =>
+  breadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'Projects', path: '/projects' },
+    { name: projectName, path: `/projects/${useParams().id}` },
+  ]);
 
 import { createClient } from "@/lib/supabase/client";
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 

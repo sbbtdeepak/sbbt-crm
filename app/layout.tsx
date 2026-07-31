@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
+import { Suspense } from "react";
 import "./globals.css";
 import MobileBrandHeader from "@/components/layout/MobileBrandHeader";
+import GoogleAnalytics from "@/components/shared/GoogleAnalytics";
+import { enterpriseJsonLd } from "@/lib/seo/schema";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -65,7 +69,7 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  metadataBase: new URL("https://www.sbbt.in"),
+  metadataBase: new URL("https://sbbt.in"),
   alternates: {
     canonical: "/",
   },
@@ -76,12 +80,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = enterpriseJsonLd();
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
       <body className="min-h-full flex flex-col">
+        <Suspense fallback={null}>
+          <GoogleAnalytics />
+        </Suspense>
         {/* Skip to content link for keyboard users */}
         <a href="#main-content" className="skip-to-content">
           Skip to content
@@ -90,6 +99,11 @@ export default function RootLayout({
         <main id="main-content" className="flex-1">
           {children}
         </main>
+        <Script
+          id="enterprise-seo-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </body>
     </html>
   );

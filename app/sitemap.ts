@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 // ============================================================
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://www.sbbt.in";
+  const baseUrl = "https://sbbt.in";
   const supabase = await createClient();
 
   // Static routes
@@ -47,12 +47,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/quote`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.7,

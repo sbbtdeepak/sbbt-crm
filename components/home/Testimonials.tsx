@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -39,7 +39,7 @@ function TestimonialCard({ t }: { t: Testimonial }) {
   return (
     <div
       className="flex-shrink-0 w-[280px] sm:w-[320px] lg:w-[360px] rounded-2xl bg-white border border-slate-100 p-5 sm:p-6 shadow-sm
-                 transition-all duration-300 hover:shadow-md"
+        transition-all duration-300 hover:shadow-md"
     >
       {/* Stars */}
       <StarRating rating={t.rating} />
@@ -100,31 +100,55 @@ function Scroller({ items }: { items: Testimonial[] }) {
 export default function Testimonials() {
   const [items, setItems] = useState<Testimonial[]>([]);
 
+  console.log("[DEBUG] Testimonials mounted");
+
   useEffect(() => {
     const supabase = createClient();
+
+    console.log("[DEBUG] Querying cms_testimonials where is_featured = true");
+
     supabase
       .from("cms_testimonials")
-      .select("id, client_name, content, rating, project_type, location, image_url")
-      .eq("is_active", true)
+      .select("id, client_name, testimonial, rating, project_name, location, image_url")
+      .eq("is_featured", true)
       .order("display_order", { ascending: true })
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("[DEBUG] Query FAILED - Supabase error:", error);
+          return;
+        }
+
+        console.log("[DEBUG] Query success - returned rows count:", data?.length || 0);
+        console.log("[DEBUG] Returned data:", data);
+
+        if (!data || data.length === 0) {
+          console.log("[DEBUG] Rows=0 - possible reasons: (a) no rows with is_featured=true in table, (b) migration 064/073 not applied, (c) RLS policy blocks read, (d) site_id mismatch");
+        }
+
         if (data && data.length > 0) {
-          setItems(
-            data.map((r: Record<string, unknown>) => ({
-              id: String(r.id),
-              clientName: (r.client_name as string) || "",
-              content: (r.content as string) || "",
-              rating: (r.rating as number) || 5,
-              projectType: (r.project_type as string) || "",
-              location: (r.location as string) || "",
-              imageUrl: (r.image_url as string) || undefined,
-            }))
-          );
+          const mapped = data.map((r: Record<string, unknown>) => ({
+            id: String(r.id),
+            clientName: (r.client_name as string) || "",
+            content: (r.testimonial as string) || "",
+            rating: (r.rating as number) || 5,
+            projectType: (r.project_type as string) || "",
+            location: (r.location as string) || "",
+            imageUrl: (r.image_url as string) || undefined,
+          }));
+          console.log("[DEBUG] Calling setItems with mapped items count:", mapped.length);
+          setItems(mapped);
+        } else {
+          console.log("[DEBUG] setItems NOT called because data is empty or null");
         }
       });
   }, []);
 
-  if (items.length === 0) return null;
+  console.log("[DEBUG] Render state - items.length:", items.length);
+
+  if (items.length === 0) {
+    console.log("[DEBUG] Returning null from render because items.length === 0");
+    return null;
+  }
 
   return (
     <section className="bg-white py-12 sm:py-16 overflow-hidden">

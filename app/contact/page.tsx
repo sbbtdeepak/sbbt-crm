@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { getCompanyPublicData } from "@/app/dashboard/cms/actions";
+import { trackContactFormSubmit } from "@/lib/analytics";
 
 export default function ContactPage() {
   const [form, setForm] = useState({
@@ -66,6 +67,7 @@ export default function ContactPage() {
         return;
       }
 
+      trackContactFormSubmit();
       setSubmitted(true);
       setSubmitting(false);
       setForm({ full_name: '', email: '', mobile_number: '', message: '', plot_location: '' });

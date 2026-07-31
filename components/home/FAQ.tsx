@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { faqSchema } from "@/lib/seo/schema";
 
 const FAQ_ITEMS = [
   {
@@ -62,68 +63,83 @@ export default function FAQ() {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  const jsonLd = faqSchema(
+    FAQ_ITEMS.map((item) => ({
+      question: item.question,
+      answer: item.answer,
+    }))
+  );
+
   return (
-    <section className="bg-white py-6 sm:py-10 text-slate-900">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.32em] text-indigo-600 sm:text-sm">
-            FAQ
-          </p>
-          <h2 className="mt-1.5 text-lg font-semibold tracking-tight text-slate-950 sm:text-2xl">
-            Frequently Asked Questions
-          </h2>
-        </div>
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        ></script>
+      )}
+      <section className="bg-white py-6 sm:py-10 text-slate-900">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-[0.32em] text-indigo-600 sm:text-sm">
+              FAQ
+            </p>
+            <h2 className="mt-1.5 text-lg font-semibold tracking-tight text-slate-950 sm:text-2xl">
+              Frequently Asked Questions
+            </h2>
+          </div>
 
-        <div className="mt-4 space-y-2">
-          {FAQ_ITEMS.map((item, index) => {
-            const isOpen = openIndex === index;
+          <div className="mt-4 space-y-2">
+            {FAQ_ITEMS.map((item, index) => {
+              const isOpen = openIndex === index;
 
-            return (
-              <div
-                key={index}
-                className="overflow-hidden rounded-xl border border-slate-200 transition-colors hover:border-slate-300"
-              >
-                <button
-                  onClick={() => toggle(index)}
-                  className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-slate-50"
-                  aria-expanded={isOpen}
-                >
-                  <span className="pr-4 text-xs font-semibold text-slate-900 sm:text-sm">
-                    {item.question}
-                  </span>
-                  <svg
-                    className={`h-3.5 w-3.5 flex-shrink-0 text-slate-400 transition-transform duration-300 ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-
+              return (
                 <div
-                  className={`transition-all duration-300 ease-in-out ${
-                    isOpen
-                      ? "max-h-96 opacity-100"
-                      : "max-h-0 opacity-0"
-                  }`}
+                  key={index}
+                  className="overflow-hidden rounded-xl border border-slate-200 transition-colors hover:border-slate-300"
                 >
-                  <div className="border-t border-slate-100 px-4 py-2.5 text-xs leading-5 text-slate-600">
-                    {item.answer}
+                  <button
+                    onClick={() => toggle(index)}
+                    className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-slate-50"
+                    aria-expanded={isOpen}
+                  >
+                    <span className="pr-4 text-xs font-semibold text-slate-900 sm:text-sm">
+                      {item.question}
+                    </span>
+                    <svg
+                      className={`h-3.5 w-3.5 flex-shrink-0 text-slate-400 transition-transform duration-300 ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+
+                  <div
+                    className={`transition-all duration-300 ease-in-out ${
+                      isOpen
+                        ? "max-h-96 opacity-100"
+                        : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    <div className="border-t border-slate-100 px-4 py-2.5 text-xs leading-5 text-slate-600">
+                      {item.answer}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

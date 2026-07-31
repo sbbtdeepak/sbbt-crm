@@ -16,26 +16,30 @@ interface BlogDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
+import { buildItemMetadata, getCompanySeoFallback } from "@/lib/seo/metadata";
+
 export async function generateMetadata({
   params,
 }: BlogDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
   const blog = await getBlogBySlug(slug);
+  const fallback = await getCompanySeoFallback();
 
   if (!blog) {
     return { title: "Blog Not Found | SBBT" };
   }
 
-  return {
-    title: blog.meta_title || `${blog.title} | SBBT`,
-    description: blog.meta_description || blog.excerpt,
-    openGraph: {
-      title: blog.meta_title || blog.title,
-      description: blog.meta_description || blog.excerpt,
-      type: "article",
-      ...(blog.featured_image_url && { images: [{ url: blog.featured_image_url }] }),
-    },
-  };
+  const title = blog.meta_title?.trim() || `${blog.title} | ${fallback.siteName}`;
+  const description = blog.meta_description?.trim() || blog.excerpt?.trim() || fallback.description;
+
+  return buildItemMetadata({
+    title,
+    description,
+    keywords: blog.tags?.trim() || fallback.keywords,
+    path: `/blogs/${blog.slug || slug}`,
+    fallback,
+    ogImage: blog.featured_image_url?.trim() || fallback.logoUrl,
+  });
 }
 
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {

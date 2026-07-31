@@ -1,12 +1,5 @@
 import { MetadataRoute } from "next";
 
-// ============================================================
-// robots.txt Generation
-// SBBT CRM Next.js Project
-//
-// Controls search engine crawling permissions.
-// ============================================================
-
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [

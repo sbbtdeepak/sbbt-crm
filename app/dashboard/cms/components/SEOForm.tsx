@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { ImageUploader } from "@/components/shared/ImageUploader";
 import { saveSEO } from "../actions";
 import type { CMSSEORow } from "../types";
@@ -14,6 +14,9 @@ export default function SEOForm({ seo }: Props) {
     success: false,
     message: "",
   });
+
+  // Local state for OG image URL so preview updates immediately after upload
+  const [ogImageUrl, setOgImageUrl] = useState(seo?.og_image_url || "");
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -125,21 +128,15 @@ export default function SEOForm({ seo }: Props) {
             <div>
               <ImageUploader
                 folder="og-images"
-                value={seo?.og_image_url || ""}
-                onChange={(url) => {
-                  const input = document.createElement("input");
-                  input.type = "hidden";
-                  input.name = "og_image_url";
-                  input.value = url;
-                  document.querySelector("form")?.appendChild(input);
-                }}
+                value={ogImageUrl}
+                onChange={setOgImageUrl}
                 label="Open Graph Image"
                 disabled={isPending}
               />
               <input
                 type="hidden"
                 name="og_image_url"
-                defaultValue={seo?.og_image_url || ""}
+                value={ogImageUrl}
               />
             </div>
 

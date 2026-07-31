@@ -1,10 +1,20 @@
 "use client";
 
+import { breadcrumbSchema } from '@/lib/seo/schema';
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'Projects', path: '/projects' },
+]);
+
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from 'react';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+
+// BreadcrumbList JSON-LD is injected once via the script below
+const jsonLd = breadcrumbs;
 
 type Project = {
   id: string;
@@ -67,6 +77,10 @@ export default function ProjectsPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Header />
 
       <div className="md:pt-28 max-w-7xl mx-auto px-4 sm:px-6 py-6">

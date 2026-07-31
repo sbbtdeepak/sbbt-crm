@@ -23,8 +23,17 @@ export interface PublicBlog {
   excerpt: string;
   content: string;
   featured_image_url: string;
+  featured_image_alt: string;
   author: string;
   tags: string;
+  category: string;
+  reading_time: number;
+  views: number;
+  is_hot: boolean;
+  featured: boolean;
+  published_date: string | null;
+  og_image_url: string;
+  faq: Array<{ question: string; answer: string }>;
   meta_title: string;
   meta_description: string;
   is_published: boolean;
@@ -155,7 +164,7 @@ export async function getPackagesForPublic(): Promise<PublicPackage[]> {
 }
 
 /**
- * Fetch a single package by slug (for public display).
+ * Fetch single package by slug (for public display).
  */
 export async function getPackageBySlug(slug: string): Promise<PublicPackage | null> {
   const supabase = await createServerClient();
@@ -219,31 +228,54 @@ export async function getPackageBySlug(slug: string): Promise<PublicPackage | nu
 // ============================================================
 
 /**
- * Fetch published blogs from cms_blogs.
- * Filters by is_published = true and orders by display_order.
- * @param options.limit  Max number of blogs to return (default: all)
- * @param options.search Optional search filter (matches title, excerpt, tags)
+ * Options for fetching published blogs.
  */
-export async function getBlogs(options?: {
+export interface BlogQueryOptions {
   limit?: number;
   search?: string;
-}): Promise<PublicBlog[]> {
+  category?: string;
+  featured?: boolean;
+  isHot?: boolean;
+  sortBy?: "display_order" | "views" | "created_at" | "published_date";
+  offset?: number;
+}
+
+/**
+ * Fetch published blogs from cms_blogs.
+ * Filters by is_published = true and supports premium query options.
+ */
+export async function getBlogs(options?: BlogQueryOptions): Promise<PublicBlog[]> {
   const supabase = await createServerClient();
 
   let query = supabase
     .from("cms_blogs")
     .select("*")
-    .eq("is_published", true)
-    .order("display_order", { ascending: true });
+    .eq("is_published", true);
+
+  if (options?.category) {
+    query = query.eq("category", options.category);
+  }
+
+  if (options?.featured !== undefined) {
+    query = query.eq("featured", options.featured);
+  }
+
+  if (options?.isHot !== undefined) {
+    query = query.eq("is_hot", options.isHot);
+  }
+
+  query = query.order(options?.sortBy || "display_order", { ascending: options?.sortBy === "views" ? false : true });
 
   if (options?.search) {
     const term = `%${options.search}%`;
     query = query.or(
-      `title.ilike.${term},excerpt.ilike.${term},tags.ilike.${term},content.ilike.${term}`
+      `title.ilike.${term},excerpt.ilike.${term},tags.ilike.${term},content.ilike.${term},category.ilike.${term},meta_title.ilike.${term},meta_description.ilike.${term}`
     );
   }
 
-  if (options?.limit) {
+  if (options?.offset) {
+    query = query.range(options.offset, (options.offset || 0) + (options.limit || 6) - 1);
+  } else if (options?.limit) {
     query = query.limit(options.limit);
   }
 
@@ -258,7 +290,7 @@ export async function getBlogs(options?: {
 }
 
 /**
- * Fetch a single blog by its slug.
+ * Fetch single blog by its slug.
  */
 export async function getBlogBySlug(slug: string): Promise<PublicBlog | null> {
   const supabase = await createServerClient();
@@ -279,6 +311,22 @@ export async function getBlogBySlug(slug: string): Promise<PublicBlog | null> {
 }
 
 /**
+ * Extract unique categories from all published blogs.
+ */
+export async function getBlogCategories(): Promise<string[]> {
+  const blogs = await getBlogs();
+  const categorySet = new Set<string>();
+
+  for (const blog of blogs) {
+    if (blog.category) {
+      categorySet.add(blog.category.trim());
+    }
+  }
+
+  return Array.from(categorySet).sort();
+}
+
+/**
  * Extract unique tags from all published blogs.
  * Tags are stored as comma-separated strings.
  */
@@ -296,6 +344,41 @@ export async function getBlogTags(): Promise<string[]> {
   }
 
   return Array.from(tagSet).sort();
+}
+
+/**
+ * Fetch related blogs sharing the same category, excluding the given slug.
+ */
+export async function getRelatedBlogs(slug: string, category: string, limit = 6): Promise<PublicBlog[]> {
+  if (!category) return [];
+
+  const blogs = await getBlogs({ category, limit, sortBy: "created_at" });
+  return blogs.filter((blog) => blog.slug !== slug);
+}
+
+/**
+ * Fetch adjacent (previous/next) blog entries for pagination.
+ */
+export async function getAdjacentBlogs(slug: string): Promise<{ prev: PublicBlog | null; next: PublicBlog | null }> {
+  const supabase = await createServerClient();
+  const all = await getBlogs();
+
+  const index = all.findIndex((blog) => blog.slug === slug);
+  if (index === -1) return { prev: null, next: null };
+
+  return {
+    prev: index > 0 ? all[index - 1] : null,
+    next: index < all.length - 1 ? all[index + 1] : null,
+  };
+}
+
+/**
+ * Increment the views counter for a blog via SECURITY DEFINER RPC.
+ * Safe for anonymous public visitors.
+ */
+export async function incrementBlogViews(slug: string): Promise<void> {
+  const supabase = createBrowserClient();
+  await supabase.rpc("increment_blog_views", { p_slug: slug });
 }
 
 // ============================================================
@@ -336,28 +419,40 @@ export async function getTestimonials(options?: {
 // ============================================================
 
 /**
- * Fetch published blogs from cms_blogs on the client side.
+ * Fetch published blogs from cms_blogs on client side.
  */
-export async function getBlogsClient(options?: {
-  limit?: number;
-  search?: string;
-}): Promise<PublicBlog[]> {
+export async function getBlogsClient(options?: BlogQueryOptions): Promise<PublicBlog[]> {
   const supabase = createBrowserClient();
 
   let query = supabase
     .from("cms_blogs")
     .select("*")
-    .eq("is_published", true)
-    .order("display_order", { ascending: true });
+    .eq("is_published", true);
+
+  if (options?.category) {
+    query = query.eq("category", options.category);
+  }
+
+  if (options?.featured !== undefined) {
+    query = query.eq("featured", options.featured);
+  }
+
+  if (options?.isHot !== undefined) {
+    query = query.eq("is_hot", options.isHot);
+  }
+
+  query = query.order(options?.sortBy || "display_order", { ascending: options?.sortBy === "views" ? false : true });
 
   if (options?.search) {
     const term = `%${options.search}%`;
     query = query.or(
-      `title.ilike.${term},excerpt.ilike.${term},tags.ilike.${term},content.ilike.${term}`
+      `title.ilike.${term},excerpt.ilike.${term},tags.ilike.${term},content.ilike.${term},category.ilike.${term},meta_title.ilike.${term},meta_description.ilike.${term}`
     );
   }
 
-  if (options?.limit) {
+  if (options?.offset) {
+    query = query.range(options.offset, (options.offset || 0) + (options.limit || 6) - 1);
+  } else if (options?.limit) {
     query = query.limit(options.limit);
   }
 
@@ -372,7 +467,7 @@ export async function getBlogsClient(options?: {
 }
 
 /**
- * Fetch featured testimonials from cms_testimonials on the client side.
+ * Fetch featured testimonials from cms_testimonials on client side.
  */
 export async function getTestimonialsClient(options?: {
   limit?: number;
@@ -400,7 +495,7 @@ export async function getTestimonialsClient(options?: {
 }
 
 /**
- * Fetch all active packages on the client side.
+ * Fetch all active packages on client side.
  */
 export async function getPackagesClient(): Promise<PublicPackage[]> {
   const supabase = createBrowserClient();

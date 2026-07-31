@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import MobileBottomNav from "./MobileBottomNav";
 import { getCompanyPublicData } from "@/app/dashboard/cms/actions";
+import { trackGetQuoteClick } from "@/lib/analytics";
 
 const menus = [
   { name: "Home", href: "/" },
@@ -86,6 +87,7 @@ export default function Header() {
             {/* CTA - right */}
             <Link
               href="/quote"
+              onClick={() => trackGetQuoteClick()}
               className="flex-shrink-0 rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-500 hover:shadow-lg hover:shadow-emerald-600/30 active:scale-95"
             >
               {`Let\u2019s Build`}
