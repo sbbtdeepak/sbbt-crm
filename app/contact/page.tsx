@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import PageHero from "@/components/shared/PageHero";
 import { getCompanyPublicData } from "@/app/dashboard/cms/actions";
 import { trackContactFormSubmit } from "@/lib/analytics";
 
@@ -81,13 +82,7 @@ export default function ContactPage() {
     return (
       <div className="bg-gray-50 min-h-screen">
         <Header />
-        <div className="max-w-xl mx-auto px-4 py-12 text-center md:pt-24">
-          <div className="bg-white p-8 rounded-xl shadow-md">
-            <div className="text-green-500 text-5xl mb-3">✓</div>
-            <h1 className="text-xl font-bold text-gray-900">Thank You!</h1>
-            <p className="mt-2 text-gray-600 text-sm">Your message has been sent. We will get back to you shortly.</p>
-          </div>
-        </div>
+        <PageHero title="Thank You!" subtitle="Your message has been sent. We will get back to you shortly." />
         <Footer />
       </div>
     );
@@ -121,8 +116,9 @@ export default function ContactPage() {
   return (
     <div className="bg-gray-50 min-h-screen">
       <Header />
+      <PageHero title="Get in Touch" subtitle="We would love to hear from you. Fill in the form and we will get back to you." />
 
-      <div className="md:pt-24 max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Contact Form */}
           <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">

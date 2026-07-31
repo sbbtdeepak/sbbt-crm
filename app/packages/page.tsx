@@ -13,6 +13,11 @@ import Footer from '@/components/layout/Footer';
 import { createClient } from '@/lib/supabase/client';
 import PackageCalculator from '@/components/packages/PackageCalculator';
 import PackageCompareModal from '@/components/packages/PackageCompareModal';
+import PageHero from '@/components/shared/PageHero';
+import GoogleReviews from '@/components/home/GoogleReviews';
+import Testimonials from '@/components/home/Testimonials';
+import Blogs from '@/components/home/Blogs';
+import CTA from '@/components/home/CTA';
 
 // BreadcrumbList JSON-LD is injected once via the script below
 const jsonLd = breadcrumbs;
@@ -164,15 +169,7 @@ export default function PackagesPage() {
       />
       <Header />
       <main className="min-h-screen bg-gray-50">
-        {/* Hero - Compact */}
-        <section className="bg-indigo-900 text-white py-8 sm:py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3">Our Construction Packages</h1>
-            <p className="text-indigo-200 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto">
-              Transparent pricing with detailed specifications. Choose the package that fits your needs.
-            </p>
-          </div>
-        </section>
+        <PageHero title="Our Construction Packages" subtitle="Transparent pricing with detailed specifications. Choose the package that fits your needs." />
 
         {/* Package Cards + Calculator */}
         <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
@@ -344,6 +341,14 @@ export default function PackagesPage() {
             );
           })()}
         </section>
+
+        {/* Post-Calculator Sections */}
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <GoogleReviews />
+          <Testimonials />
+          <Blogs />
+          <CTA />
+        </div>
       </main>
 
       {/* Floating Compare Button */}

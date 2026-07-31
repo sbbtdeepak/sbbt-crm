@@ -2,38 +2,39 @@
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import PageHero from "@/components/shared/PageHero";
 import CTA from "@/components/home/CTA";
 
 const categories = [
   {
-    name: "Channel Partner",
-    description: "Partner with us to offer SBBT construction services to your network and earn commissions.",
-    icon: "🤝",
-  },
-  {
-    name: "Contractor",
-    description: "Join our network of verified contractors for ongoing construction projects.",
+    name: "Construction Manager",
     icon: "🏗️",
+    description: "Lead and manage construction projects from planning to handover. Ensure quality, timelines, and team coordination.",
   },
   {
-    name: "Vendor",
-    description: "Supply materials and services to SBBT projects with timely payments.",
-    icon: "📦",
+    name: "Site Engineer",
+    icon: "🔧",
+    description: "Supervise on-site activities, monitor structural integrity, and coordinate with contractors and vendors.",
+  },
+  {
+    name: "Interior Designer",
+    icon: "🎨",
+    description: "Design modern, functional interior spaces that align with client vision and SBBT quality standards.",
   },
   {
     name: "Architect",
-    description: "Collaborate with our design team to create exceptional living spaces.",
-    icon: "🏛️",
-  },
-  {
-    name: "Engineer",
-    description: "Join our engineering team for structural and project planning.",
     icon: "📐",
+    description: "Create innovative building designs, floor plans, and elevations for residential and commercial projects.",
   },
   {
-    name: "Employee",
-    description: "Build your career with SBBT. Check out our current openings.",
-    icon: "👥",
+    name: "Civil Engineer",
+    icon: "🏛️",
+    description: "Work on structural design, material estimation, and project feasibility studies for new builds.",
+  },
+  {
+    name: "Business Development",
+    icon: "📈",
+    description: "Drive sales, manage client relationships, and expand SBBT's presence in Delhi NCR and beyond.",
   },
 ];
 
@@ -41,20 +42,7 @@ export default function JoinUsPage() {
   return (
     <>
       <Header />
-
-      {/* Hero */}
-      <section className="md:pt-24 bg-slate-50">
-        <div className="mx-auto max-w-7xl px-6 py-10">
-          <div className="text-center">
-            <h1 className="text-xl font-bold text-slate-950 sm:text-2xl lg:text-3xl">
-              Join <span className="text-indigo-600">Us</span>
-            </h1>
-            <p className="mt-1.5 text-xs text-slate-600 max-w-xl mx-auto sm:text-sm">
-              Become part of the SBBT family. Choose your path and grow with us.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero title="Join Our Team" subtitle="Build your career with SBBT. Explore exciting opportunities in construction, design, and project management." />
 
       {/* Choose Your Category */}
       <section className="bg-white py-8">
@@ -161,7 +149,6 @@ export default function JoinUsPage() {
       </section>
 
       <CTA />
-
       <Footer />
     </>
   );

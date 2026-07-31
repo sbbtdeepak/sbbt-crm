@@ -12,6 +12,11 @@ import { useEffect, useState } from 'react';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+import PageHero from '@/components/shared/PageHero';
+import GoogleReviews from '@/components/home/GoogleReviews';
+import Testimonials from '@/components/home/Testimonials';
+import Blogs from '@/components/home/Blogs';
+import CTA from '@/components/home/CTA';
 
 // BreadcrumbList JSON-LD is injected once via the script below
 const jsonLd = breadcrumbs;
@@ -38,61 +43,71 @@ export default function ProjectsPage() {
       // Fetch projects with their first gallery image as thumbnail fallback
       const { data, error } = await supabase
         .from('cms_projects')
-        .select(`
-          *,
-          cms_project_gallery!left(image_url)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching projects:', error.message);
+        console.error('Error fetching projects:', error);
         setLoading(false);
         return;
       }
 
-      // Map projects: if no thumbnail, use first gallery image
-      const mappedProjects = (data || []).map((p: Record<string, unknown>) => {
-        const gallery = p.cms_project_gallery as Array<{ image_url: string }> | undefined;
-        const firstGalleryImage = gallery?.[0]?.image_url;
-        return {
-          ...p,
-          thumbnail: (p.thumbnail as string) || firstGalleryImage || null,
-        } as Project;
-      });
+      if (!data || data.length === 0) {
+        setLoading(false);
+        return;
+      }
 
-      setProjects(mappedProjects);
+      // For each project, try to get the first gallery image as thumbnail
+      const projectIds = data.map(p => p.id);
+      const { data: galleryData } = await supabase
+        .from('cms_project_gallery')
+        .select('project_id, image_url')
+        .in('project_id', projectIds)
+        .order('display_order', { ascending: true });
+
+      // Create a map of project_id -> first image
+      const thumbnailMap: Record<string, string> = {};
+      if (galleryData) {
+        for (const img of galleryData) {
+          if (!thumbnailMap[img.project_id]) {
+            thumbnailMap[img.project_id] = img.image_url;
+          }
+        }
+      }
+
+      const mapped = data.map((p: Record<string, unknown>) => ({
+        id: p.id as string,
+        name: p.name as string,
+        client_name: p.client_name as string,
+        project_value: p.project_value as number,
+        status: p.status as string,
+        location: p.location as string,
+        plot_area: p.plot_area as string,
+        floors: p.floors as number,
+        thumbnail: (p.thumbnail as string) || thumbnailMap[p.id as string] || null,
+      }));
+
+      setProjects(mapped);
       setLoading(false);
     };
 
     fetchProjects();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-gray-50">
-        <div className="text-sm text-gray-600">Loading...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Header />
+      <main>
+        <PageHero title="Our Projects" subtitle="Explore our completed and ongoing construction projects." />
 
-      <div className="md:pt-28 max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        <div className="text-center mb-6">
-          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
-            Our <span className="text-indigo-600">Projects</span>
-          </h1>
-          <p className="mt-1.5 text-xs text-gray-500">Explore our completed and ongoing construction projects.</p>
-        </div>
-
-        <div className="max-w-7xl mx-auto">
-          {projects.length === 0 ? (
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+          {loading ? (
+            <div className="text-center py-12 text-gray-400 text-xs">Loading projects...</div>
+          ) : projects.length === 0 ? (
             <div className="text-center py-12 text-gray-400 text-xs">No projects added yet.</div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
@@ -106,8 +121,8 @@ export default function ProjectsPage() {
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs">No Image</div>
                       )}
                       <span className={`absolute top-2 right-2 text-[8px] px-1.5 py-0.5 rounded-full font-medium ${
-                        project.status === 'completed' ? 'bg-green-100 text-green-700' : 
-                        project.status === 'ongoing' ? 'bg-yellow-100 text-yellow-700' : 
+                        project.status === 'completed' ? 'bg-green-100 text-green-700' :
+                        project.status === 'ongoing' ? 'bg-yellow-100 text-yellow-700' :
                         'bg-blue-100 text-blue-700'
                       }`}>
                         {project.status}
@@ -124,7 +139,15 @@ export default function ProjectsPage() {
             </div>
           )}
         </div>
-      </div>
+
+        {/* Post-Project Sections */}
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <GoogleReviews />
+          <Testimonials />
+          <Blogs />
+          <CTA />
+        </div>
+      </main>
 
       <Footer />
     </div>

@@ -107,6 +107,8 @@ export default function Testimonials() {
 
     console.log("[DEBUG] Querying cms_testimonials where is_featured = true");
 
+    console.log("[DEBUG] Supabase query prepared — table: cms_testimonials, filter: is_featured=true, order: display_order ASC");
+
     supabase
       .from("cms_testimonials")
       .select("id, client_name, testimonial, rating, project_name, location, image_url")
@@ -118,8 +120,11 @@ export default function Testimonials() {
           return;
         }
 
-        console.log("[DEBUG] Query success - returned rows count:", data?.length || 0);
-        console.log("[DEBUG] Returned data:", data);
+        console.log("[DEBUG] Query success — error:", error, "| data.length:", data?.length || 0);
+        if (data && data.length > 0) {
+          console.log("[DEBUG] First row (raw):", JSON.stringify(data[0], null, 2));
+          console.log("[DEBUG] First row keys:", Object.keys(data[0]));
+        }
 
         if (!data || data.length === 0) {
           console.log("[DEBUG] Rows=0 - possible reasons: (a) no rows with is_featured=true in table, (b) migration 064/073 not applied, (c) RLS policy blocks read, (d) site_id mismatch");
@@ -136,6 +141,7 @@ export default function Testimonials() {
             imageUrl: (r.image_url as string) || undefined,
           }));
           console.log("[DEBUG] Calling setItems with mapped items count:", mapped.length);
+          console.log("[DEBUG] First mapped item (after transform):", JSON.stringify(mapped[0], null, 2));
           setItems(mapped);
         } else {
           console.log("[DEBUG] setItems NOT called because data is empty or null");

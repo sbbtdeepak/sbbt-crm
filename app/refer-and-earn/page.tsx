@@ -2,6 +2,7 @@
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import PageHero from "@/components/shared/PageHero";
 import ReferEarn from "@/components/home/ReferEarn";
 import FAQ from "@/components/home/FAQ";
 import CTA from "@/components/home/CTA";
@@ -10,21 +11,7 @@ export default function ReferAndEarnPage() {
   return (
     <>
       <Header />
-
-      {/* Hero */}
-      <section className="md:pt-24 bg-slate-50">
-        <div className="mx-auto max-w-7xl px-6 py-8">
-          <div className="text-center">
-            <h1 className="text-lg font-bold text-slate-950 sm:text-xl lg:text-2xl">
-              Refer & Earn
-            </h1>
-            <p className="mt-1.5 text-xs text-slate-600 max-w-xl mx-auto sm:text-sm">
-              Share SBBT with your friends and family. Earn rewards when their
-              construction project starts with us.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero title="Refer & Earn" subtitle="Share SBBT with your friends and family. Earn rewards when their construction project starts with us." />
 
       {/* How it Works - using existing ReferEarn component */}
       <ReferEarn />
@@ -127,9 +114,7 @@ export default function ReferAndEarnPage() {
       </section>
 
       <FAQ />
-
       <CTA />
-
       <Footer />
     </>
   );

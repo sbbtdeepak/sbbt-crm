@@ -23,11 +23,9 @@ const servicesLinks = [
 ];
 
 const legalLinks = [
-  { name: "Privacy", href: "/privacy" },
-  { name: "Terms", href: "/terms" },
-  { name: "Refund", href: "/refund" },
-  { name: "Cancellation", href: "/cancellation" },
-  { name: "Cookies", href: "/cookies" },
+  { name: "Privacy Policy", href: "/privacy-policy" },
+  { name: "Terms & Conditions", href: "/terms-and-conditions" },
+  { name: "Disclaimer", href: "/disclaimer" },
 ];
 
 export default function Footer() {
