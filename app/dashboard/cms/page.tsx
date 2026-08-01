@@ -1,3 +1,5 @@
+import { createClient } from "@/lib/supabase/server";
+import { getAllPackages, getMediaItems } from "./actions";
 import CompanyForm from "./components/CompanyForm";
 import HomepageForm from "./components/HomepageForm";
 import SEOForm from "./components/SEOForm";
@@ -10,8 +12,6 @@ import BlogsSection from "./components/BlogsSection";
 import TestimonialsSection from "./components/TestimonialsSection";
 import BrandsSection from "./components/BrandsSection";
 import MediaManager from "./components/MediaManager";
-import { createClient } from "@/lib/supabase/server";
-import { getAllPackages, getMediaItems } from "./actions";
 import type {
   CMSCompanyRow,
   CMSHomepageRow,
@@ -58,8 +58,6 @@ export default async function CMSPage({
     socialresult,
     settingsresult,
     internalSettingsresult,
-    packagesresult,
-    mediavresult,
   ] = await Promise.all([
     supabase.from("cms_company").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
     supabase.from("cms_homepage").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
@@ -67,8 +65,6 @@ export default async function CMSPage({
     supabase.from("cms_social").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
     supabase.from("cms_settings").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
     supabase.from("cms_internal_settings").select("*").eq("site_id", DEFAULT_SITE_ID).maybeSingle(),
-    getAllPackages(),
-    getMediaItems(),
   ]);
 
   const company = companyresult.data as CMSCompanyRow | null;
@@ -77,8 +73,6 @@ export default async function CMSPage({
   const social = socialresult.data as CMSSocialRow | null;
   const settings = settingsresult.data as CMSSettingsRow | null;
   const internalSettings = internalSettingsresult.data as CMSInternalSettingsRow | null;
-  const packages = packagesresult as unknown as CMSPackageFull[];
-  const mediaItems = mediavresult as CMSMediaItem[];
 
   const error =
     companyresult.error?.message ||
@@ -89,9 +83,19 @@ export default async function CMSPage({
     internalSettingsresult.error?.message ||
     null;
 
+  // Fetch packages and media items only when needed (lazy loading)
+  let packages: CMSPackageFull[] = [];
+  let mediaItems: CMSMediaItem[] = [];
+  
   // Get tab from search params (default to company)
   const params = await searchParams;
   const activeTab: TabType = (params.tab as TabType) || "company";
+  
+  if (activeTab === "packages") {
+    packages = await getAllPackages() as unknown as CMSPackageFull[];
+  } else if (activeTab === "media") {
+    mediaItems = await getMediaItems() as CMSMediaItem[];
+  }
 
   return (
     <div className="space-y-6">
