@@ -9,6 +9,7 @@ interface Props {
     source?: string;
     date_from?: string;
     date_to?: string;
+  assigned_to?: string;
     page?: string;
     limit?: string;
   }>;
@@ -23,6 +24,7 @@ export default async function LeadsPage({ searchParams }: Props) {
     source: params.source || undefined,
     date_from: params.date_from || undefined,
     date_to: params.date_to || undefined,
+  assigned_to: params.assigned_to || undefined,
     page: params.page ? parseInt(params.page, 10) : 1,
     limit: params.limit ? parseInt(params.limit, 10) : 20,
   };

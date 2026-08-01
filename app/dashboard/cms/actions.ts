@@ -1633,6 +1633,7 @@ export async function saveInternalSettings(
     'accounts_email',
     'google_sheet_url',
     'webhook_url',
+    'webhook_secret',
     'whatsapp_api_number',
   ] as const;
 
@@ -1646,6 +1647,7 @@ export async function saveInternalSettings(
 
   payload.smtp_ready = formData.get('smtp_ready') === 'on' ? 'true' : 'false';
   payload.resend_ready = formData.get('resend_ready') === 'on' ? 'true' : 'false';
+  payload.webhook_enabled = formData.get('webhook_enabled') === 'on' ? 'true' : 'false';
 
   const { error } = await supabase
     .from('cms_internal_settings')

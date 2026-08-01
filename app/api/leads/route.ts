@@ -1,4 +1,5 @@
 import { createLeadFromAPI } from "@/app/dashboard/leads/actions";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   try {
@@ -28,6 +29,9 @@ export async function POST(request: Request) {
       );
     }
 
+    // Forward lead to webhook if configured
+    void forwardToWebhook(body, request);
+
     return Response.json({
       success: true,
       message: result.message,
@@ -39,5 +43,34 @@ export async function POST(request: Request) {
       { success: false, error: "Internal server error" },
       { status: 500 }
     );
+  }
+}
+
+
+async function forwardToWebhook(body: Record<string, unknown>, request: Request) {
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("cms_internal_settings")
+      .select("webhook_url, webhook_enabled, webhook_secret")
+      .eq("id", 1)
+      .single();
+
+    if (!data?.webhook_enabled || !data.webhook_url) return;
+
+    await fetch(data.webhook_url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(data.webhook_secret ? { "X-Webhook-Secret": data.webhook_secret } : {}),
+      },
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        source_ip: request.headers.get("x-forwarded-for") || "",
+        lead: body,
+      }),
+    });
+  } catch (error) {
+    console.error("Webhook forward error:", error);
   }
 }

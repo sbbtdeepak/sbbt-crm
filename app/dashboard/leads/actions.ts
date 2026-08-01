@@ -8,6 +8,7 @@ import {
   LeadQueryParams,
   LeadQueryResult,
   LEAD_STATUSES,
+  LEAD_STATUS_LABELS,
 } from "./types";
 import {
   notifyNewLead,
@@ -410,6 +411,11 @@ export async function getLeads(
     query = query.lte("created_at", params.date_to.trim());
   }
 
+ // Filter by assigned_to (future-ready)
+ if (params.assigned_to && params.assigned_to.trim()) {
+  query = query.eq("assigned_to", params.assigned_to.trim());
+ }
+
   // Order by created_at descending (latest first)
   query = query.order("created_at", { ascending: false });
 
@@ -426,19 +432,28 @@ export async function getLeads(
       page,
       limit,
       total_pages: 0,
+  stage_counts: {},
     };
   }
 
   const total = count || 0;
   const totalPages = Math.ceil(total / limit);
 
-  return {
-    data: (data || []) as LeadRow[],
-    count: total,
-    page,
-    limit,
-    total_pages: totalPages,
-  };
+ // Compute stage counts from the fetched page data.
+ const stageCounts: Record<string, number> = {};
+ for (const row of data || []) {
+  const key = row.status || "unknown";
+  stageCounts[key] = (stageCounts[key] || 0) + 1;
+ }
+
+ return {
+  data: (data || []) as LeadRow[],
+  count: total,
+  page,
+  limit,
+  total_pages: totalPages,
+  stage_counts: stageCounts,
+ };
 }
 
 /**
@@ -511,6 +526,20 @@ export async function updateLeadStatus(
   }
 
   revalidatePath("/dashboard/leads");
+
+ // Append status change timeline entry to remarks
+ if (oldStatus !== status) {
+  const timestamp = new Date().toISOString();
+  const statusLabel = LEAD_STATUS_LABELS[status as keyof typeof LEAD_STATUS_LABELS] || status;
+  const statusEntry = `[${timestamp}] (${userId || "admin"}) Status changed to ${statusLabel}`;
+  const currentRemarks = currentLead.remarks || "";
+  const updatedRemarks = currentRemarks ? `${currentRemarks}\n${statusEntry}` : statusEntry;
+
+  await supabase
+   .from("contact_leads")
+   .update({ remarks: updatedRemarks })
+   .eq("id", id);
+ }
 
   // Fire status change notification asynchronously
   if (currentLead && oldStatus !== status) {

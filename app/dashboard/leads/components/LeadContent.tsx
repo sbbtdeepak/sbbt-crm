@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LeadRow, LeadQueryParams, LeadQueryResult, LEAD_STATUS_LABELS } from "../types";
+import { LeadRow, LeadQueryParams, LeadQueryResult, LEAD_STATUS_LABELS, LEAD_SOURCES, LEAD_SOURCE_LABELS } from "../types";
 import LeadTable from "./LeadTable";
 import LeadDetailsModal from "./LeadDetailsModal";
 
@@ -56,6 +56,19 @@ export default function LeadContent({ leads, error, query, result }: Props) {
         </p>
       </div>
 
+      {/* Pipeline Stage Summary */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        {Object.entries(LEAD_STATUS_LABELS).map(([status, label]) => {
+          const count = result.stage_counts[status] || 0;
+          return (
+            <div key={status} className="rounded-xl bg-white p-3 shadow border border-gray-100">
+              <div className="text-xs font-medium text-gray-500">{label}</div>
+              <div className="text-xl font-bold text-gray-800 mt-1">{count}</div>
+            </div>
+          );
+        })}
+      </div>
+
       {/* Error */}
       {error && (
         <div className="rounded-lg border border-red-300 bg-red-50 p-5 text-red-600">
@@ -65,14 +78,14 @@ export default function LeadContent({ leads, error, query, result }: Props) {
 
       {/* Search and Filters */}
       <div className="rounded-xl bg-white p-4 shadow border border-gray-100">
-        <form method="GET" action="/dashboard/leads" className="grid grid-cols-1 md:grid-cols-5 gap-3">
+        <form method="GET" action="/dashboard/leads" className="grid grid-cols-1 md:grid-cols-6 gap-3">
           {/* Search */}
           <div className="md:col-span-2">
             <input
               type="text"
               name="search"
               defaultValue={query.search || ""}
-              placeholder="Search by name, phone, or email..."
+              placeholder="Search by name, phone, or email."
               className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition"
             />
           </div>
@@ -93,12 +106,49 @@ export default function LeadContent({ leads, error, query, result }: Props) {
             </select>
           </div>
 
-          {/* Date Filter */}
+          {/* Source Filter */}
+          <div>
+            <select
+              name="source"
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition"
+              defaultValue={query.source || ""}
+            >
+              <option value="">All Sources</option>
+              {LEAD_SOURCES.map((source) => (
+                <option key={source} value={source}>
+                  {LEAD_SOURCE_LABELS[source]}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Date From Filter */}
           <div>
             <input
               type="date"
               name="date_from"
               defaultValue={query.date_from || ""}
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition"
+            />
+          </div>
+
+          {/* Date To Filter */}
+          <div>
+            <input
+              type="date"
+              name="date_to"
+              defaultValue={query.date_to || ""}
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition"
+            />
+          </div>
+
+          {/* Assigned To Filter */}
+          <div>
+            <input
+              type="text"
+              name="assigned_to"
+              defaultValue={query.assigned_to || ""}
+              placeholder="Assigned to (user id)"
               className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition"
             />
           </div>
@@ -115,7 +165,7 @@ export default function LeadContent({ leads, error, query, result }: Props) {
         </form>
 
         {/* Clear Filters */}
-        {(query.search || query.status || query.date_from) && (
+        {(query.search || query.status || query.source || query.date_from || query.date_to || query.assigned_to) && (
           <div className="mt-3">
             <a
               href="/dashboard/leads"

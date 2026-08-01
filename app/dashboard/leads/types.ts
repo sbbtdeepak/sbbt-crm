@@ -34,7 +34,9 @@ export const LEAD_STATUSES = [
   "new",
   "contacted",
   "follow_up",
+  "meeting_scheduled",
   "site_visit_scheduled",
+  "estimate_sent",
   "quotation_sent",
   "negotiation",
   "won",
@@ -47,7 +49,9 @@ export const LEAD_STATUS_LABELS: Record<LeadStatus, string> = {
   new: "New",
   contacted: "Contacted",
   follow_up: "Follow Up",
-  site_visit_scheduled: "Site Visit Scheduled",
+  meeting_scheduled: "Meeting Scheduled",
+  site_visit_scheduled: "Site Visit",
+  estimate_sent: "Estimate Sent",
   quotation_sent: "Quotation Sent",
   negotiation: "Negotiation",
   won: "Won",
@@ -58,8 +62,10 @@ export const LEAD_STATUS_COLORS: Record<LeadStatus, string> = {
   new: "bg-blue-100 text-blue-700",
   contacted: "bg-indigo-100 text-indigo-700",
   follow_up: "bg-amber-100 text-amber-700",
-  site_visit_scheduled: "bg-purple-100 text-purple-700",
-  quotation_sent: "bg-cyan-100 text-cyan-700",
+  meeting_scheduled: "bg-violet-100 text-violet-700",
+  site_visit_scheduled: "bg-fuchsia-100 text-fuchsia-700",
+  estimate_sent: "bg-cyan-100 text-cyan-700",
+  quotation_sent: "bg-teal-100 text-teal-700",
   negotiation: "bg-orange-100 text-orange-700",
   won: "bg-emerald-100 text-emerald-700",
   lost: "bg-red-100 text-red-700",
@@ -70,6 +76,7 @@ export const LEAD_STATUS_COLORS: Record<LeadStatus, string> = {
 // ============================================================
 
 export const LEAD_SOURCES = [
+  "website",
   "hero_popup",
   "hero_form",
   "mobile_popup",
@@ -87,6 +94,7 @@ export const LEAD_SOURCES = [
 export type LeadSource = (typeof LEAD_SOURCES)[number];
 
 export const LEAD_SOURCE_LABELS: Record<LeadSource, string> = {
+  website: "Website",
   hero_popup: "Hero Popup",
   hero_form: "Hero Form",
   mobile_popup: "Mobile Popup",
@@ -155,13 +163,14 @@ export interface LeadFormData {
 // ============================================================
 
 export interface LeadQueryParams {
-  search?: string;
-  status?: string;
-  source?: string;
-  date_from?: string;
-  date_to?: string;
-  page?: number;
-  limit?: number;
+ search?: string;
+ status?: string;
+ source?: string;
+ date_from?: string;
+ date_to?: string;
+ assigned_to?: string;
+ page?: number;
+ limit?: number;
 }
 
 export interface LeadQueryResult {
@@ -170,6 +179,7 @@ export interface LeadQueryResult {
   page: number;
   limit: number;
   total_pages: number;
+  stage_counts: Record<string, number>;
 }
 
 // ============================================================
@@ -191,4 +201,29 @@ export interface LeadRemark {
   text: string;
   timestamp: string;
   added_by: string;
+}
+
+// ============================================================
+// Lead Activity Timeline
+// ============================================================
+//
+// NOTE: Timeline entries are currently derived from the existing
+// `remarks` column (free-form text lines with `[timestamp] (actor) text`
+// format). Architecture is prepared for a future `lead_activities`
+// table (id, lead_id, activity_type, description, actor_id, created_at).
+// When that table is introduced, the buildTimeline helper in
+// LeadDetailsModal can read from it without UI changes.
+
+export type LeadTimelineEntryType =
+  | "lead_created"
+  | "status_changed"
+  | "remark_added"
+  | "quote_requested";
+
+export interface LeadTimelineEntry {
+  type: LeadTimelineEntryType;
+  label: string;
+  detail?: string;
+  timestamp: string | null;
+  actor?: string;
 }

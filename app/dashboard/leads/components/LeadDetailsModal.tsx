@@ -10,6 +10,12 @@ interface Props {
   onClose: () => void;
 }
 
+interface TimelineEntry {
+  timestamp: string;
+  user: string;
+  text: string;
+}
+
 export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
   const [isAddingRemark, setIsAddingRemark] = useState(false);
   const [remarkText, setRemarkText] = useState("");
@@ -62,6 +68,26 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
       minute: "2-digit",
     });
   };
+
+  // Parse remarks for timeline entries: [ISO timestamp] (user) message
+  const parseTimeline = (): TimelineEntry[] => {
+    if (!lead.remarks) return [];
+    const entries: TimelineEntry[] = [];
+    const lines = lead.remarks.split("\n");
+    for (const line of lines) {
+      const match = line.match(/^\[(.*?)\] \((.*?)\) (.*)$/);
+      if (match) {
+        entries.push({
+          timestamp: match[1],
+          user: match[2],
+          text: match[3],
+        });
+      }
+    }
+    return entries.reverse();
+  };
+
+  const timeline = parseTimeline();
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -162,6 +188,13 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
 
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">
+                  Assigned To
+                </label>
+                <p className="text-sm text-gray-900">{lead.assigned_to || "-"}</p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">
                   Status
                 </label>
                 <select
@@ -228,6 +261,33 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
             </div>
           )}
 
+          {/* Activity Timeline */}
+          {timeline.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-xs font-semibold text-gray-500 mb-3">
+                Activity Timeline
+              </h3>
+              <div className="space-y-3">
+                {timeline.map((entry, index) => (
+                  <div key={index} className="flex gap-3">
+                    <div className="flex flex-col items-center">
+                      <div className="h-2 w-2 rounded-full bg-indigo-500 mt-1.5" />
+                      {index < timeline.length - 1 && (
+                        <div className="w-px flex-1 bg-gray-200" />
+                      )}
+                    </div>
+                    <div className="pb-3">
+                      <p className="text-sm text-gray-900">{entry.text}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {entry.user} • {formatDate(entry.timestamp)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Remarks */}
           <div className="mb-6">
             <label className="block text-xs font-medium text-gray-500 mb-2">
@@ -247,7 +307,7 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
                 type="text"
                 value={remarkText}
                 onChange={(e) => setRemarkText(e.target.value)}
-                placeholder="Add a remark..."
+                placeholder="Add remark."
                 className="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && remarkText.trim()) {
@@ -260,7 +320,7 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
                 disabled={isAddingRemark || !remarkText.trim()}
                 className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition"
               >
-                {isAddingRemark ? "Adding..." : "Add"}
+                {isAddingRemark ? "Adding…" : "Add"}
               </button>
             </div>
           </div>

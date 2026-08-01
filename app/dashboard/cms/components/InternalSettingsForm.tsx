@@ -166,6 +166,23 @@ export default function InternalSettingsForm({ settings }: Props) {
                 placeholder="https://hooks.example.com/..."
               />
             </div>
+
+            <div>
+              <label
+                htmlFor="webhook_secret"
+                className="block mb-2 font-medium text-gray-700"
+              >
+                Webhook Secret
+              </label>
+              <input
+                id="webhook_secret"
+                name="webhook_secret"
+                type="password"
+                defaultValue={settings?.webhook_secret || ""}
+                className="w-full rounded-lg border p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="Shared secret for webhook authentication"
+              />
+            </div>
           </div>
         </div>
 
@@ -173,6 +190,22 @@ export default function InternalSettingsForm({ settings }: Props) {
         <div className="bg-white border rounded-xl p-6">
           <h2 className="text-lg font-semibold mb-4">Service Readiness</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center">
+              <input
+                id="webhook_enabled"
+                name="webhook_enabled"
+                type="checkbox"
+                defaultChecked={settings?.webhook_enabled || false}
+                className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+              />
+              <label
+                htmlFor="webhook_enabled"
+                className="ml-2 text-sm font-medium text-gray-700"
+              >
+                Webhook Enabled
+              </label>
+            </div>
+
             <div className="flex items-center">
               <input
                 id="smtp_ready"

@@ -187,6 +187,10 @@ export interface CMSInternalSettingsRow extends CMSBase {
   google_sheet_url: string;
   /** Webhook URL for external integrations */
   webhook_url: string;
+  /** Whether webhook forwarding is enabled */
+  webhook_enabled: boolean;
+  /** Secret token for webhook authentication */
+  webhook_secret: string;
   /** Whether SMTP is configured and ready */
   smtp_ready: boolean;
   /** Whether Resend is configured and ready */
