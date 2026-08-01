@@ -134,13 +134,10 @@ export default async function BlogsPage({
 
       {/* ============ Category Chips ============ */}
       <section className="mx-auto max-w-7xl px-6 mt-6">
-        <CategoryChips
-          categories={categories.map((c: { name: string; slug: string }) => ({
-            name: c.name,
-            slug: c.slug,
-          }))}
-          activeCategory={activeCategory}
-        />
+      <CategoryChips
+        categories={categories}
+        active={activeCategory}
+      />
       </section>
 
       {/* ============ Hot Topics ============ */}
@@ -162,9 +159,9 @@ export default async function BlogsPage({
               href={`/blogs/${heroBlog.slug}`}
               className="group relative col-span-2 overflow-hidden rounded-2xl bg-slate-900"
             >
-              {heroBlog.image_url ? (
+              {heroBlog.featured_image_url ? (
                 <img
-                  src={heroBlog.image_url}
+                  src={heroBlog.featured_image_url}
                   alt={heroBlog.title}
                   className="h-full w-full object-cover opacity-70 transition group-hover:scale-105 group-hover:opacity-80"
                 />
@@ -194,9 +191,9 @@ export default async function BlogsPage({
                   href={`/blogs/${heroSecondary.slug}`}
                   className="group relative flex-1 overflow-hidden rounded-2xl bg-slate-800"
                 >
-                  {heroSecondary.image_url ? (
+                  {heroSecondary.featured_image_url ? (
                     <img
-                      src={heroSecondary.image_url}
+                      src={heroSecondary.featured_image_url}
                       alt={heroSecondary.title}
                       className="h-full w-full object-cover opacity-60 transition group-hover:scale-105"
                     />
@@ -219,9 +216,9 @@ export default async function BlogsPage({
                   href={`/blogs/${heroTertiary.slug}`}
                   className="group relative flex-1 overflow-hidden rounded-2xl bg-slate-800"
                 >
-                  {heroTertiary.image_url ? (
+                  {heroTertiary.featured_image_url ? (
                     <img
-                      src={heroTertiary.image_url}
+                      src={heroTertiary.featured_image_url}
                       alt={heroTertiary.title}
                       className="h-full w-full object-cover opacity-60 transition group-hover:scale-105"
                     />
