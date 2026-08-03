@@ -197,7 +197,7 @@ export default function LeadForm({
           return undefined;
         case "budget":
           if (!value) return "Budget is required";
-          if (!isValidBudget(value)) return "Minimum project budget is ₹21 Lakhs.";
+          if (!isValidBudget(value)) return "Budget must be between ₹21 Lakhs and ₹99,99,99,999.";
           return undefined;
         default:
           return undefined;
@@ -491,7 +491,7 @@ export default function LeadForm({
             value={budget ? formatIndianCurrency(budget) : ""}
             onChange={(e) => handleFieldChange("budget", e.target.value)}
             onBlur={() => handleBlur("budget")}
-            maxLength={10}
+            maxLength={12}
           />
           {renderFieldError("budget")}
           {!errors.budget && budget && isValidBudget(budget) && (

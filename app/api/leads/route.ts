@@ -23,9 +23,12 @@ export async function POST(request: Request) {
     });
 
     if (!result.success) {
+      const status = result.message.includes("maximum number of requests")
+        ? 429
+        : 400;
       return Response.json(
         { success: false, error: result.message, errors: result.errors },
-        { status: 400 }
+        { status }
       );
     }
 

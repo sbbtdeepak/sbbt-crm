@@ -24,6 +24,27 @@
   ): Promise<CreateLeadResult> {
     const supabase = await createClient();
 
+    // Email rate limiting: max 3 submissions per hour per email
+    if (input.email && input.email.trim()) {
+      const normalizedEmail = input.email.trim().toLowerCase();
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
+      const { count, error: countError } = await supabase
+        .from("crm_leads")
+        .select("*", { count: "exact", head: true })
+        .eq("email", normalizedEmail)
+        .gte("created_at", oneHourAgo);
+
+      if (countError) {
+        console.error("Rate limit check error:", countError);
+      } else if (count && count >= 3) {
+        return {
+          success: false,
+          message: "You have reached the maximum number of requests. Please try again after one hour.",
+        };
+      }
+    }
+
     const leadNumber = await generateLeadNumber();
 
     const { error } = await supabase

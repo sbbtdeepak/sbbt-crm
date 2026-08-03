@@ -51,7 +51,7 @@ export function validateLeadForm(data: LeadFormData): Record<string, string> {
   if (!data.budget) {
     errors.budget = "Budget is required";
   } else if (!isValidBudget(data.budget)) {
-    errors.budget = "Minimum project budget is ₹21 Lakhs.";
+    errors.budget = "Budget must be between ₹21 Lakhs and ₹99,99,99,999.";
   }
 
   return errors;

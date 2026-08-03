@@ -5,6 +5,9 @@
 /** Minimum project budget in rupees (₹21 Lakhs) */
 export const MIN_BUDGET = 2100000;
 
+/** Maximum project budget in rupees */
+export const MAX_BUDGET = 999999999;
+
 /** Indian mobile number: exactly 10 digits, first digit 6/7/8/9 */
 export function isValidIndianMobile(value: string): boolean {
   const digits = value.replace(/\D/g, "");
@@ -18,12 +21,12 @@ export function isValidName(value: string): boolean {
   return trimmed.length >= 2 && /^[A-Za-z ]+$/.test(trimmed);
 }
 
-/** Budget: must be >= MIN_BUDGET */
+/** Budget: must be >= MIN_BUDGET and <= MAX_BUDGET */
 export function isValidBudget(value: string): boolean {
   const digits = value.replace(/\D/g, "");
   if (!digits) return false;
   const num = Number(digits);
-  return !isNaN(num) && num >= MIN_BUDGET;
+  return !isNaN(num) && num >= MIN_BUDGET && num <= MAX_BUDGET;
 }
 
 /** Email: basic format check */
