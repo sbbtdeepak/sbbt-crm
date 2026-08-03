@@ -1,6 +1,8 @@
 // ============================================================
-// Lead Module — TypeScript Types
+// Lead Module — TypeScript Types (CRM Leads V2)
 // SBBT CRM Next.js Project
+//
+// Types match the crm_leads table schema (UUID id, mobile, etc.)
 // ============================================================
 
 // ============================================================
@@ -8,22 +10,19 @@
 // ============================================================
 
 export interface LeadBase {
-  id: number;
+  id: string;
   lead_number: string;
-  site_id: string;
   created_at: string | null;
   updated_at: string | null;
-  created_by: string | null;
-  updated_by: string | null;
 }
 
 export type LeadInsert = Omit<
   LeadRow,
-  "id" | "lead_number" | "created_at" | "updated_at" | "created_by" | "updated_by"
+  "id" | "lead_number" | "created_at" | "updated_at"
 >;
 
 export type LeadUpdate = Partial<
-  Omit<LeadRow, "id" | "created_at" | "updated_at" | "created_by" | "updated_by">
+  Omit<LeadRow, "id" | "created_at" | "updated_at">
 >;
 
 // ============================================================
@@ -110,33 +109,28 @@ export const LEAD_SOURCE_LABELS: Record<LeadSource, string> = {
 };
 
 // ============================================================
-// Lead Row
+// Lead Row (crm_leads table)
 // ============================================================
 
 export interface LeadRow extends LeadBase {
-  full_name: string | null;
-  mobile_number: string | null;
+  full_name: string;
+  mobile: string;
   email: string | null;
-  plot_location: string | null;
+  location: string | null;
+  plot_area: string | null;
   budget: string | null;
-  service_required: string | null;
-  source: string | null;
-  current_page: string | null;
+  service: string | null;
+  message: string | null;
+  source: string;
+  page_url: string | null;
   utm_source: string | null;
   utm_medium: string | null;
   utm_campaign: string | null;
   ip_address: string | null;
-  assigned_to: string | null;
   status: string;
-  remarks: string | null;
-  name: string | null;
-  phone: string | null;
-  location: string | null;
-  message: string | null;
+  assigned_to: string | null;
+  otp_verified: boolean;
 }
-
-/** @deprecated Use LeadRow for database row type */
-export type Lead = LeadRow;
 
 // ============================================================
 // Lead Form Data
@@ -144,13 +138,13 @@ export type Lead = LeadRow;
 
 export interface LeadFormData {
   full_name: string;
-  mobile_number: string;
+  mobile: string;
   email: string;
-  plot_location: string;
+  location: string;
   budget: string;
-  service_required: string;
+  service: string;
   source: string;
-  current_page: string;
+  page_url: string;
   utm_source: string;
   utm_medium: string;
   utm_campaign: string;
@@ -163,14 +157,14 @@ export interface LeadFormData {
 // ============================================================
 
 export interface LeadQueryParams {
- search?: string;
- status?: string;
- source?: string;
- date_from?: string;
- date_to?: string;
- assigned_to?: string;
- page?: number;
- limit?: number;
+  search?: string;
+  status?: string;
+  source?: string;
+  date_from?: string;
+  date_to?: string;
+  assigned_to?: string;
+  page?: number;
+  limit?: number;
 }
 
 export interface LeadQueryResult {
@@ -206,13 +200,6 @@ export interface LeadRemark {
 // ============================================================
 // Lead Activity Timeline
 // ============================================================
-//
-// NOTE: Timeline entries are currently derived from the existing
-// `remarks` column (free-form text lines with `[timestamp] (actor) text`
-// format). Architecture is prepared for a future `lead_activities`
-// table (id, lead_id, activity_type, description, actor_id, created_at).
-// When that table is introduced, the buildTimeline helper in
-// LeadDetailsModal can read from it without UI changes.
 
 export type LeadTimelineEntryType =
   | "lead_created"

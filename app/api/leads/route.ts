@@ -1,31 +1,34 @@
-import { createLeadFromAPI } from "@/app/dashboard/leads/actions";
+import { createLeadSubmission } from "@/lib/leads/service";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Use the unified lead creation logic
-    const result = await createLeadFromAPI({
-      full_name: body.full_name || body.name,
-      mobile_number: body.mobile_number || body.phone || body.contact,
-      email: body.email,
-      plot_location: body.plot_location || body.location,
-      budget: body.budget,
-      service_required: body.service_required,
-      source: body.source || "hero_popup",
-      current_page: body.current_page || request.headers.get("referer") || "",
-      utm_source: body.utm_source,
-      utm_medium: body.utm_medium,
-      utm_campaign: body.utm_campaign,
+    // Use unified lead creation logic
+    const result = await createLeadSubmission({
+      full_name: body.full_name || body.name || "",
+      mobile: body.mobile_number || body.phone || body.contact || "",
+      email: body.email || "",
+      location: body.plot_location || body.location || "",
+      budget: body.budget || "",
+      service: body.service_required || "quote_request",
+      source: body.source || "website",
+      page_url: body.current_page || request.headers.get("referer") || "",
+      utm_source: body.utm_source || "",
+      utm_medium: body.utm_medium || "",
+      utm_campaign: body.utm_campaign || "",
       ip_address: body.ip_address || request.headers.get("x-forwarded-for") || "",
-      message: body.message || body.remarks,
+      message: body.message || body.remarks || "",
     });
 
     if (!result.success) {
+      const status = result.message.includes("maximum number of requests")
+        ? 429
+        : 400;
       return Response.json(
         { success: false, error: result.message, errors: result.errors },
-        { status: 400 }
+        { status }
       );
     }
 
@@ -56,7 +59,7 @@ async function forwardToWebhook(body: Record<string, unknown>, request: Request)
       .eq("id", 1)
       .single();
 
-    if (!data?.webhook_enabled || !data.webhook_url) return;
+    if (!data || !data.webhook_enabled || !data.webhook_url) return;
 
     await fetch(data.webhook_url, {
       method: "POST",

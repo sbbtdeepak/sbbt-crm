@@ -60,7 +60,7 @@ export interface NotificationPayload {
   /** When the notification was created */
   created_at: string;
   /** Related lead ID (for tracking) */
-  lead_id?: number;
+  lead_id?: string;
   /** Related lead number (for human readability) */
   lead_number?: string;
 }
@@ -233,7 +233,7 @@ export const notificationService = new NotificationService();
 export const LeadNotificationTemplates = {
   /** Notification sent when a new lead is created */
   newLead: (
-    leadId: number,
+    leadId: string,
     leadNumber: string,
     fullName: string,
     source: string
@@ -250,7 +250,7 @@ export const LeadNotificationTemplates = {
 
   /** Notification sent when a lead's status changes */
   statusChanged: (
-    leadId: number,
+    leadId: string,
     leadNumber: string,
     fullName: string,
     oldStatus: string,
@@ -268,7 +268,7 @@ export const LeadNotificationTemplates = {
 
   /** Notification sent when a remark is added to a lead */
   remarkAdded: (
-    leadId: number,
+    leadId: string,
     leadNumber: string,
     fullName: string,
     remark: string
@@ -285,7 +285,7 @@ export const LeadNotificationTemplates = {
 
   /** Notification sent to the lead (customer) */
   customerNotification: (
-    leadId: number,
+    leadId: string,
     leadNumber: string,
     recipient: string,
     subject: string,

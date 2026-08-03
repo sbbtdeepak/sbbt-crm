@@ -165,6 +165,7 @@ export interface EstimateRow extends EstimateBase {
   customer_mobile: string;
   customer_email: string;
   lead_id: number | null;
+  crm_lead_id: string | null;
   notes: string;
 }
 
