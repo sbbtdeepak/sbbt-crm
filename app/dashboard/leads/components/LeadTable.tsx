@@ -51,14 +51,6 @@ export default function LeadTable({ leads, onViewDetails }: Props) {
     });
   };
 
-  const getDisplayName = (lead: LeadRow): string => {
-    return lead.full_name || lead.name || "Unknown";
-  };
-
-  const getDisplayPhone = (lead: LeadRow): string => {
-    return lead.mobile_number || lead.phone || "-";
-  };
-
   return (
     <div className="overflow-hidden rounded-xl border bg-white shadow">
       <div className="overflow-x-auto">
@@ -90,7 +82,7 @@ export default function LeadTable({ leads, onViewDetails }: Props) {
                   </td>
 
                   <td className="px-4 py-4">
-                    <div className="font-semibold">{getDisplayName(lead)}</div>
+                    <div className="font-semibold">{lead.full_name || "Unknown"}</div>
                     {lead.message && (
                       <div className="text-sm text-gray-500 line-clamp-2 max-w-xs">
                         {lead.message}
@@ -98,7 +90,7 @@ export default function LeadTable({ leads, onViewDetails }: Props) {
                     )}
                   </td>
 
-                  <td className="px-4 py-4 text-sm">{getDisplayPhone(lead)}</td>
+                  <td className="px-4 py-4 text-sm">{lead.mobile || "-"}</td>
 
                   <td className="px-4 py-4 text-sm">{lead.email || "-"}</td>
 

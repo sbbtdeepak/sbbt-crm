@@ -4,16 +4,9 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import LeadPopupForm from "@/components/shared/LeadPopupForm";
+import LeadForm from "@/components/shared/LeadForm";
 import { getCompanyPublicData } from "@/app/dashboard/cms/actions";
 import { trackGetQuoteClick } from "@/lib/analytics";
-
-interface LeadFormState {
-  name: string;
-  contact: string;
-  location: string;
-  budget: string;
-}
 
 export default function Hero() {
   const [hero, setHero] = useState({
@@ -31,44 +24,43 @@ export default function Hero() {
   });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupShown, setPopupShown] = useState(false);
-  const [leadForm, setLeadForm] = useState<LeadFormState>({
-    name: "",
-    contact: "",
-    location: "",
-    budget: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState("");
 
   useEffect(() => {
     // Fetch company metrics
-    getCompanyPublicData().then(data => {
-      setCompanyData({
-        google_rating: data.google_rating,
-        years_experience: data.years_experience,
-        homes_delivered: data.homes_delivered,
-      });
-    }).catch(() => {});
+    getCompanyPublicData()
+      .then((data) => {
+        setCompanyData({
+          google_rating: data.google_rating,
+          years_experience: data.years_experience,
+          homes_delivered: data.homes_delivered,
+        });
+      })
+      .catch(() => {});
 
     const supabase = createClient();
 
-    // Fetch CMS Homepage data
-    supabase
-      .from("cms_homepage")
-      .select("*")
-      .eq("site_id", "00000000-0000-0000-0000-000000000001")
-      .maybeSingle()
-      .then(({ data: cmsHomepage }) => {
-        setHero({
-          title: cmsHomepage?.hero_heading || "",
-          subtitle: cmsHomepage?.hero_subheading || "",
-          cta_text: cmsHomepage?.hero_cta_text || "Get Your Free Quote",
-          cta_link: cmsHomepage?.hero_cta_link || "/quote",
-          image_url: cmsHomepage?.hero_background_url || "",
-          stats: cmsHomepage?.stats || [],
-        });
-      });
+    // Fetch CMS Homepage data (null-safe: keep defaults if fetch fails)
+    (async () => {
+      try {
+        const { data: cmsHomepage } = await supabase
+          .from("cms_homepage")
+          .select("*")
+          .eq("site_id", "00000000-0000-0000-0000-000000000001")
+          .maybeSingle();
 
+        if (!cmsHomepage) return;
+        setHero({
+          title: cmsHomepage.hero_heading || "",
+          subtitle: cmsHomepage.hero_subheading || "",
+          cta_text: cmsHomepage.hero_cta_text || "Get Your Free Quote",
+          cta_link: cmsHomepage.hero_cta_link || "/quote",
+          image_url: cmsHomepage.hero_background_url || "",
+          stats: cmsHomepage.stats || [],
+        });
+      } catch {
+        // Keep default hero content on fetch error
+      }
+    })();
   }, []);
 
   // Show popup after 10 seconds
@@ -83,56 +75,21 @@ export default function Hero() {
     return () => clearTimeout(timer);
   }, [popupShown]);
 
-  const handleLeadFormChange = (field: keyof LeadFormState, value: string) => {
-    setLeadForm(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleLeadSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitMessage("");
-
-    try {
-      const response = await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...leadForm,
-          source: "hero_popup",
-          current_page: "/",
-        }),
-      });
-
-      if (response.ok) {
-        trackGetQuoteClick();
-        setSubmitMessage("Quote request submitted successfully! We'll contact you soon.");
-        setLeadForm({ name: "", contact: "", location: "", budget: "" });
-        setTimeout(() => setIsPopupOpen(false), 2000);
-      } else {
-        setSubmitMessage("Failed to submit. Please try again.");
-      }
-    } catch {
-      setSubmitMessage("Failed to submit. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const hasImage = Boolean(hero.image_url && hero.image_url.startsWith("http"));
 
   return (
     <>
       {/* ============================================ */}
-      {/* DESKTOP HERO - Premium Asymmetrical Layout   */}
+      {/* DESKTOP HERO - Premium Asymmetrical Layout */}
       {/* ============================================ */}
       <section className="hidden md:block bg-white relative overflow-hidden" aria-label="Hero banner">
         {/* Subtle background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/40 via-white to-emerald-50/30 pointer-events-none" />
-        
+
         {/* Main content */}
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-[80px] pt-20 pb-0">
           <div className="grid lg:grid-cols-[25fr_75fr] gap-8 xl:gap-12 items-center min-h-[600px]">
-            
+
             {/* LEFT CONTENT - 35% */}
             <div className="relative z-10 pb-8">
               {/* Trust Pill */}
@@ -154,18 +111,18 @@ export default function Hero() {
 
               {/* Trust Badges - Dynamically from Company CMS */}
               <div className="mt-6 flex flex-wrap items-center gap-4">
-                {(companyData.google_rating > 0) && (
+                {companyData.google_rating > 0 && (
                   <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
                     <span className="text-emerald-600 text-xs">{'★'.repeat(Math.round(companyData.google_rating))}</span>
                     <span className="text-[11px] font-semibold text-emerald-700">{companyData.google_rating} Google Rating</span>
                   </div>
                 )}
-                {(companyData.years_experience > 0) && (
+                {companyData.years_experience > 0 && (
                   <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-3 py-1.5">
                     <span className="text-[11px] font-semibold text-blue-700">{companyData.years_experience}+ Years Experience</span>
                   </div>
                 )}
-                {(companyData.homes_delivered > 0) && (
+                {companyData.homes_delivered > 0 && (
                   <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
                     <span className="text-[11px] font-semibold text-emerald-700">{companyData.homes_delivered.toLocaleString()} Homes Built</span>
                   </div>
@@ -222,72 +179,19 @@ export default function Hero() {
           {/* Floating Quote Form Below Hero */}
           <div className="relative -mt-14 pb-12 z-20">
             <div className="max-w-4xl mx-auto">
-              <form onSubmit={handleLeadSubmit} className="rounded-3xl bg-white/90 backdrop-blur-2xl border border-slate-200/80 shadow-2xl shadow-slate-900/10 p-6 sm:p-8">
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
-                  <div className="col-span-2 md:col-span-1">
-                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">Name</label>
-                    <input
-                      type="text"
-                      placeholder="Your Name"
-                      value={leadForm.name}
-                      onChange={(e) => handleLeadFormChange("name", e.target.value)}
-                      required
-                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition bg-white"
-                    />
-                  </div>
-                  <div className="col-span-2 md:col-span-1">
-                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">Mobile Number</label>
-                    <input
-                      type="tel"
-                      placeholder="+91 XXXXX XXXXX"
-                      value={leadForm.contact}
-                      onChange={(e) => handleLeadFormChange("contact", e.target.value)}
-                      required
-                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition bg-white"
-                    />
-                  </div>
-                  <div className="col-span-2 md:col-span-1">
-                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">Plot Location</label>
-                    <input
-                      type="text"
-                      placeholder="Delhi / NCR"
-                      value={leadForm.location}
-                      onChange={(e) => handleLeadFormChange("location", e.target.value)}
-                      required
-                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition bg-white"
-                    />
-                  </div>
-                  <div className="col-span-2 md:col-span-1">
-                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">Budget (₹)</label>
-                    <input
-                      type="text"
-                      placeholder="Approx. budget"
-                      value={leadForm.budget}
-                      onChange={(e) => handleLeadFormChange("budget", e.target.value)}
-                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition bg-white"
-                    />
-                  </div>
-                  <div className="col-span-2 md:col-span-1">
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-600 to-teal-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:scale-105 active:scale-95 disabled:opacity-50"
-                    >
-                      {isSubmitting ? "Submitting..." : "GET QUOTE NOW"}
-                    </button>
-                  </div>
-                </div>
-                {submitMessage && (
-                  <p className="mt-3 text-xs text-center text-slate-600 bg-slate-50 rounded-xl py-2">{submitMessage}</p>
-                )}
-              </form>
+              <LeadForm
+                variant="inline"
+                source="hero_popup"
+                currentPage="/"
+                onSuccess={trackGetQuoteClick}
+              />
             </div>
           </div>
         </div>
       </section>
 
       {/* ============================================ */}
-      {/* MOBILE HERO - Premium Compact Layout         */}
+      {/* MOBILE HERO - Premium Compact Layout */}
       {/* ============================================ */}
       <section className="md:hidden bg-white relative pt-0.5" aria-label="Hero banner">
         {/* Hero Image - 16:9 */}
@@ -328,18 +232,18 @@ export default function Hero() {
 
           {/* Trust Badges Row - Dynamically from Company CMS */}
           <div className="flex flex-wrap gap-1.5">
-            {(companyData.google_rating > 0) && (
+            {companyData.google_rating > 0 && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1">
                 <span className="text-emerald-600 text-xs">{'★'.repeat(Math.round(companyData.google_rating))}</span>
                 <span className="text-[10px] font-semibold text-emerald-700">{companyData.google_rating} Google Rating</span>
               </span>
             )}
-            {(companyData.years_experience > 0) && (
+            {companyData.years_experience > 0 && (
               <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-1">
                 <span className="text-[10px] font-semibold text-blue-700">{companyData.years_experience}+ Years</span>
               </span>
             )}
-            {(companyData.homes_delivered > 0) && (
+            {companyData.homes_delivered > 0 && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1">
                 <span className="text-[10px] font-semibold text-emerald-700">{companyData.homes_delivered.toLocaleString()} Homes</span>
               </span>
@@ -366,14 +270,13 @@ export default function Hero() {
       </section>
 
       {/* Lead Popup Form */}
-      <LeadPopupForm
+      <LeadForm
+        variant="popup"
+        source="hero_popup"
+        currentPage="/"
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
-        leadForm={leadForm}
-        onFormChange={handleLeadFormChange}
-        onSubmit={handleLeadSubmit}
-        isSubmitting={isSubmitting}
-        submitMessage={submitMessage}
+        onSuccess={trackGetQuoteClick}
       />
     </>
   );

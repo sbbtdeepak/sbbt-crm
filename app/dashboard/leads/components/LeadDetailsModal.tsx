@@ -25,14 +25,6 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
   const statusKey = lead.status as keyof typeof LEAD_STATUS_COLORS;
   const statusColor = LEAD_STATUS_COLORS[statusKey] || "bg-gray-100 text-gray-700";
 
-  const getDisplayName = (): string => {
-    return lead.full_name || lead.name || "Unknown";
-  };
-
-  const getDisplayPhone = (): string => {
-    return lead.mobile_number || lead.phone || "-";
-  };
-
   const handleStatusChange = async (newStatus: string) => {
     try {
       await updateLeadStatus(lead.id, newStatus);
@@ -69,11 +61,11 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
     });
   };
 
-  // Parse remarks for timeline entries: [ISO timestamp] (user) message
+  // Parse message for timeline entries: [ISO timestamp] (user) message
   const parseTimeline = (): TimelineEntry[] => {
-    if (!lead.remarks) return [];
+    if (!lead.message) return [];
     const entries: TimelineEntry[] = [];
-    const lines = lead.remarks.split("\n");
+    const lines = lead.message.split("\n");
     for (const line of lines) {
       const match = line.match(/^\[(.*?)\] \((.*?)\) (.*)$/);
       if (match) {
@@ -130,7 +122,7 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
                   Full Name
                 </label>
                 <p className="text-sm font-semibold text-gray-900">
-                  {getDisplayName()}
+                  {lead.full_name || "Unknown"}
                 </p>
               </div>
 
@@ -138,7 +130,7 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Mobile Number
                 </label>
-                <p className="text-sm text-gray-900">{getDisplayPhone()}</p>
+                <p className="text-sm text-gray-900">{lead.mobile || "-"}</p>
               </div>
 
               <div>
@@ -150,9 +142,9 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
 
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">
-                  Plot Location
+                  Location
                 </label>
-                <p className="text-sm text-gray-900">{lead.plot_location || lead.location || "-"}</p>
+                <p className="text-sm text-gray-900">{lead.location || "-"}</p>
               </div>
 
               <div>
@@ -169,7 +161,7 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Service Required
                 </label>
-                <p className="text-sm text-gray-900">{lead.service_required || "-"}</p>
+                <p className="text-sm text-gray-900">{lead.service || "-"}</p>
               </div>
 
               <div>
@@ -181,9 +173,9 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
 
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">
-                  Current Page
+                  Page URL
                 </label>
-                <p className="text-sm text-gray-900">{lead.current_page || "-"}</p>
+                <p className="text-sm text-gray-900">{lead.page_url || "-"}</p>
               </div>
 
               <div>
@@ -293,9 +285,9 @@ export default function LeadDetailsModal({ lead, isOpen, onClose }: Props) {
             <label className="block text-xs font-medium text-gray-500 mb-2">
               Remarks
             </label>
-            {lead.remarks ? (
+            {lead.message ? (
               <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg whitespace-pre-wrap">
-                {lead.remarks}
+                {lead.message}
               </div>
             ) : (
               <p className="text-sm text-gray-400">No remarks yet.</p>

@@ -5,7 +5,6 @@
 // SBBT CRM Next.js Project
 //
 // Follows the existing Server Action pattern from:
-//   - app/dashboard/leads/actions.ts
 //   - app/dashboard/cms/actions.ts
 //   - app/dashboard/master-data/actions.ts
 //
@@ -34,6 +33,7 @@ import {
   type PricingItem,
 } from "./types";
 import { calculatePricing, calculateItemTotal } from "./lib/pricing-engine";
+import { generateLeadNumber } from "@/lib/leads/lead-number";
 import {
   notifyNewEstimate,
   notifyEstimateStatusChange,
@@ -265,19 +265,19 @@ export async function getAddOnItems(addOnIds: number[]) {
  * Used in Step 11 — CRM Integration.
  */
 export async function findLeadByMobile(mobile: string): Promise<{
-  id: number;
+  id: string;
   lead_number: string;
   full_name: string;
-  mobile_number: string;
+  mobile: string;
   email: string | null;
 } | null> {
   if (!mobile) return null;
 
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("contact_leads")
-    .select("id, lead_number, full_name, mobile_number, email")
-    .eq("mobile_number", mobile)
+    .from("crm_leads")
+    .select("id, lead_number, full_name, mobile, email")
+    .eq("mobile", mobile)
     .order("created_at", { ascending: false })
     .limit(1)
     .single();
@@ -293,29 +293,25 @@ export async function findLeadByMobile(mobile: string): Promise<{
 /**
  * Creates a new lead from estimate customer data.
  * Used in Step 11 — CRM Integration (when no existing lead found).
- * Reuses the existing createLeadFromAPI pattern.
+ * Creates a lead in the crm_leads table.
  */
 export async function createLeadFromEstimate(
   customerName: string,
   customerMobile: string,
   customerEmail: string
-): Promise<number | null> {
+): Promise<string | null> {
   const supabase = await createClient();
-  const userId = await getCurrentUserId();
 
   const { data, error } = await supabase
-    .from("contact_leads")
+    .from("crm_leads")
     .insert({
+      lead_number: generateLeadNumber(),
       full_name: customerName,
-      mobile_number: customerMobile,
+      mobile: customerMobile,
       email: customerEmail,
       source: "estimate_engine",
       status: "new",
-      service_required: "estimate",
-      site_id: DEFAULT_SITE_ID,
-      created_by: userId,
-      name: customerName,
-      phone: customerMobile,
+      service: "estimate",
     })
     .select("id")
     .single();
@@ -361,7 +357,7 @@ export async function createEstimate(
   const customer_name = sanitizeInput(formData.get("customer_name"));
   const customer_mobile = sanitizeInput(formData.get("customer_mobile"));
   const customer_email = sanitizeInput(formData.get("customer_email"));
-  const lead_id = formData.get("lead_id") ? parseInteger(formData.get("lead_id") as string) : null;
+  const lead_id = formData.get("lead_id") ? String(formData.get("lead_id")) : null;
 
   // --- Extract project information (Step 2) ---
   const project_type = sanitizeInput(formData.get("project_type")) || "residential";
@@ -471,7 +467,7 @@ export async function createEstimate(
   const pricing = calculatePricing(pricingInput);
 
   // --- CRM Integration (Step 11) ---
-  let resolvedLeadId = lead_id;
+  let resolvedLeadId: string | null = lead_id;
   if (!resolvedLeadId && customer_mobile) {
     // Check if lead exists
     const existingLead = await findLeadByMobile(customer_mobile);
@@ -523,7 +519,7 @@ export async function createEstimate(
     customer_name,
     customer_mobile,
     customer_email,
-    lead_id: resolvedLeadId,
+    crm_lead_id: resolvedLeadId,
     notes,
     created_by: userId,
     updated_by: userId,

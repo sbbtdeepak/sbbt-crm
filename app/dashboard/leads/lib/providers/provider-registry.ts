@@ -66,7 +66,7 @@ export async function notifyNewLead(
 ): Promise<NotificationResult[]> {
   initializeProviders();
 
-  const fullName = lead.full_name || lead.name || "Unknown";
+  const fullName = lead.full_name || "Unknown";
   const leadSource = lead.source || source || "website";
 
   const basePayload = LeadNotificationTemplates.newLead(
@@ -120,7 +120,7 @@ export async function notifyLeadStatusChange(
 ): Promise<NotificationResult[]> {
   initializeProviders();
 
-  const fullName = lead.full_name || lead.name || "Unknown";
+  const fullName = lead.full_name || "Unknown";
 
   const basePayload = LeadNotificationTemplates.statusChanged(
     lead.id,
@@ -156,7 +156,7 @@ export async function notifyLeadRemarkAdded(
 ): Promise<NotificationResult[]> {
   initializeProviders();
 
-  const fullName = lead.full_name || lead.name || "Unknown";
+  const fullName = lead.full_name || "Unknown";
 
   const basePayload = LeadNotificationTemplates.remarkAdded(
     lead.id,
