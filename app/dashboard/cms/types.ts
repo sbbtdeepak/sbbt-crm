@@ -75,7 +75,7 @@ export interface CMSCompanyRow extends CMSBase {
   tagline: string;
   /** URL to company logo image (stored in cms/logos/) */
   logo_url: string;
-  /** URL to favicon image (stored in cms/favicons/) */
+  /** URL to favicon image (stored in cms/favicon/) */
   favicon_url: string;
   /** Primary brand color (hex, e.g. "#4f46e5") */
   primary_color: string;

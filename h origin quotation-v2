@@ -1,0 +1,5 @@
+[33mb48f97b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mquotation-v2[m[33m, [m[1;32mlead-module-v2[m[33m)[m feat(leads): complete CRM Leads V2 migration and production-ready quote submission
+[33me47af6d[m feat: Lead Module V2 stable with crm_leads and RLS fixes
+[33m1dc3a3b[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m fix(leads): add production contact_leads schema and restore website lead submissions
+[33m4b539d5[m[33m ([m[1;33mtag: [m[1;33mv1.0.0-rc1[m[33m)[m release: v1.0 RC1 stable foundation
+[33mffc598f[m chore: stabilize project, remove dead code and fix build
